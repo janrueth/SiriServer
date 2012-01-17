@@ -144,8 +144,7 @@ class Decoder:
         result = libspeex.speex_decoder_ctl(self.state, SPEEX_GET_FRAME_SIZE, byref(self.frame_size));
 
         self.bits = SpeexBits()
-        libspeex.speex_bits_init(byref(self.bits))
-        print "test"        
+        libspeex.speex_bits_init(byref(self.bits)) 
 
     def decode(self, data):
         self.buffer = create_string_buffer(1024)

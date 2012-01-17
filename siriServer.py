@@ -63,13 +63,14 @@ class HandleConnection(asyncore.dispatcher_with_send):
                 self.data = self.data[4:]
                 self.consumed_ace = True
                 self.output_buffer = "HTTP/1.1 200 OK\r\nServer: Apache-Coyote/1.1\r\nDate: " +  formatdate(timeval=None, localtime=False, usegmt=True) + "\r\nConnection: close\r\n\r\n\xAA\xCC\xEE\x02"
-                self.flush_output_buffer()
+                #self.flush_output_buffer()
             
             self.process_compressed_data()
 
     def send_plist(self, plist):
         bplist = biplist.writePlistToString(plist);
-        self.unzipped_output_buffer = struct.pack('!BBBH', 2,0,0, len(bplist)) + bplist
+        #
+        self.unzipped_output_buffer = struct.pack('!BBBH', 2,0,0,len(bplist)) + bplist
         self.flush_unzipped_output() 
     
     def send_pong(self, id):
@@ -93,17 +94,16 @@ class HandleConnection(asyncore.dispatcher_with_send):
                 print "Packet with class: ", object['class']
                 print "packet with content: ", object
                 
-                
                 if object['class'] == 'CreateSessionInfoRequest':
 		    # how does a positive answer look like?
                     print "returning response"
-                    self.send_plist({"class":"CommandFailed",
-                                    "properties":
-                                    {"reason":"Not authenticated", "errorCode":0, "callbacks":[]},
-                                    "aceId": str(uuid.uuid4()),
-                                    "refId": object['refId'],
-                                    "group":"com.apple.ace.system"})
-                #                ??    self.send_plist({"class": "CreateSessionInfoResponse", "properties": {"test": "test"}, "aceId":str(uuid.uuid4()), "refId":object['aceId'], "group":"com.apple.ace.system"})
+                    #self.send_plist({"class":"CommandFailed",
+                    #                "properties":
+                    #            {"reason":"Not authenticated", "errorCode":0, "callbacks":[]},
+                    #            "aceId": str(uuid.uuid4()),
+                    #            "refId": object['refId'],
+                    #            "group":"com.apple.ace.system"})
+                    self.send_plist({"class": "CreateSessionInfoResponse", "properties": {"sessionInfo": "THIS IS YOUR TOKEN FUCKHEAD", "validityDuration": 90000}, "aceId":str(uuid.uuid4()), "refId":object['aceId'], "group":"com.apple.ace.system"})
                     
                 
                 if object['class'] == 'SetAssistantData':
@@ -151,7 +151,7 @@ class HandleConnection(asyncore.dispatcher_with_send):
                         if len(possible_matches) > 0:
                             best_match = possible_matches[0]['utterance']
                             best_match_confidence = possible_matches[0]['confidence']
-                            print "Best matching result: \"{0}\" with a confidence of {1}%".format(best_match, round(float(best_match_confidence)*100,2))
+                            print u"Best matching result: \"{0}\" with a confidence of {1}%".format(best_match, round(float(best_match_confidence)*100,2))
 
                     
                 #                if object['class'] == 'ClearContext':
