@@ -1,0 +1,7 @@
+This is a very early version of a siri server
+
+you need libspeex libflac installed
+
+you also need the python package biplist (easy_install biplist)
+
+
