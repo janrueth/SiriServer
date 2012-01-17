@@ -62,7 +62,7 @@ class HandleConnection(asyncore.dispatcher_with_send):
                 print "Received removing ace instruction: ", repr(self.data[:4])
                 self.data = self.data[4:]
                 self.consumed_ace = True
-                self.output_buffer = "HTTP/1.1 200 OK\r\nServer: Apache-Coyote/1.1\r\nDate: " +  formatdate(timeval=None, localtime=False, usegmt=True) + "\r\nConnection: close\r\n\r\n\xAA\xCC\xEE\x02"
+                self.output_buffer = "HTTP/1.1 200 OK\r\nServer: Apache-Coyote/1.1\r\nDate: " +  formatdate(timeval=None, localtime=False, usegmt=True) + "\r\nConnection: close\r\n\r\n\xaa\xcc\xee\x02"
                 #self.flush_output_buffer()
             
             self.process_compressed_data()
@@ -82,6 +82,7 @@ class HandleConnection(asyncore.dispatcher_with_send):
         if header_end < 0:
             return None
         header_end += 4
+        #        print "Google header: ", response[:header_end]
         json_string = response[header_end:len(response)-1];
         return json.loads(json_string)
 
@@ -107,15 +108,13 @@ class HandleConnection(asyncore.dispatcher_with_send):
                     
                 
                 if object['class'] == 'SetAssistantData':
-                    self.output_buffer = self.output_buffer[:len(self.output_buffer)-4];
-                    self.flush_output_buffer()
+                    # grab assistant data, how is a device identified?
+                    pass
                 
 		#probably Create Set and Load assistant work together, first we create one response with success, fill it with set..data and later can load it again using load... however.. what are valid responses to all three requests?
                 if object['class'] == 'LoadAssistant':
                 # reply with a AssistentLoaded
-                    plist = {"class": "AssistantLoaded", "properties": {"version": "20111216-32234-branches/telluride?cnxn=293552c2-8e11-4920-9131-5f5651ce244e", "requestSync":False, "dataAnchor":"removed"}, "aceId":str(uuid.uuid4()), "refId":object['aceId'], "group":"com.apple.ace.system"}
-                    self.unzipped_output_buffer = biplist.writePlistToString(plist)
-                    self.flush_unzipped_output()
+                   self.send_plist({"class": "AssistantLoaded", "properties": {"version": "20111216-32234-branches/telluride?cnxn=293552c2-8e11-4920-9131-5f5651ce244e", "requestSync":False, "dataAnchor":"removed"}, "aceId":str(uuid.uuid4()), "refId":object['aceId'], "group":"com.apple.ace.system"})
             
                 if object['class'] == 'StartSpeechRequest':
                     self.speech[object['aceId']] = []
@@ -125,7 +124,10 @@ class HandleConnection(asyncore.dispatcher_with_send):
                     
                 if object['class'] == 'SpeechPacket':
                     self.speech[object['refId']] += object['properties']['packets']
-        
+                
+                if object['class'] == 'CancelRequest':
+                    del self.speech[object['refId']]
+                
                 if object['class'] == 'FinishSpeech':
 		    #this should be done async
                     pcm = reencode.decodeToPCM(self.speech[object['refId']], 16000, 8)
@@ -193,7 +195,10 @@ class HandleConnection(asyncore.dispatcher_with_send):
         return plist
 
     def flush_unzipped_output(self):
+            
         self.output_buffer += self.compressor.compress(self.unzipped_output_buffer)
+        #make sure everything is compressed
+        self.output_buffer += self.compressor.flush(zlib.Z_SYNC_FLUSH)
         self.unzipped_output_buffer = ""
 
         self.flush_output_buffer()
