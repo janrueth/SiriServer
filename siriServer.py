@@ -35,6 +35,7 @@ class HandleConnection(asyncore.dispatcher_with_send):
         self.unzipped_input = ""
         self.unzipped_output_buffer = ""
         self.output_buffer = ""
+        self.speech = dict()
         self.pong = 1
         self.ping = 0
             
@@ -94,32 +95,41 @@ class HandleConnection(asyncore.dispatcher_with_send):
                 
                 
                 if object['class'] == 'CreateSessionInfoRequest':
+		    # how does a positive answer look like?
                     print "returning response"
                     self.send_plist({"class":"CommandFailed",
                                     "properties":
                                     {"reason":"Not authenticated", "errorCode":0, "callbacks":[]},
                                     "aceId": str(uuid.uuid4()),
-                                    "refId": str(uuid.uuid4()),
+                                    "refId": object['refId'],
                                     "group":"com.apple.ace.system"})
-                #                    self.send_plist({"class": "CreateSessionInfoResponse", "properties": {"test": "test"}, "aceId":str(uuid.uuid4()), "refId":object['aceId'], "group":"com.apple.ace.system"})
+                #                ??    self.send_plist({"class": "CreateSessionInfoResponse", "properties": {"test": "test"}, "aceId":str(uuid.uuid4()), "refId":object['aceId'], "group":"com.apple.ace.system"})
                     
                 
                 if object['class'] == 'SetAssistantData':
                     self.output_buffer = self.output_buffer[:len(self.output_buffer)-4];
                     self.flush_output_buffer()
                 
+		#probably Create Set and Load assistant work together, first we create one response with success, fill it with set..data and later can load it again using load... however.. what are valid responses to all three requests?
                 if object['class'] == 'LoadAssistant':
                 # reply with a AssistentLoaded
                     plist = {"class": "AssistantLoaded", "properties": {"version": "20111216-32234-branches/telluride?cnxn=293552c2-8e11-4920-9131-5f5651ce244e", "requestSync":False, "dataAnchor":"removed"}, "aceId":str(uuid.uuid4()), "refId":object['aceId'], "group":"com.apple.ace.system"}
                     self.unzipped_output_buffer = biplist.writePlistToString(plist)
                     self.flush_unzipped_output()
+            
                 if object['class'] == 'StartSpeechRequest':
-                    self.current_speech = []
+                    self.speech[object['aceId']] = []
+                        
+                if object['class'] == 'StartSpeechDictation':
+                    self.speech[object['aceId']] = []
+                    
                 if object['class'] == 'SpeechPacket':
-                    self.current_speech += object['properties']['packets']
+                    self.speech[object['refId']] += object['properties']['packets']
+        
                 if object['class'] == 'FinishSpeech':
-
-                    pcm = reencode.decodeToPCM(self.current_speech, 16000, 8)
+		    #this should be done async
+                    pcm = reencode.decodeToPCM(self.speech[object['refId']], 16000, 8)
+                    del self.speech[object['refId']]
                     enc = flac.Encoder()
                     numSamples = int(len(pcm)/2)
                     enc.initialize(16000, 1, 16, numSamples)
