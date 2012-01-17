@@ -4,4 +4,6 @@ you need libspeex libflac installed
 
 you also need the python package biplist (easy_install biplist)
 
+you need to create a certificate and a key file for your domain
 
+place the certificate in a file server.passless.crt and the key in server.passless.key
