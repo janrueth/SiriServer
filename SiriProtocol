@@ -86,7 +86,7 @@ The next authentication relevant command send by iDevice is:
 "class":"CreateSessionInfoRequest"
 
 which has a "properties": {"sessionInfoRequest": "…"}
-the sessionInfoRequest seems to be some kind of signature or encryption, maybe generated using the public key of the certificate exchanged before. This would allow the server to check if the correct certificate is in use, or validate internal data. I don't know.
+the sessionInfoRequest seems to be some kind of signature or encryption, maybe generated using the public key of the certificate exchanged before. This would allow the server to check if the correct certificate is in use, or validate internal data. I don't know. I know that this value changes every time, maybe a nonce involved? Like a handshake
 
 What I know is that the server responds to this message either with a negative "class": "CommandFailed" command or in case it could verify the authenticity it replies with a:
 
@@ -94,6 +94,11 @@ What I know is that the server responds to this message either with a negative "
 "properties": {"sessionInfo": "Binary Token Blob", "validityDuration": 90000}
 
 where sessionInfo is a unique token which allows to reidentify the device, and validityDuration denotes the time (in what?? seconds? would be 25 hours what apple sends) this token is valid. 
+
+Funny:
+Sending a command failed instead of "CreateSessionInfoResponse" lets me bypass this
+
+{"class":"CommandFailed", "properties": {"reason":"Not authenticated", "errorCode":0, "callbacks":[]}, "aceId": str(uuid.uuid4()), "refId": object['aceId'], "group":"com.apple.ace.system"}
 
 
 ------------------------------------
@@ -127,4 +132,47 @@ I don't know what they mean.
 
 
 
+-----------------------------------------
 
+
+About audio data:
+
+It starts either with a
+"class": "StartSpeechRequest"
+with  'properties': {'codec': 'Speex_WB_Quality8', 'handsFree': False, 'audioSource': 'BuiltInMic'}}
+
+As we can see, we use a Speex Codec on Wideband (16000Hz sample rate) on SpeexQualityLevel 8 here. AudioSource is the source where the audio was recorded from, handsFree probably denotes whether or not we activated siri via home button or just by holding it to the ear but I did not test that.
+
+There is also a
+"class": "StartSpeechDictation"
+which also has the codec information but also other properties I don't have at hand right now…
+
+
+however always after both there are:
+
+"class": "SpeechPacket"
+which has always as refId the aceId of the StartSpeechRequest or StartSpeechDictation so we always know which SpeechPaket belongs to which request.
+Also there are 'properties': {'packets': ['SPEEX STREAM'], 'packetNumber': i}
+It sends an array of packets of a speex stream and the packetNumber, we can use the packetNumber to decide if we received all packets…
+
+
+However we end a audio recording with:
+
+"class": "FinishSpeech"
+which has refId the aceId of the StartSpeechRequest or StartSpeechDictation.
+It also got 'properties': {'packetCount': TotalNumPackets} with TotalNumPackets being the sum of all SpeechPackets the iDevice sent.
+
+
+We can easily decode the audio using libspeex, setting to wb and writing all packets in order of packet number into speex buffer using:
+speex_bits_read_from()
+and then we can loop a decode over:
+speex_decode_int() resulting in each loop in 320 int16 (that are 640 byte) PCM, so one PCM frame.
+When we concat all these frames we have raw PCM audio with sample rate of 16kHz, signed 16 bits per sample in little endian, one channel(mono). We can save this load it with these settings in Audacity or use any other encoder to get mp3, flac or what ever.
+
+
+There can also be a
+"class": "CancelRequest"
+with refId of the request which aborts a SpeechPacket stream… (e.g. user discards)
+
+There is also a 
+"class":"CancelSucceeded", which is a server command to the client. It might be used to acknowledge a successful cancel to in response to a CancelRequest

@@ -104,13 +104,13 @@ class HandleConnection(asyncore.dispatcher_with_send):
                 if object['class'] == 'CreateSessionInfoRequest':
 		    # how does a positive answer look like?
                     print "returning response"
-                    #self.send_plist({"class":"CommandFailed",
-                    #                "properties":
-                    #            {"reason":"Not authenticated", "errorCode":0, "callbacks":[]},
-                    #            "aceId": str(uuid.uuid4()),
-                    #            "refId": object['refId'],
-                    #            "group":"com.apple.ace.system"})
-                    self.send_plist({"class": "CreateSessionInfoResponse", "properties": {"sessionInfo": "THIS IS YOUR TOKEN FUCKHEAD", "validityDuration": 90000}, "aceId":str(uuid.uuid4()), "refId":object['aceId'], "group":"com.apple.ace.system"})
+                    self.send_plist({"class":"CommandFailed",
+                                    "properties":
+                                {"reason":"Not authenticated", "errorCode":0, "callbacks":[]},
+                                "aceId": str(uuid.uuid4()),
+                                "refId": object['aceId'],
+                                "group":"com.apple.ace.system"})
+                    #self.send_plist({"class": "CreateSessionInfoResponse", "properties": {"sessionInfo": "\x02\xDA=\x99\xC2\x0E\xE2\x10__\x038\xE8>C\xA5\xD5\x00\x00\x00@\xA6\xC4\x879\x84s\e\xCC\b\xEB\xC7\a>\xA6\x8AxZ\xF6\x1ELr\x1F3\x81\x8E$;9\xF6+`A<\akW\x86\xD9\x1Es\x16%\xD3aK_\xC1\xCElrM\xAA\x80\xD6\xA3V)\xF1\x80\xAF\xFF\xAA\x86\xD2\x01\xC1\xDA\xD9F~9I\x82[\xD2\xA4\xF2\xE9o'\x91\x05\xE0|\b\x00\x00\x006\x01\x02\fnb\xA2\x966\x94*@\xE8\x86\x98vu\xD4mO", "validityDuration": 90000}, "aceId":str(uuid.uuid4()), "refId":object['aceId'], "group":"com.apple.ace.system"})
                     
                 if object['class'] == 'CreateAssistant':
                     self.send_plist({"class": "AssistantCreated", "properties": {"speechId": str(uuid.uuid4()), "assistantId": str(uuid.uuid4())}, "group":"com.apple.ace.system", "callbacks":[], "aceId": str(uuid.uuid4()), "refId": object['aceId']})
@@ -135,6 +135,7 @@ class HandleConnection(asyncore.dispatcher_with_send):
                     self.speech[object['refId']] += object['properties']['packets']
                 
                 if object['class'] == 'CancelRequest':
+                    # we should test if this stil exists..
                     del self.speech[object['refId']]
                 
                 if object['class'] == 'FinishSpeech':
