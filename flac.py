@@ -5,8 +5,6 @@ import struct
 import tempfile
 import os
 
-#find lib
-
 libflac_name = ctypes.util.find_library('FLAC')
 if libflac_name == None:
     print "Could not find libFLAC"
