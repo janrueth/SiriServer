@@ -1,8 +1,11 @@
 This is a very early version of a siri server
 
+The file SiriProtocol documents everything I found out about the protocol by now
+
 you need libspeex libflac installed
 
 you also need the python package biplist (easy_install biplist)
+you also need the python package M2Crypto (easy_install M2Crypto)
 
 you need to create a certificate and a key file for your domain
 
