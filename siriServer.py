@@ -5,6 +5,16 @@ import reencode
 import flac
 import json
 import asyncore
+from M2Crypto import BIO, RSA, X509
+
+caCertFile = open('ca.pem')
+caCert = X509.load_cert_bio(BIO.MemoryBuffer(caCertFile.read()))
+caCertFile.close()
+certFile = open('server.passless.crt')
+serverCert = X509.load_cert_bio(BIO.MemoryBuffer(certFile.read()))
+certFile.close()
+
+
 
 class HandleConnection(asyncore.dispatcher_with_send):
     def __init__(self, conn):
@@ -70,11 +80,11 @@ class HandleConnection(asyncore.dispatcher_with_send):
     def send_plist(self, plist):
         bplist = biplist.writePlistToString(plist);
         #
-        self.unzipped_output_buffer = struct.pack('!BBBH', 2,0,0,len(bplist)) + bplist
+        self.unzipped_output_buffer = struct.pack('>BBBH', 2,0,0,len(bplist)) + bplist
         self.flush_unzipped_output() 
     
     def send_pong(self, id):
-        self.unzipped_output_buffer = struct.pack('!BBBH', 4,0,0, id)
+        self.unzipped_output_buffer = struct.pack('>BBBH', 4,0,0, id)
         self.flush_unzipped_output() 
 
     def parseGoogleResponse(self, response):
@@ -96,20 +106,19 @@ class HandleConnection(asyncore.dispatcher_with_send):
                 print "packet with content: ", object
                 
                 if object['class'] == 'GetSessionCertificate':
-                    print "Got asked for certificate, should return GetSessionCertificateResponse, but how?"
-                    #"APPEL SENDS 2 CERTS HERE, starting with a six byte header (first byte = 1, second byte = number of certificated following, network ordered int32 with length of first certificate DER formatted, then after this certificate again int32 in networkorder length of next certificate"
-                    {"group":"com.apple.ace.system", "aceId": str(uuid.uuid4()), "refId": object['aceId'], "class": "GetSessionCertificateResponse", "properties":{"certificate": "\x01\x00\x00\x00\x00\x00"}}
-                    pass
+                    caDer = caCert.as_der()
+                    serverDer = serverCert.as_der()
+                    self.send_plist({"group":"com.apple.ace.system", "aceId": str(uuid.uuid4()), "refId": object['aceId'], "class": "GetSessionCertificateResponse", "properties":{"certificate": "\x01\x02"+struct.pack(">I", len(caDer))+caDer + struct.pack(">I", len(serverDer))+serverDer}})
                 
                 if object['class'] == 'CreateSessionInfoRequest':
 		    # how does a positive answer look like?
                     print "returning response"
-                    self.send_plist({"class":"CommandFailed",
-                                    "properties":
-                                {"reason":"Not authenticated", "errorCode":0, "callbacks":[]},
-                                "aceId": str(uuid.uuid4()),
-                                "refId": object['aceId'],
-                                "group":"com.apple.ace.system"})
+                        #self.send_plist({"class":"CommandFailed",
+                        #    "properties":
+                        #    {"reason":"Not authenticated", "errorCode":0, "callbacks":[]},
+                        #    "aceId": str(uuid.uuid4()),
+                        #    "refId": object['aceId'],
+                        #    "group":"com.apple.ace.system"})
                     #self.send_plist({"class": "CreateSessionInfoResponse", "properties": {"sessionInfo": "\x02\xDA=\x99\xC2\x0E\xE2\x10__\x038\xE8>C\xA5\xD5\x00\x00\x00@\xA6\xC4\x879\x84s\e\xCC\b\xEB\xC7\a>\xA6\x8AxZ\xF6\x1ELr\x1F3\x81\x8E$;9\xF6+`A<\akW\x86\xD9\x1Es\x16%\xD3aK_\xC1\xCElrM\xAA\x80\xD6\xA3V)\xF1\x80\xAF\xFF\xAA\x86\xD2\x01\xC1\xDA\xD9F~9I\x82[\xD2\xA4\xF2\xE9o'\x91\x05\xE0|\b\x00\x00\x006\x01\x02\fnb\xA2\x966\x94*@\xE8\x86\x98vu\xD4mO", "validityDuration": 90000}, "aceId":str(uuid.uuid4()), "refId":object['aceId'], "group":"com.apple.ace.system"})
                     
                 if object['class'] == 'CreateAssistant':
@@ -123,6 +132,8 @@ class HandleConnection(asyncore.dispatcher_with_send):
 		#probably Create Set and Load assistant work together, first we create one response with success, fill it with set..data and later can load it again using load... however.. what are valid responses to all three requests?
                 if object['class'] == 'LoadAssistant':
                 # reply with a AssistentLoaded
+                    # AssistantNotFound
+                    # DestroyAssistant -> AssistantDestroyed
                    self.send_plist({"class": "AssistantLoaded", "properties": {"version": "20111216-32234-branches/telluride?cnxn=293552c2-8e11-4920-9131-5f5651ce244e", "requestSync":False, "dataAnchor":"removed"}, "aceId":str(uuid.uuid4()), "refId":object['aceId'], "group":"com.apple.ace.system"})
             
                 if object['class'] == 'StartSpeechRequest':
@@ -174,7 +185,7 @@ class HandleConnection(asyncore.dispatcher_with_send):
     def hasNextObj(self):
         if len(self.unzipped_input) == 0:
             return False
-        cmd, inter1, inter2, data = struct.unpack('!BBBH', self.unzipped_input[:5])
+        cmd, inter1, inter2, data = struct.unpack('>BBBH', self.unzipped_input[:5])
         if cmd in (3,4): #ping pong
             return True
         if cmd == 2:
@@ -182,7 +193,7 @@ class HandleConnection(asyncore.dispatcher_with_send):
             return ((data + 5) < len(self.unzipped_input))
     
     def read_next_object_from_unzipped(self):
-        cmd, inter1, inter2, data = struct.unpack('!BBBH', self.unzipped_input[:5])
+        cmd, inter1, inter2, data = struct.unpack('>BBBH', self.unzipped_input[:5])
         print cmd, inter1, inter2, data
         
         if cmd == 3: #ping
