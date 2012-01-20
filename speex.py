@@ -80,52 +80,6 @@ class SpeexBits(Structure):
                 , ('reserved2', c_void_p)
                 ]
 
-class SpeexMode(Structure):
-    _fields_ = [('mode', c_void_p),
-                ('query', c_void_p),
-                ('modeName', c_char_p),
-                ('modeID', c_int),
-                ('bitstream_version', c_int),
-                ('enc_init', c_void_p),
-                ('enc_destroy', c_void_p),
-                ('enc', c_void_p),
-                ('dec_init', c_void_p),
-                ('dec_destroy', c_void_p),
-                ('dec', c_void_p),
-                ('enc_ctl', c_void_p),
-                ('dec_ctl', c_void_p)
-                ]
-
-class Encoder:
-    def initialize(self, mode=SPEEX_MODEID_UWB):
-        print "!"
-        self.state = libspeex.speex_encoder_init(libspeex.speex_lib_get_mode(mode))
-        print "2"
-        self.control(SPEEX_SET_VBR, 0)
-        self.control(SPEEX_SET_QUALITY, 5)
-        self.control(SPEEX_SET_COMPLEXITY, 3)
-        self.control(SPEEX_SET_HIGHPASS, 1)
-
-        self.bits = SpeexBits()
-        libspeex.speex_bits_init(byref(self.bits))
-        self.buffer = create_string_buffer(2000)
-
-    def encode(self, data):
-        self.buffer.value = data
-        libspeex.speex_bits_reset(byref(self.bits))
-        libspeex.speex_encode_int(self.state, self.buffer, byref(self.bits))
-        written = libspeex.speex_bits_write(byref(self.bits), self.buffer, len(self.buffer))
-        return string_at(self.buffer, written)
-
-    def destroy(self):
-        libspeex.speex_encoder_destroy(self.state)
-        libspeex.speex_bits_destroy(byref(self.bits))
-
-    def control(self, request, val):
-        if request in [SPEEX_SET_VBR, SPEEX_SET_QUALITY, SPEEX_SET_COMPLEXITY, SPEEX_SET_HIGHPASS]:
-            tmp = c_int()
-            tmp.value = val
-            libspeex.speex_encoder_ctl(self.state, request, byref(tmp))
 
 class Decoder:
     def initialize(self, mode=SPEEX_MODEID_UWB):
