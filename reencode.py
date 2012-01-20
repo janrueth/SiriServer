@@ -8,3 +8,4 @@ def decodeToPCM(appleSpeex, rate, quality):
         raw = dec.decode(appleSpeex)
         dec.destroy()
 	return raw
+
