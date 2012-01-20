@@ -75,9 +75,9 @@ As far as I could find out, the certificate field is structured as follows:
 First, a six byte header. The first byte seems to be always 1, the second byte might tell how many certificates are included, I always got 2. The next 4 bytes (network order = big endian) denote the size (length) of the first certificate.
 So skipping bytes 0 to 5 and reading length bytes gives us the first certificate in X.509 DER format.
 
-After that there seem to be another length field which is again 4 byte long in big endian. So skipping another four bytes and reading length bytes should give us the second certificate. However, it looks like a DER certificate and most certainly is one, I was unable to read it using M2Crypto like the first certificate, maybe I just did something wrong. 
+After that there seem to be another length field which is again 4 byte long in big endian. So skipping another four bytes and reading length bytes should gives the second certificate. 
 
-The first certificate by Apple is a CA certificate of "Apple System Integration Certification Authority". I don't know what the second is as I could not read the DER.
+The first certificate by Apple is a CA certificate of "Apple System Integration Certification Authority". The second certificate is the server certificate issued by the ca.
 
 
 -----------------------------------
