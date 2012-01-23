@@ -88,6 +88,8 @@ The next authentication relevant command send by iDevice is:
 which has a "properties": {"sessionInfoRequest": "…"}
 the sessionInfoRequest seems to be some kind of signature or encryption, maybe generated using the public key of the certificate exchanged before. This would allow the server to check if the correct certificate is in use, or validate internal data. I don't know. I know that this value changes every time, maybe a nonce involved? Like a handshake
 
+First 10 bytes seem to be always equal.
+
 What I know is that the server responds to this message either with a negative "class": "CommandFailed" command or in case it could verify the authenticity it replies with a:
 
 "class": "CreateSessionInfoResponse" which has
@@ -130,6 +132,13 @@ it has  "properties":{"version": "version string of something, i.d.k.", "request
 
 I don't know what they mean.
 
+
+Invalidating a Session or negative replies:
+
+using "SessionValidationFailed" allows to inform the iDevice about invalid session data,
+one can set one of these possible "properties":{"errorCode": ""}
+
+errorCode can be one of the following: "InvalidSessionInfo" probably in reply to CreateSessionInfoRequest. "InvalidValidationData" probably in case of already existing session e.g. when creating an assistant. "InvalidFingerprint" ???. "ClientNotAuthenticated" general authentication error??. "RegistrationLimitReached", maybe if siri is out of capacity???  "UnsupportedHardwareVersion" when you use an device not officially supported.
 
 
 -----------------------------------------
