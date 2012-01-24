@@ -77,8 +77,13 @@ So skipping bytes 0 to 5 and reading length bytes gives us the first certificate
 
 After that there seem to be another length field which is again 4 byte long in big endian. So skipping another four bytes and reading length bytes should gives the second certificate. 
 
-The first certificate by Apple is a CA certificate of "Apple System Integration Certification Authority". The second certificate is the server certificate issued by the ca.
+The first certificate by Apple is a CA certificate of "Apple System Integration Certification Authority" signed by apple root ca.
 
+The second certificate is the server certificate issued by the ca.
+
+I tried installing a self signed root ca.
+
+I send a sub CA cert signed by the self signed root ca and a cert signed by this sub ca. However iPhone does not answer react… There are a couple of custom extensions X509 v3 (OIDs) i could not find a documentation on. Also I don't know if it is legal to use them. Maybe they are necessary or the certificate is rejected
 
 -----------------------------------
 
