@@ -17,6 +17,13 @@ class AceObject:
     def getGroup(self):
         return self.plist['group']
 
+    def getProperties(self):
+        try:
+            return self.plist['properties']
+        except:
+            self.plist['properties'] = dict()
+            return self.plist['properties']
+
 class ServerBoundCommand(AceObject):
     def __init__(self, plist):
         super(ServerBoundCommand, self).__init__(None, None)
@@ -24,12 +31,7 @@ class ServerBoundCommand(AceObject):
         
     def getAceId(self):
         return self.plist['aceId']
-    
-    def getProperties(self):
-        try:
-            return self.plist['properties']
-        except:
-            return dict()
+
 
 class ClientBoundCommand(AceObject):
     def __init__(self, encodedClassName, groupIdentifier, aceId, refId):
