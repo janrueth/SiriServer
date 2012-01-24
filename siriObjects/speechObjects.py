@@ -1,4 +1,4 @@
-from baseObjects import ServerBoundCommand, ClientBoundCommand, AceObject
+from siriObjects.baseObjects import ServerBoundCommand, ClientBoundCommand, AceObject
 
 
 class StartSpeechRequest(ServerBoundCommand):
@@ -62,7 +62,7 @@ class SpeechRecognized(ClientBoundCommand):
 
     def setRecognition(self, recognition):
         if isinstance(recognition, Recognition):
-            self.getProperties()['recognition'] = recognition
+            self.getProperties()['recognition'] = recognition.getPList()
         else:
             raise Exception('Wrong Class', 'You must supply this setter with a Recognition class')
 
@@ -78,10 +78,88 @@ class Recognition(AceObject):
             return []
 
     def setPhrases(self, phrases):
-        if isinstance(phrases, list)
+        if type(phrases) == list:
             if len(phrases) == len(filter(lambda x: isinstance(x, Phrases), phrases)):
-                self.getProperties()['phrases'] = phrases
+                self.getProperties()['phrases'] = map(lambda x: x.getPList(), phrases)
             else:
                 raise Exception('Wrong Class', 'All elements of phrases must be of type Phrases')
         else:
             raise Exception('Wrong Class', 'phrases must be a list of Phrases')
+
+class Phrases(AceObject):
+    def __init__(self):
+        super(Phrases, self).__init__("Phrases", "com.apple.ace.speech")
+    
+    def getLowConfidence(self):
+        try:
+            return self.getProperties()['lowConfidence']
+        except:
+            return False
+
+    def setLowConfidence(self, lowConfidence):
+        if type(lowConfidence) == bool:
+            self.getProperties()['lowConfidence'] = lowConfidence
+        else:
+            raise Exception('Wrong Type', 'lowConfidence must be of type bool')
+
+    def getInterpretations(self):
+        try:
+            return self.getProperties()['interpretations']
+        except:
+            return []
+
+    def setInterpretations(self, interpretations):
+        if type(interpretations) == list:
+            if len(interpretations) == len(filter(lambda x: isinstance(x, Interpretation), interpretations)):
+                self.getProperties()['interpretations'] = map(lambda x: x.getPList(), interpretations)
+            else:
+                raise Exception('Wrong Class', 'All elements of interpretations must be of type Interpretation')
+        else:
+            raise Exception('Wrong Class', 'interpretations must be a list of Interpretations')
+
+class Interpretation(AceObject):
+    def __init__(self):
+        super(Interpretation, self).__init__("Interpretation", "com.apple.ace.speech")
+
+    def getTokens(self):
+        try:
+            return self.getProperties()['tokens']
+        except:
+            return []
+
+    def setTokens(self, tokens):
+        if type(tokens) == list:
+            if len(tokens) == len(filter(lambda x: isinstance(x, Token), tokens)):
+                self.getProperties()['tokens'] = map(lambda x: x.getPList(), tokens)
+            else:
+                raise Exception('Wrong Class', 'All elements of tokens must be of type Token')
+        else:
+            raise Exception('Wrong Class', 'tokens must be a list of Tokens')
+
+class Token(AceObject):
+    def __init__(self, text, startTime, endTime, confidenceScore, removeSpaceBefore, removeSpaceAfter):
+        super(Token, self).__init__("Token", "com.apple.ace.speech")
+        self.setText(text)
+        self.setStartTime(startTime)
+        self.setEndTime(endTime)
+        self.setConfidenceScore(confidenceScore)
+        self.setRemoveSpaceBefore(removeSpaceBefore)
+        self.setRemoveSpaceAfter(removeSpaceAfter)
+
+    def setText(self, text):
+        self.getProperties()['text'] = text
+
+    def setStartTime(self, startTime):
+        self.getProperties()['startTime'] = startTime
+    
+    def setEndTime(self, endTime):
+        self.getProperties()['endTime'] = endTime
+    
+    def setConfidenceScore(self, confidenceScore):
+        self.getProperties()['confidenceScore'] = confidenceScore
+
+    def setRemoveSpaceBefore(self, removeSpaceBefore):
+        self.getProperties()['removeSpaceBefore'] = removeSpaceBefore
+
+    def setRemoveSpaceAfter(self, removeSpaceAfter):
+        self.getProperties()['removeSpaceAfter'] = removeSpaceAfter
