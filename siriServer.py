@@ -9,11 +9,11 @@ from M2Crypto import BIO, RSA, X509
 
 from siriObjects import speechObjects, baseObjects
 
-caCertFile = open('ca.pem')
-caCert = X509.load_cert_bio(BIO.MemoryBuffer(caCertFile.read()))
+caCertFile = open('OrigAppleSubCACert.der')
+caCert = X509.load_cert_bio(BIO.MemoryBuffer(caCertFile.read()), format=0)
 caCertFile.close()
-certFile = open('server.passless.crt')
-serverCert = X509.load_cert_bio(BIO.MemoryBuffer(certFile.read()))
+certFile = open('OrigAppleServerCert.der')
+serverCert = X509.load_cert_bio(BIO.MemoryBuffer(certFile.read()), format=0)
 certFile.close()
 
 
@@ -80,13 +80,14 @@ class HandleConnection(asyncore.dispatcher_with_send):
             self.process_compressed_data()
 
     def send_plist(self, plist):
+        print "Sending: ", plist
         bplist = biplist.writePlistToString(plist);
         #
-        self.unzipped_output_buffer = struct.pack('>BBBH', 2,0,0,len(bplist)) + bplist
+        self.unzipped_output_buffer = struct.pack('>BI', 2,len(bplist)) + bplist
         self.flush_unzipped_output() 
     
     def send_pong(self, id):
-        self.unzipped_output_buffer = struct.pack('>BBBH', 4,0,0, id)
+        self.unzipped_output_buffer = struct.pack('>BI', 4, id)
         self.flush_unzipped_output() 
 
     def parseGoogleResponse(self, response):
@@ -108,44 +109,21 @@ class HandleConnection(asyncore.dispatcher_with_send):
                 print "packet with content: ", object
                 
                 
-                #self.send_plist({"class":"SessionValidationFailed", "group":"com.apple.ace.system", "aceId":str(uuid.uuid4()), "refId": object['aceId'], "properties":{"reason":"Not authenticated", "errorCode":0, "callbacks":[]}})
-                
                 if object['class'] == 'GetSessionCertificate':
                     caDer = caCert.as_der()
                     serverDer = serverCert.as_der()
-                    self.send_plist({"group":"com.apple.ace.system", "aceId": str(uuid.uuid4()), "refId": object['aceId'], "class": "GetSessionCertificateResponse", "properties":{"certificate": "\x01\x02"+struct.pack(">I", len(caDer))+caDer + struct.pack(">I", len(serverDer))+serverDer}})
+                    self.send_plist({"class": "GetSessionCertificateResponse", "group": "com.apple.ace.system", "aceId": str(uuid.uuid4()), "refId": object['aceId'], "properties":{"certificate": biplist.Data("\x01\x02"+struct.pack(">I", len(caDer))+caDer + struct.pack(">I", len(serverDer))+serverDer)}})
 
                     #self.send_plist({"class":"CommandFailed", "properties": {"reason":"Not authenticated", "errorCode":0, "callbacks":[]}, "aceId": str(uuid.uuid4()), "refId": object['aceId'], "group":"com.apple.ace.system"})
                 if object['class'] == 'CreateSessionInfoRequest':
 		    # how does a positive answer look like?
                     print "returning response"
-                    self.send_plist({"class": "CommandIgnored", "properties":{}, "aceId": str(uuid.uuid4()), "refId":object['aceId'], "group":"com.apple.ace.system"})
-                    #self.send_plist({"class":"SessionValidationFailed", "properties":{"errorCode":"RegistrationLimitReached"}, "aceId": str(uuid.uuid4()), "refId":object['aceId'], "group":"com.apple.ace.system"})
-                        #2345 SessionValidationFailed
-                        #2346 InvalidSessionInfo
-#2347 InvalidValidationData
-#2348 InvalidFingerprint
-#2349 ClientNotAuthenticated
-#2350 RegistrationLimitReached
-                            #2351 UnsupportedHardwareVersion
-                        #self.send_plist({"class": "CreateSessionInfoResponse", "properties": {"sessionInfo": "\x02\xDA=\x99\xC2\x0E\xE2\x10__\x038\xE8>C\xA5\xD5\x00\x00\x00@\xA6\xC4\x879\x84s\e\xCC\b\xEB\xC7\a>\xA6\x8AxZ\xF6\x1ELr\x1F3\x81\x8E$;9\xF6+`A<\akW\x86\xD9\x1Es\x16%\xD3aK_\xC1\xCElrM\xAA\x80\xD6\xA3V)\xF1\x80\xAF\xFF\xAA\x86\xD2\x01\xC1\xDA\xD9F~9I\x82[\xD2\xA4\xF2\xE9o'\x91\x05\xE0|\b\x00\x00\x006\x01\x02\fnb\xA2\x966\x94*@\xE8\x86\x98vu\xD4mO", "validityDuration": 90000}, "aceId":str(uuid.uuid4()), "refId":object['aceId'], "group":"com.apple.ace.system"})
+                    self.send_plist({"class":"CommandFailed", "properties": {"reason":"Not authenticated", "errorCode":0, "callbacks":[]}, "aceId": str(uuid.uuid4()), "refId": object['aceId'], "group":"com.apple.ace.system"})
+                    #self.send_plist({"class":"SessionValidationFailed", "properties":{"errorCode":"UnsupportedHardwareVersion"}, "aceId": str(uuid.uuid4()), "refId":object['aceId'], "group":"com.apple.ace.system"})
                     
                 if object['class'] == 'CreateAssistant':
-                    #self.send_plist({"class": "AssistantCreated", "properties": {"speechId": str(uuid.uuid4()), "assistantId": str(uuid.uuid4())}, "group":"com.apple.ace.system", "callbacks":[], "aceId": str(uuid.uuid4()), "refId": object['aceId']})
-                    print "sending failures"
-                    self.send_plist({"class":"SessionValidationFailed", "properties":{"errorCode":"InvalidValidationData"}, "aceId": str(uuid.uuid4()), "refId":object['aceId'], "group":"com.apple.ace.system"})
-                    self.send_plist({"class":"SessionValidationFailed", "properties":{"errorCode":"InvalidSessionInfo"}, "aceId": str(uuid.uuid4()), "refId":object['aceId'], "group":"com.apple.ace.system"})
-                    self.send_plist({"class":"SessionValidationFailed", "properties":{"errorCode":"InvalidFingerprint"}, "aceId": str(uuid.uuid4()), "refId":object['aceId'], "group":"com.apple.ace.system"})
-                    self.send_plist({"class":"SessionValidationFailed", "properties":{"errorCode":"ClientNotAuthenticated"}, "aceId": str(uuid.uuid4()), "refId":object['aceId'], "group":"com.apple.ace.system"})
-                    #caDer = caCert.as_der()
-                    #serverDer = serverCert.as_der()
-                    #self.send_plist({"group":"com.apple.ace.system", "aceId": str(uuid.uuid4()), "refId": object['aceId'], "class": "GetSessionCertificateResponse", "properties":{"certificate": "\x01\x02"+struct.pack(">I", len(caDer))+caDer + struct.pack(">I", len(serverDer))+serverDer}})
-                    #self.send_plist({"class":"SessionValidationFailed",
-                        #"properties":{"errorCode":"UnsupportedHardwareVersion"},
-                        #           "aceId": str(uuid.uuid4()),
-                        #           "refId":object['aceId'],
-                        #           "group":"com.apple.ace.system"})
-                
+                    self.send_plist({"class": "AssistantCreated", "properties": {"speechId": str(uuid.uuid4()), "assistantId": str(uuid.uuid4())}, "group":"com.apple.ace.system", "callbacks":[], "aceId": str(uuid.uuid4()), "refId": object['aceId']})
+            
                 if object['class'] == 'SetAssistantData':
                     # grab assistant data, how is a device identified?
                     pass
@@ -154,7 +132,7 @@ class HandleConnection(asyncore.dispatcher_with_send):
                 if object['class'] == 'LoadAssistant':
                 # reply with a AssistentLoaded
                 #  self.send_plist({"class": "AssistantNotFound", "aceId":str(uuid.uuid4()), "refId":object['aceId'], "group":"com.apple.ace.system"})
-                    #self.send_plist({"class": "AssistantLoaded", "properties": {"version": "20111216-32234-branches/telluride?cnxn=293552c2-8e11-4920-9131-5f5651ce244e", "requestSync":False, "dataAnchor":"removed"}, "aceId":str(uuid.uuid4()), "refId":object['aceId'], "group":"com.apple.ace.system"})
+                    self.send_plist({"class": "AssistantLoaded", "properties": {"version": "20111216-32234-branches/telluride?cnxn=293552c2-8e11-4920-9131-5f5651ce244e", "requestSync":False, "dataAnchor":"removed"}, "aceId":str(uuid.uuid4()), "refId":object['aceId'], "group":"com.apple.ace.system"})
                     pass
                 if object['class'] == 'DestroyAssistant':
                     self.send_plist({"class": "AssistantDestroyed", "properties": {"assistantId": object['properties']['assistantId']}, "aceId":str(uuid.uuid4()), "refId":object['aceId'], "group":"com.apple.ace.system"})
@@ -178,6 +156,7 @@ class HandleConnection(asyncore.dispatcher_with_send):
                     del self.speech[object['refId']]
                     enc = flac.Encoder()
                     numSamples = int(len(pcm)/2)
+                    print "Having audio of {0}ms".format(int(len(pcm)/2/16))
                     enc.initialize(16000, 1, 16, numSamples)
                     enc.encode(pcm)
                     enc.finish()
@@ -198,7 +177,18 @@ class HandleConnection(asyncore.dispatcher_with_send):
                             best_match = possible_matches[0]['utterance']
                             best_match_confidence = possible_matches[0]['confidence']
                             print u"Best matching result: \"{0}\" with a confidence of {1}%".format(best_match, round(float(best_match_confidence)*100,2))
-                            self.send_plist({"class": "SpeechRecognized", "properties": {"sessionId": "", "recognition": {"properties": {"phrases": {} }}}})
+                            recognized = speechObjects.SpeechRecognized(object['aceId'])
+                            recognized.setSessionId(str(uuid.uuid4()))
+                            recognition = speechObjects.Recognition()
+                            phrases = speechObjects.Phrases()
+                            phrases.setLowConfidence(False)
+                            interpretation = speechObjects.Interpretation()
+                            token = speechObjects.Token(best_match, 0, int(len(pcm)/2/16), 1000.0, True, True)
+                            interpretation.setTokens([token])
+                            phrases.setInterpretations([interpretation])
+                            recognition.setPhrases([phrases])
+                            recognized.setRecognition(recognition)
+                            self.send_plist(recognized.getPList())
                     
     def hasNextObj(self):
         if len(self.unzipped_input) == 0:
