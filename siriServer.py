@@ -198,7 +198,7 @@ class HandleConnection(asyncore.dispatcher_with_send):
                             best_match = possible_matches[0]['utterance']
                             best_match_confidence = possible_matches[0]['confidence']
                             print u"Best matching result: \"{0}\" with a confidence of {1}%".format(best_match, round(float(best_match_confidence)*100,2))
-                                self.send_plist({"class": "SpeechRecognized", "properties": {"sessionId": "", "recognition": {"properties": {"phrases": {}}}}}})
+                            self.send_plist({"class": "SpeechRecognized", "properties": {"sessionId": "", "recognition": {"properties": {"phrases": {} }}}})
                     
     def hasNextObj(self):
         if len(self.unzipped_input) == 0:

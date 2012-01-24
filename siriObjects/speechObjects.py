@@ -1,4 +1,4 @@
-import baseObjects
+from baseObjects import ServerBoundCommand, ClientBoundCommand
 
 
 class StartSpeechRequest(ServerBoundCommand):
@@ -29,7 +29,7 @@ class SpeechSpacket(ServerBoundCommand):
     
     def getPacketNumber(self):
         try:
-            return self.getProperties()['packetNumber]
+            return self.getProperties()['packetNumber']
         except:
             return -1
 

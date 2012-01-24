@@ -32,7 +32,7 @@ class ServerBoundCommand(AceObject):
             return dict()
 
 class ClientBoundCommand(AceObject):
-    def __init__(self, encodedClassName, groupIdentifier, aceId, refId)
+    def __init__(self, encodedClassName, groupIdentifier, aceId, refId):
         super(ServerBoundCommand, self).__init__(encodedClassName, groupIdentifier)
         self.plist['aceId'] = aceId if aceId != None else str(uuid4())
         self.plist['refId'] = refId if refId != None else str(uuid4())
@@ -45,10 +45,9 @@ class ClientBoundCommand(AceObject):
 
 
 
-classToPyClassMapping = {
-    'StartSpeechRequest' = speechObjects.StartSpeechRequest
-    'SpeechSpacket' = speechObjects.SpeechSpacket
-    'FinishSpeech' = speechObjects.FinishSpeech
+classToPyClassMapping = {'StartSpeechRequest': speechObjects.StartSpeechRequest,
+    'SpeechSpacket': speechObjects.SpeechSpacket,
+    'FinishSpeech': speechObjects.FinishSpeech
 }
 
 
