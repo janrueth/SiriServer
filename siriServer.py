@@ -193,7 +193,7 @@ class HandleConnection(asyncore.dispatcher_with_send):
                             
                             # Just for now echo the detected text
                             view = uiObjects.AddViews(object['refId'])
-                            view.views += [uiObjects.AssistantUtteranceView(text="FICKI", speakableText="FICKI")]
+                            view.views += [uiObjects.AssistantUtteranceView(text=best_match, speakableText=best_match)]
                             self.send_object(view)
                             
                             # at the end we need to finish the request

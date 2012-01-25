@@ -54,19 +54,19 @@ class SpeechRecognized(ClientBoundCommand):
 
 
 class Recognition(AceObject):
-    def __init__(self, phrases=[]):
+    def __init__(self, phrases=None):
         super(Recognition, self).__init__("Recognition", "com.apple.ace.speech")
-        self.phrases = phrases
+        self.phrases = phrases if phrases != None else []
     
     def to_plist(self):
         self.add_property('phrases')
         return super(Recognition, self).to_plist()
 
 class Phrase(AceObject):
-    def __init__(self, lowConfidence=False, interpretations=[]):
+    def __init__(self, lowConfidence=False, interpretations=None):
         super(Phrase, self).__init__("Phrase", "com.apple.ace.speech")
         self.lowConfidence = lowConfidence
-        self.interpretations = interpretations
+        self.interpretations = interpretations if interpretations != None else []
     
     def to_plist(self):
         self.add_property('lowConfidence')
@@ -74,9 +74,9 @@ class Phrase(AceObject):
         return super(Phrase, self).to_plist()
 
 class Interpretation(AceObject):
-    def __init__(self, tokens=[]):
+    def __init__(self, tokens=None):
         super(Interpretation, self).__init__("Interpretation", "com.apple.ace.speech")
-        self.tokens = tokens
+        self.tokens = tokens if tokens != None else []
     
     def to_plist(self):
         self.add_property('tokens')
