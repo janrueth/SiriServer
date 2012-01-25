@@ -7,7 +7,7 @@ import json
 import asyncore
 from M2Crypto import BIO, RSA, X509
 
-from siriObjects import speechObjects, baseObjects
+from siriObjects import speechObjects, baseObjects, uiObjects
 
 caCertFile = open('OrigAppleSubCACert.der')
 caCert = X509.load_cert_bio(BIO.MemoryBuffer(caCertFile.read()), format=0)
@@ -78,6 +78,9 @@ class HandleConnection(asyncore.dispatcher_with_send):
                 #self.flush_output_buffer()
             
             self.process_compressed_data()
+
+    def send_object(self, obj):
+        self.send_plist(obj.to_plist())
 
     def send_plist(self, plist):
         print "Sending: ", plist
@@ -177,18 +180,24 @@ class HandleConnection(asyncore.dispatcher_with_send):
                             best_match = possible_matches[0]['utterance']
                             best_match_confidence = possible_matches[0]['confidence']
                             print u"Best matching result: \"{0}\" with a confidence of {1}%".format(best_match, round(float(best_match_confidence)*100,2))
-                            recognized = speechObjects.SpeechRecognized(object['aceId'])
-                            recognized.setSessionId(str(uuid.uuid4()))
-                            recognition = speechObjects.Recognition()
-                            phrases = speechObjects.Phrases()
-                            phrases.setLowConfidence(False)
-                            interpretation = speechObjects.Interpretation()
+                            
+                            # construct a SpeechRecognized
                             token = speechObjects.Token(best_match, 0, int(len(pcm)/2/16), 1000.0, True, True)
-                            interpretation.setTokens([token])
-                            phrases.setInterpretations([interpretation])
-                            recognition.setPhrases([phrases])
-                            recognized.setRecognition(recognition)
-                            self.send_plist(recognized.getPList())
+                            interpretation = speechObjects.Interpretation([token])
+                            phrase = speechObjects.Phrase(lowConfidence=False, interpretations=[interpretation])
+                            recognition = speechObjects.Recognition([phrase])
+                            recognized = speechObjects.SpeechRecognized(object['refId'], recognition)
+                            
+                            # Send speechRecognized to iDevice
+                            self.send_object(recognized)
+                            
+                            # Just for now echo the detected text
+                            view = uiObjects.AddViews(object['refId'])
+                            view.views += [uiObjects.AssistantUtteranceView(text="FICKI", speakableText="FICKI")]
+                            self.send_object(view)
+                            
+                            # at the end we need to finish the request
+                            self.send_object(baseObjects.RequestCompleted(object['refId']))
                     
     def hasNextObj(self):
         if len(self.unzipped_input) == 0:
