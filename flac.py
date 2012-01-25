@@ -22,7 +22,7 @@ def writeCallBack(encoder, buffer, bytes, samples, current_frame, client_data):
 class Encoder:
 
     
-    def initialize(self, sample_rate, channels, bps, numSamples):
+    def initialize(self, sample_rate, channels, bps):
         libflac.FLAC__stream_encoder_new.restype = c_void_p
         libflac.FLAC__stream_encoder_set_verify.argtypes = [c_void_p, c_bool]
         libflac.FLAC__stream_encoder_set_verify.restype = c_bool
@@ -70,7 +70,6 @@ class Encoder:
         ok &= libflac.FLAC__stream_encoder_set_channels(self.encoder, channels)
         ok &= libflac.FLAC__stream_encoder_set_bits_per_sample(self.encoder, bps);
         ok &= libflac.FLAC__stream_encoder_set_sample_rate(self.encoder, sample_rate);
-        ok &= libflac.FLAC__stream_encoder_set_total_samples_estimate(self.encoder, numSamples);
         
         
         self.output = ""

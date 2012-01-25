@@ -104,7 +104,7 @@ class Decoder:
         self.buffer = create_string_buffer(1024)
         decoded_frame = (c_int16*self.frame_size.value)()
         
-	out = ""
+        out = ""
         for i in range(0,len(data)):
             self.buffer = data[i]
             libspeex.speex_bits_read_from(byref(self.bits), self.buffer, len(data[i]))

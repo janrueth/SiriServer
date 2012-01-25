@@ -1,7 +1,7 @@
 import socket, ssl, sys, zlib, binascii, time, select, struct, biplist
 from email.utils import formatdate
 import uuid
-import reencode
+import speex
 import flac
 import json
 import asyncore
@@ -140,31 +140,30 @@ class HandleConnection(asyncore.dispatcher_with_send):
                 if object['class'] == 'DestroyAssistant':
                     self.send_plist({"class": "AssistantDestroyed", "properties": {"assistantId": object['properties']['assistantId']}, "aceId":str(uuid.uuid4()), "refId":object['aceId'], "group":"com.apple.ace.system"})
 
-                if object['class'] == 'StartSpeechRequest':
-                    self.speech[object['aceId']] = []
-                        
-                if object['class'] == 'StartSpeechDictation':
-                    self.speech[object['aceId']] = []
+                if object['class'] == 'StartSpeechRequest' or object['class'] == 'StartSpeechDictation':
+                    decoder = speex.Decoder()
+                    decoder.initialize(mode=speex.SPEEX_MODEID_WB)
+                    encoder = flac.Encoder()
+                    encoder.initialize(16000, 1, 16) #16kHz sample rate, 1 channel, 16 bits per sample
+                    self.speech[object['aceId']] = (decoder, encoder)
                     
                 if object['class'] == 'SpeechPacket':
-                    self.speech[object['refId']] += object['properties']['packets']
+                    (decoder, encoder) = self.speech[object['refId']]
+                    pcm = decoder.decode(object['properties']['packets'])
+                    encoder.encode(pcm)
                 
                 if object['class'] == 'CancelRequest':
                     # we should test if this stil exists..
                     del self.speech[object['refId']]
                 
                 if object['class'] == 'FinishSpeech':
-		    #this should be done async
-                    pcm = reencode.decodeToPCM(self.speech[object['refId']], 16000, 8)
+                    (decoder, encoder) = self.speech[object['refId']]
+                    decoder.destroy()
+                    encoder.finish()
+                    flacBin = encoder.getBinary()
+                    encoder.destroy()
                     del self.speech[object['refId']]
-                    enc = flac.Encoder()
-                    numSamples = int(len(pcm)/2)
-                    print "Having audio of {0}ms".format(int(len(pcm)/2/16))
-                    enc.initialize(16000, 1, 16, numSamples)
-                    enc.encode(pcm)
-                    enc.finish()
-                    flacBin = enc.getBinary()
-                    enc.destroy()
+                    #this should be done async
                     
                     http_request = "POST /speech-api/v1/recognize?xjerr=1&client=chromium&pfilter=2&lang=de-DE&maxresults=6 HTTP/1.0\r\nHost: www.google.com\r\nContent-Type: audio/x-flac; rate=16000\r\nContent-Length: %d\r\n\r\n" % len(flacBin)
                     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -182,7 +181,7 @@ class HandleConnection(asyncore.dispatcher_with_send):
                             print u"Best matching result: \"{0}\" with a confidence of {1}%".format(best_match, round(float(best_match_confidence)*100,2))
                             
                             # construct a SpeechRecognized
-                            token = speechObjects.Token(best_match, 0, int(len(pcm)/2/16), 1000.0, True, True)
+                            token = speechObjects.Token(best_match, 0, 0, 1000.0, True, True)
                             interpretation = speechObjects.Interpretation([token])
                             phrase = speechObjects.Phrase(lowConfidence=False, interpretations=[interpretation])
                             recognition = speechObjects.Recognition([phrase])
