@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import socket, ssl, sys, zlib, binascii, time, select, struct, biplist
 from email.utils import formatdate
 import uuid
@@ -5,11 +8,15 @@ import speex
 import flac
 import json
 import asyncore
+import re
+
 from M2Crypto import BIO, RSA, X509
 
 from siriObjects import speechObjects, baseObjects, uiObjects
 
 from httpClient import AsyncOpenHttp
+
+from sslDispatcher import ssl_dispatcher
 
 caCertFile = open('OrigAppleSubCACert.der')
 caCert = X509.load_cert_bio(BIO.MemoryBuffer(caCertFile.read()), format=0)
@@ -20,27 +27,13 @@ certFile.close()
 
 
 
-class HandleConnection(asyncore.dispatcher_with_send):
+class HandleConnection(ssl_dispatcher):
     def __init__(self, conn):
         asyncore.dispatcher_with_send.__init__(self, conn)
-        self.socket = ssl.wrap_socket(conn,
-                                      server_side=True,
-                                      certfile="server.passless.crt",
-                                      keyfile="server.passless.key",
-                                      ssl_version=ssl.PROTOCOL_TLSv1,
-                                      do_handshake_on_connect=False,
-                                      cert_reqs=ssl.CERT_NONE)
-        while True:
-            try:
-                self.socket.do_handshake()
-                break
-            except ssl.SSLError, err:
-                if err.args[0] == ssl.SSL_ERROR_WANT_READ:
-                    select.select([self.socket], [], [])
-                elif err.args[0] == ssl.SSL_ERROR_WANT_WRITE:
-                    select.select([], [self.socket], [])
-                else:
-                    raise        
+        
+        self.ssled = False
+        self.secure_connection(certfile="server.passless.crt", keyfile="server.passless.key", server_side=True)               
+
         self.consumed_ace = False
         self.data = ""
         self.binary_mode = False
@@ -57,12 +50,18 @@ class HandleConnection(asyncore.dispatcher_with_send):
         self.googleData = None
         self.lastRequestId = None
         self.dictation = None
+    
+    def handle_ssl_established(self):                
+        self.ssled = True
+
+    def handle_ssl_shutdown(self):
+        self.ssled = False
             
     def readable(self):
-        if isinstance(self.socket, ssl.SSLSocket):
+        if self.ssled:
             while self.socket.pending() > 0:
                 self.handle_read_event()
-            return True
+        return True
 
     def handle_read(self):
         self.data += self.recv(8192)
@@ -147,7 +146,8 @@ class HandleConnection(asyncore.dispatcher_with_send):
                 if not dictation:
                     # Just for now echo the detected text
                     view = uiObjects.AddViews(requestId)
-                    view.views += [uiObjects.AssistantUtteranceView(text=best_match, speakableText=best_match)]
+                    answer = best_match
+                    view.views += [uiObjects.AssistantUtteranceView(text=answer, speakableText=answer)]
                     self.send_object(view)
                 
                 # at the end we need to finish the request
