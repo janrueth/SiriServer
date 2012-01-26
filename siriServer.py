@@ -9,6 +9,8 @@ from M2Crypto import BIO, RSA, X509
 
 from siriObjects import speechObjects, baseObjects, uiObjects
 
+from httpClient import AsyncOpenHttp
+
 caCertFile = open('OrigAppleSubCACert.der')
 caCert = X509.load_cert_bio(BIO.MemoryBuffer(caCertFile.read()), format=0)
 caCertFile.close()
@@ -50,6 +52,11 @@ class HandleConnection(asyncore.dispatcher_with_send):
         self.speech = dict()
         self.pong = 1
         self.ping = 0
+        self.httpClient = AsyncOpenHttp(self.handle_google_data, self.handle_google_failure)
+        self.gotGoogleAnswer = False
+        self.googleData = None
+        self.lastRequestId = None
+        self.dictation = None
             
     def readable(self):
         if isinstance(self.socket, ssl.SSLSocket):
@@ -77,7 +84,27 @@ class HandleConnection(asyncore.dispatcher_with_send):
                 self.output_buffer = "HTTP/1.1 200 OK\r\nServer: Apache-Coyote/1.1\r\nDate: " +  formatdate(timeval=None, localtime=False, usegmt=True) + "\r\nConnection: close\r\n\r\n\xaa\xcc\xee\x02"
                 #self.flush_output_buffer()
             
+            # first process outstanding google answers THIS happens at least on each PING
+            if self.gotGoogleAnswer:
+                self.process_recognized_speech(self.googleData, self.lastRequestId, self.dictation)
+                self.lastRequestId = None
+                self.dictation = None
+                self.googleData = None
+                self.gotGoogleAnswer = False
+            
             self.process_compressed_data()
+
+    def handle_google_data(self, body, requestId, dictation):
+        self.googleData = json.loads(body)
+        self.lastRequestId = requestId
+        self.dictation = dictation
+        self.gotGoogleAnswer = True
+
+    def handle_google_failure(self, requestId, dictation):
+        self.googleData = None
+        self.lastRequestId = requestId
+        self.dictation = dictation
+        self.gotGoogleAnswer = True
 
     def send_object(self, obj):
         self.send_plist(obj.to_plist())
@@ -93,14 +120,40 @@ class HandleConnection(asyncore.dispatcher_with_send):
         self.unzipped_output_buffer = struct.pack('>BI', 4, id)
         self.flush_unzipped_output() 
 
-    def parseGoogleResponse(self, response):
-        header_end = response.find('\r\n\r\n')
-        if header_end < 0:
-            return None
-        header_end += 4
-        #        print "Google header: ", response[:header_end]
-        json_string = response[header_end:len(response)-1];
-        return json.loads(json_string)
+    def process_recognized_speech(self, googleJson, requestId, dictation):
+        if googleJson == None:
+            # there was a network failure
+            self.send_object(speechObjects.SpeechFailure(requestId, "No connection to Google possible"))
+            self.send_object(baseObjects.RequestCompleted(requestID))
+        else:
+            possible_matches = googleJson['hypotheses']
+            if len(possible_matches) > 0:
+                best_match = possible_matches[0]['utterance']
+                best_match_confidence = possible_matches[0]['confidence']
+                print u"Best matching result: \"{0}\" with a confidence of {1}%".format(best_match, round(float(best_match_confidence)*100,2))
+                
+                # construct a SpeechRecognized
+                token = speechObjects.Token(best_match, 0, 0, 1000.0, True, True)
+                interpretation = speechObjects.Interpretation([token])
+                phrase = speechObjects.Phrase(lowConfidence=False, interpretations=[interpretation])
+                recognition = speechObjects.Recognition([phrase])
+                recognized = speechObjects.SpeechRecognized(requestId, recognition)
+                
+                # Send speechRecognized to iDevice
+                self.send_object(recognized)
+                
+                # HERE WE SHOULD INSERT PLUGIN FILTERING
+                
+                if not dictation:
+                    # Just for now echo the detected text
+                    view = uiObjects.AddViews(requestId)
+                    view.views += [uiObjects.AssistantUtteranceView(text=best_match, speakableText=best_match)]
+                    self.send_object(view)
+                
+                # at the end we need to finish the request
+                self.send_object(baseObjects.RequestCompleted(requestId))
+
+            
 
     def process_compressed_data(self):
         self.unzipped_input += self.decompressor.decompress(self.data)
@@ -145,10 +198,11 @@ class HandleConnection(asyncore.dispatcher_with_send):
                     decoder.initialize(mode=speex.SPEEX_MODEID_WB)
                     encoder = flac.Encoder()
                     encoder.initialize(16000, 1, 16) #16kHz sample rate, 1 channel, 16 bits per sample
-                    self.speech[object['aceId']] = (decoder, encoder)
+                    dictation=(object['class'] == 'StartSpeechDictation')
+                    self.speech[object['aceId']] = (decoder, encoder, dictation)
                     
                 if object['class'] == 'SpeechPacket':
-                    (decoder, encoder) = self.speech[object['refId']]
+                    (decoder, encoder, dictation) = self.speech[object['refId']]
                     pcm = decoder.decode(object['properties']['packets'])
                     encoder.encode(pcm)
                 
@@ -157,46 +211,14 @@ class HandleConnection(asyncore.dispatcher_with_send):
                     del self.speech[object['refId']]
                 
                 if object['class'] == 'FinishSpeech':
-                    (decoder, encoder) = self.speech[object['refId']]
+                    (decoder, encoder, dictation) = self.speech[object['refId']]
                     decoder.destroy()
                     encoder.finish()
                     flacBin = encoder.getBinary()
                     encoder.destroy()
                     del self.speech[object['refId']]
-                    #this should be done async
                     
-                    http_request = "POST /speech-api/v1/recognize?xjerr=1&client=chromium&pfilter=2&lang=de-DE&maxresults=6 HTTP/1.0\r\nHost: www.google.com\r\nContent-Type: audio/x-flac; rate=16000\r\nContent-Length: %d\r\n\r\n" % len(flacBin)
-                    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    s.connect(("www.google.com", 80))
-                    s.send(http_request)
-                    s.send(flacBin)
-                    response = s.recv(1024)
-                    s.close()
-                    answer = self.parseGoogleResponse(response)
-                    if answer != None:
-                        possible_matches = answer['hypotheses']
-                        if len(possible_matches) > 0:
-                            best_match = possible_matches[0]['utterance']
-                            best_match_confidence = possible_matches[0]['confidence']
-                            print u"Best matching result: \"{0}\" with a confidence of {1}%".format(best_match, round(float(best_match_confidence)*100,2))
-                            
-                            # construct a SpeechRecognized
-                            token = speechObjects.Token(best_match, 0, 0, 1000.0, True, True)
-                            interpretation = speechObjects.Interpretation([token])
-                            phrase = speechObjects.Phrase(lowConfidence=False, interpretations=[interpretation])
-                            recognition = speechObjects.Recognition([phrase])
-                            recognized = speechObjects.SpeechRecognized(object['refId'], recognition)
-                            
-                            # Send speechRecognized to iDevice
-                            self.send_object(recognized)
-                            
-                            # Just for now echo the detected text
-                            view = uiObjects.AddViews(object['refId'])
-                            view.views += [uiObjects.AssistantUtteranceView(text=best_match, speakableText=best_match)]
-                            self.send_object(view)
-                            
-                            # at the end we need to finish the request
-                            self.send_object(baseObjects.RequestCompleted(object['refId']))
+                    self.httpClient.make_google_request(flacBin, object['refId'], dictation, language='de-DE', allowCurses=True)
                     
     def hasNextObj(self):
         if len(self.unzipped_input) == 0:
