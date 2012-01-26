@@ -40,6 +40,17 @@ class FinishSpeech(ServerBoundCommand):
         except:
             return -1
 
+class SpeechFailure(ClientBoundCommand):
+    def __init__(self, refId, reasonDescription, reason=0):
+        super(SpeechRecognized, self).__init__("SpeechFailure", "com.apple.ace.speech", None, refId)
+        self.reasonDescription = reasonDescription
+        self.reason = reason
+    
+    def to_plist(self):
+        self.add_property('reasonDescription')
+        self.add_property('reason')
+        return super(SpeechFailure, self).to_plist()
+
 
 class SpeechRecognized(ClientBoundCommand):
     def __init__(self, refId, recognition, sessionId=str.upper(str(uuid.uuid4()))):
