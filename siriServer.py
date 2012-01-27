@@ -1,4 +1,4 @@
-#!/usr/bin/python
+﻿#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 import socket, ssl, sys, zlib, binascii, time, select, struct, biplist
@@ -143,11 +143,11 @@ class HandleConnection(ssl_dispatcher):
 				view = uiObjects.AddViews(requestId)
 				# Example
 				if 'how are you' in answer:
-					view.views += [uiObjects.AssistantUtteranceView(text='Thank you. I\'m fine.', speakableText='Thank you. I\'m fine.')]
+					view.views += [uiObjects.AssistantUtteranceView(text='Thank you. I\'m fine.')]
 				# elif not dictation:
-					# view.views += [uiObjects.AssistantUtteranceView(text=answer, speakableText=answer)]
+					# view.views += [uiObjects.AssistantUtteranceView(text=answer)]
 				else:
-					view.views += [uiObjects.AssistantUtteranceView(text='I don\'t know what that means, but at least it rhymes.', speakableText='I don\'t know what that means, but at least it rhymes.')]
+					view.views += [uiObjects.AssistantUtteranceView(text='I don\'t know what that means, but at least it rhymes.')]
 
 				self.send_object(view)
 				
