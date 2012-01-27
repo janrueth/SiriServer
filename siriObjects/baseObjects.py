@@ -1,7 +1,5 @@
 from uuid import uuid4
 
-import siriObjects.speechObjects
-
 class AceObject(object):
     def __init__(self, encodedClassName, groupIdentifier):
         self.className = encodedClassName
