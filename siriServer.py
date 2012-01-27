@@ -147,6 +147,12 @@ class HandleConnection(ssl_dispatcher):
                     # Just for now echo the detected text
                     view = uiObjects.AddViews(requestId)
                     answer = best_match
+                    if re.match('^.*wie geht.*dir.*$', best_match, re.IGNORECASE) != None:
+                            answer = "Mir gehts super"
+                    if re.match('^.*Test.*Server.*$', best_match, re.IGNORECASE) != None:
+                        answer = u"Der Server läuft problemlos, hör auf zu fragen du Spasti!"
+                    if re.match('^.*sinn.*leben.*$', best_match, re.IGNORECASE) != None:
+                        answer = u"Entweder 42 oder aber du musst mich weiter suchen lassen"
                     view.views += [uiObjects.AssistantUtteranceView(text=answer, speakableText=answer)]
                     self.send_object(view)
                 
@@ -209,6 +215,9 @@ class HandleConnection(ssl_dispatcher):
                 if object['class'] == 'CancelRequest':
                     # we should test if this stil exists..
                     del self.speech[object['refId']]
+            
+                if object['class'] == 'StartCorrectedSpeechRequest':
+                    self.process_recognized_speech({u'hypotheses': [{'confidence': 1.0, 'utterance': str.lower(object['properties']['utterance'])}]}, object['aceId'], False)
                 
                 if object['class'] == 'FinishSpeech':
                     (decoder, encoder, dictation) = self.speech[object['refId']]
