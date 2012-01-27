@@ -14,6 +14,7 @@ class AddViews(ClientBoundCommand):
         self.add_property('dialogPhase')
         self.add_property('views')
         return super(AddViews, self).to_plist()
+
 # Assistant-related objects
 class AssistantUtteranceView(AceObject):
     def __init__(self, text="", speakableText="", dialogIdentifier="Misc#ident", listenAfterSpeaking=False):
@@ -28,6 +29,8 @@ class AssistantUtteranceView(AceObject):
         self.add_property('dialogIdentifier')
         self.add_property('listenAfterSpeaking')
         return super(AssistantUtteranceView, self).to_plist()
+
+
 class ConfirmationOptions(AceObject):
     def __init__(self, denyCommands=None, submitCommands=None, confirmText="Confirm", denyText="Cancel", cancelCommands=None, cancelLabel="Cancel", submitLabel="Confirm", confirmCommands=None, cancelTrigger="Deny"):
         super(ConfirmationOptions, self).__init__("ConfirmationOptions", "com.apple.ace.assistant")
@@ -40,6 +43,7 @@ class ConfirmationOptions(AceObject):
         self.submitLabel = submitLabel
         self.confirmCommands = confirmCommands if confirmCommands != None else []
         self.cancelTrigger = cancelTrigger
+    
     def to_plist(self):
         self.add_property('denyCommands')
         self.add_property('submitCommands')
@@ -51,17 +55,12 @@ class ConfirmationOptions(AceObject):
         self.add_property('confirmCommands')
         self.add_property('cancelTrigger')
         return super(ConfirmationOptions, self).to_plist()
+
 class CancelSnippet(AceObject):
-    def __init__(self, requestId=""):
+    def __init__(self):
         super(CancelSnippet, self).__init__("CancelSnippet", "com.apple.ace.assistant")
-        self.requestId = requestId
-    def to_plist(self):
-        self.add_property('requestId')
-        return super(CancelSnippet, self).to_plist()
+    
 class ConfirmSnippet(AceObject):
-    def __init__(self, requestId=""):
+    def __init__(self):
         super(ConfirmSnippet, self).__init__("ConfirmSnippet", "com.apple.ace.assistant")
-        self.requestId = requestId
-    def to_plist(self):
-        self.add_property('requestId')
-        return super(ConfirmSnippet, self).to_plist()
+    
