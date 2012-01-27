@@ -42,7 +42,7 @@ class FinishSpeech(ServerBoundCommand):
 
 class SpeechFailure(ClientBoundCommand):
     def __init__(self, refId, reasonDescription, reason=0):
-        super(SpeechRecognized, self).__init__("SpeechFailure", "com.apple.ace.speech", None, refId)
+        super(SpeechFailure, self).__init__("SpeechFailure", "com.apple.ace.speech", None, refId)
         self.reasonDescription = reasonDescription
         self.reason = reason
     
