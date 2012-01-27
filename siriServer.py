@@ -209,8 +209,10 @@ class HandleConnection(ssl_dispatcher):
                 if object['class'] == 'CancelRequest':
                     # we should test if this stil exists..
                     del self.speech[object['refId']]
-                
-                if object['class'] == 'FinishSpeech':
+
+                if object['class'] == 'StartCorrectedSpeechRequest':
+                    self.process_recognized_speech({u'hypotheses': [{u'confidence': 1.0, u'utterance': str.lower(object['properties']['utterance'])}]}, object['aceId'], False)
+                elif object['class'] == 'FinishSpeech':
                     (decoder, encoder, dictation) = self.speech[object['refId']]
                     decoder.destroy()
                     encoder.finish()
