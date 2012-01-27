@@ -30,7 +30,7 @@ certFile.close()
 class HandleConnection(ssl_dispatcher):
 	def __init__(self, conn):
 		asyncore.dispatcher_with_send.__init__(self, conn)
-		
+
 		self.ssled = False
 		self.secure_connection(certfile="server.passless.crt", keyfile="server.passless.key", server_side=True)			   
 
@@ -50,13 +50,13 @@ class HandleConnection(ssl_dispatcher):
 		self.googleData = None
 		self.lastRequestId = None
 		self.dictation = None
-	
+
 	def handle_ssl_established(self):				
 		self.ssled = True
 
 	def handle_ssl_shutdown(self):
 		self.ssled = False
-			
+
 	def readable(self):
 		if self.ssled:
 			while self.socket.pending() > 0:
@@ -111,10 +111,9 @@ class HandleConnection(ssl_dispatcher):
 	def send_plist(self, plist):
 		print "Sending: ", plist
 		bplist = biplist.writePlistToString(plist);
-		#
 		self.unzipped_output_buffer = struct.pack('>BI', 2,len(bplist)) + bplist
 		self.flush_unzipped_output() 
-	
+
 	def send_pong(self, id):
 		self.unzipped_output_buffer = struct.pack('>BI', 4, id)
 		self.flush_unzipped_output() 
@@ -127,12 +126,12 @@ class HandleConnection(ssl_dispatcher):
 		else:
 			possible_matches = googleJson['hypotheses']
 			if len(possible_matches) > 0:
-				best_match = possible_matches[0]['utterance']
+				answer = possible_matches[0]['utterance']
 				best_match_confidence = possible_matches[0]['confidence']
-				print u"Best matching result: \"{0}\" with a confidence of {1}%".format(best_match, round(float(best_match_confidence)*100,2))
-				
+				print u"Best matching result: \"{0}\" with a confidence of {1}%".format(answer, round(float(best_match_confidence)*100,2))
+
 				# construct a SpeechRecognized
-				token = speechObjects.Token(best_match, 0, 0, 1000.0, True, True)
+				token = speechObjects.Token(answer, 0, 0, 1000.0, True, True)
 				interpretation = speechObjects.Interpretation([token])
 				phrase = speechObjects.Phrase(lowConfidence=False, interpretations=[interpretation])
 				recognition = speechObjects.Recognition([phrase])
@@ -140,15 +139,17 @@ class HandleConnection(ssl_dispatcher):
 				
 				# Send speechRecognized to iDevice
 				self.send_object(recognized)
-				
-				# HERE WE SHOULD INSERT PLUGIN FILTERING
-				
-				if not dictation:
-					# Just for now echo the detected text
-					view = uiObjects.AddViews(requestId)
-					answer = best_match
-					view.views += [uiObjects.AssistantUtteranceView(text=answer, speakableText=answer)]
-					self.send_object(view)
+
+				view = uiObjects.AddViews(requestId)
+				# Example
+				if 'how are you' in answer:
+					view.views += [uiObjects.AssistantUtteranceView(text='Thank you. I\'m fine.', speakableText='Thank you. I\'m fine.')]
+				# elif not dictation:
+					# view.views += [uiObjects.AssistantUtteranceView(text=answer, speakableText=answer)]
+				else:
+					view.views += [uiObjects.AssistantUtteranceView(text='I don\'t know what that means, but at least it rhymes.', speakableText='I don\'t know what that means, but at least it rhymes.')]
+
+				self.send_object(view)
 				
 				# at the end we need to finish the request
 				self.send_object(baseObjects.RequestCompleted(requestId))
