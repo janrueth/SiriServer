@@ -10,6 +10,9 @@ import json
 import asyncore
 import re
 
+import db
+from db import Assistant
+
 from M2Crypto import BIO, RSA, X509
 
 from siriObjects import speechObjects, baseObjects, uiObjects
@@ -17,14 +20,6 @@ from siriObjects import speechObjects, baseObjects, uiObjects
 from httpClient import AsyncOpenHttp
 
 from sslDispatcher import ssl_dispatcher
-
-caCertFile = open('OrigAppleSubCACert.der')
-caCert = X509.load_cert_bio(BIO.MemoryBuffer(caCertFile.read()), format=0)
-caCertFile.close()
-certFile = open('OrigAppleServerCert.der')
-serverCert = X509.load_cert_bio(BIO.MemoryBuffer(certFile.read()), format=0)
-certFile.close()
-
 
 
 class HandleConnection(ssl_dispatcher):
@@ -50,6 +45,8 @@ class HandleConnection(ssl_dispatcher):
         self.googleData = None
         self.lastRequestId = None
         self.dictation = None
+        self.dbConnection = db.getConnection()
+        self.assistant = None
     
     def handle_ssl_established(self):                
         self.ssled = True
@@ -142,6 +139,10 @@ class HandleConnection(ssl_dispatcher):
                 self.send_object(recognized)
                 
                 # HERE WE SHOULD INSERT PLUGIN FILTERING
+                # first: is there already a plugin handling a pending request???
+                # if yes, just give it the text as a outstanding response
+                # if no, ask plugin manager to give us a plugin handling this request
+                #
                 
                 if not dictation:
                     # Just for now echo the detected text
@@ -165,69 +166,104 @@ class HandleConnection(ssl_dispatcher):
         self.unzipped_input += self.decompressor.decompress(self.data)
         self.data = ""
         while self.hasNextObj():
-            object = self.read_next_object_from_unzipped()
-            if object != None:
-                print "Packet with class: ", object['class']
-                print "packet with content: ", object
+            reqObject = self.read_next_object_from_unzipped()
+            if reqObject != None:
+                print "Packet with class: ", reqObject['class']
+                print "packet with content: ", reqObject
                 
                 
-                if object['class'] == 'GetSessionCertificate':
+                if reqObject['class'] == 'GetSessionCertificate':
                     caDer = caCert.as_der()
                     serverDer = serverCert.as_der()
-                    self.send_plist({"class": "GetSessionCertificateResponse", "group": "com.apple.ace.system", "aceId": str(uuid.uuid4()), "refId": object['aceId'], "properties":{"certificate": biplist.Data("\x01\x02"+struct.pack(">I", len(caDer))+caDer + struct.pack(">I", len(serverDer))+serverDer)}})
+                    self.send_plist({"class": "GetSessionCertificateResponse", "group": "com.apple.ace.system", "aceId": str(uuid.uuid4()), "refId": reqObject['aceId'], "properties":{"certificate": biplist.Data("\x01\x02"+struct.pack(">I", len(caDer))+caDer + struct.pack(">I", len(serverDer))+serverDer)}})
 
-                    #self.send_plist({"class":"CommandFailed", "properties": {"reason":"Not authenticated", "errorCode":0, "callbacks":[]}, "aceId": str(uuid.uuid4()), "refId": object['aceId'], "group":"com.apple.ace.system"})
-                if object['class'] == 'CreateSessionInfoRequest':
+                    #self.send_plist({"class":"CommandFailed", "properties": {"reason":"Not authenticated", "errorCode":0, "callbacks":[]}, "aceId": str(uuid.uuid4()), "refId": reqObject['aceId'], "group":"com.apple.ace.system"})
+                if reqObject['class'] == 'CreateSessionInfoRequest':
 		    # how does a positive answer look like?
                     print "returning response"
-                    self.send_plist({"class":"CommandFailed", "properties": {"reason":"Not authenticated", "errorCode":0, "callbacks":[]}, "aceId": str(uuid.uuid4()), "refId": object['aceId'], "group":"com.apple.ace.system"})
-                    #self.send_plist({"class":"SessionValidationFailed", "properties":{"errorCode":"UnsupportedHardwareVersion"}, "aceId": str(uuid.uuid4()), "refId":object['aceId'], "group":"com.apple.ace.system"})
+                    self.send_plist({"class":"CommandFailed", "properties": {"reason":"Not authenticated", "errorCode":0, "callbacks":[]}, "aceId": str(uuid.uuid4()), "refId": reqObject['aceId'], "group":"com.apple.ace.system"})
+                    #self.send_plist({"class":"SessionValidationFailed", "properties":{"errorCode":"UnsupportedHardwareVersion"}, "aceId": str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
                     
-                if object['class'] == 'CreateAssistant':
-                    self.send_plist({"class": "AssistantCreated", "properties": {"speechId": str(uuid.uuid4()), "assistantId": str(uuid.uuid4())}, "group":"com.apple.ace.system", "callbacks":[], "aceId": str(uuid.uuid4()), "refId": object['aceId']})
+                if reqObject['class'] == 'CreateAssistant':
+                    #create a new assistant
+                    helper = Assistant()
+                    c = self.dbConnection.cursor()
+                    noError = True
+                    try:
+                        c.execute("insert into assistants(assistantId, assistant) values (?,?)", (helper.assistantId, helper))
+                        self.dbConnection.commit()
+                    except sqlite3.Error, e: 
+                        noError = False
+                    c.close()
+                    if noError:
+                        self.assistant = helper
+                        self.send_plist({"class": "AssistantCreated", "properties": {"speechId": str(uuid.uuid4()), "assistantId": helper.assistantId}, "group":"com.apple.ace.system", "callbacks":[], "aceId": str(uuid.uuid4()), "refId": reqObject['aceId']})
+                    else:
+                        self.send_plist({"class":"CommandFailed", "properties": {"reason":"Database error", "errorCode":2, "callbacks":[]}, "aceId": str(uuid.uuid4()), "refId": reqObject['aceId'], "group":"com.apple.ace.system"})
             
-                if object['class'] == 'SetAssistantData':
-                    # grab assistant data, how is a device identified?
-                    pass
+                if reqObject['class'] == 'SetAssistantData':
+                    # fill assistant 
+                    if self.assistant != None:
+                        c = self.dbConnection.cursor()
+                        objProperties = reqObject['properties'] 
+                        self.assistant.censorSpeech = objProperties['censorSpeech']
+                        self.assistant.timeZoneId = objProperties['timeZoneId']
+                        self.assistant.language = objProperties['language']
+                        self.assistant.region = objProperties['region']
+                        c.execute("update assistants set assistant = ? where assistantId = ?", (self.assistant, self.assistant.assistantId))
+                        self.dbConnection.commit()
+                        c.close()
+
                 
 		#probably Create Set and Load assistant work together, first we create one response with success, fill it with set..data and later can load it again using load... however.. what are valid responses to all three requests?
-                if object['class'] == 'LoadAssistant':
-                # reply with a AssistentLoaded
-                #  self.send_plist({"class": "AssistantNotFound", "aceId":str(uuid.uuid4()), "refId":object['aceId'], "group":"com.apple.ace.system"})
-                    self.send_plist({"class": "AssistantLoaded", "properties": {"version": "20111216-32234-branches/telluride?cnxn=293552c2-8e11-4920-9131-5f5651ce244e", "requestSync":False, "dataAnchor":"removed"}, "aceId":str(uuid.uuid4()), "refId":object['aceId'], "group":"com.apple.ace.system"})
-                    pass
-                if object['class'] == 'DestroyAssistant':
-                    self.send_plist({"class": "AssistantDestroyed", "properties": {"assistantId": object['properties']['assistantId']}, "aceId":str(uuid.uuid4()), "refId":object['aceId'], "group":"com.apple.ace.system"})
+                if reqObject['class'] == 'LoadAssistant':
+                    c = self.dbConnection.cursor()
+                    c.execute("select assistant from assistants where assistantId = ?", (reqObject['properties']['assistantId'],))
+                    self.dbConnection.commit()
+                    result = c.fetchone()
+                    if result == None:
+                        self.send_plist({"class": "AssistantNotFound", "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
+                    else:
+                        self.assistant = result[0]
+                        self.send_plist({"class": "AssistantLoaded", "properties": {"version": "20111216-32234-branches/telluride?cnxn=293552c2-8e11-4920-9131-5f5651ce244e", "requestSync":False, "dataAnchor":"removed"}, "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
+                    c.close()
 
-                if object['class'] == 'StartSpeechRequest' or object['class'] == 'StartSpeechDictation':
+                if reqObject['class'] == 'DestroyAssistant':
+                    c = self.dbConnection.cursor()
+                    c.execute("delete from assistants where assistantId = ?", (reqObject['properties']['assistantId'],))
+                    self.dbConnection.commit()
+                    c.close()
+                    self.send_plist({"class": "AssistantDestroyed", "properties": {"assistantId": reqObject['properties']['assistantId']}, "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
+
+                if reqObject['class'] == 'StartSpeechRequest' or reqObject['class'] == 'StartSpeechDictation':
                     decoder = speex.Decoder()
                     decoder.initialize(mode=speex.SPEEX_MODEID_WB)
                     encoder = flac.Encoder()
                     encoder.initialize(16000, 1, 16) #16kHz sample rate, 1 channel, 16 bits per sample
-                    dictation=(object['class'] == 'StartSpeechDictation')
-                    self.speech[object['aceId']] = (decoder, encoder, dictation)
+                    dictation=(reqObject['class'] == 'StartSpeechDictation')
+                    self.speech[reqObject['aceId']] = (decoder, encoder, dictation)
                     
-                if object['class'] == 'SpeechPacket':
-                    (decoder, encoder, dictation) = self.speech[object['refId']]
-                    pcm = decoder.decode(object['properties']['packets'])
+                if reqObject['class'] == 'SpeechPacket':
+                    (decoder, encoder, dictation) = self.speech[reqObject['refId']]
+                    pcm = decoder.decode(reqObject['properties']['packets'])
                     encoder.encode(pcm)
                 
-                if object['class'] == 'CancelRequest':
+                if reqObject['class'] == 'CancelRequest':
                     # we should test if this stil exists..
-                    del self.speech[object['refId']]
+                    del self.speech[reqObject['refId']]
             
-                if object['class'] == 'StartCorrectedSpeechRequest':
-                    self.process_recognized_speech({u'hypotheses': [{'confidence': 1.0, 'utterance': str.lower(object['properties']['utterance'])}]}, object['aceId'], False)
+                if reqObject['class'] == 'StartCorrectedSpeechRequest':
+                    self.process_recognized_speech({u'hypotheses': [{'confidence': 1.0, 'utterance': str.lower(reqObject['properties']['utterance'])}]}, reqObject['aceId'], False)
                 
-                if object['class'] == 'FinishSpeech':
-                    (decoder, encoder, dictation) = self.speech[object['refId']]
+                if reqObject['class'] == 'FinishSpeech':
+                    (decoder, encoder, dictation) = self.speech[reqObject['refId']]
                     decoder.destroy()
                     encoder.finish()
                     flacBin = encoder.getBinary()
                     encoder.destroy()
-                    del self.speech[object['refId']]
+                    del self.speech[reqObject['refId']]
                     
-                    self.httpClient.make_google_request(flacBin, object['refId'], dictation, language='de-DE', allowCurses=True)
+                    self.httpClient.make_google_request(flacBin, reqObject['refId'], dictation, language=self.assistant.language, allowCurses=True)
                     
     def hasNextObj(self):
         if len(self.unzipped_input) == 0:
@@ -294,7 +330,18 @@ class SiriServer(asyncore.dispatcher):
             print 'Incoming connection from %s' % repr(addr)
             handler = HandleConnection(sock)
 
-	
+# load the certificates
+caCertFile = open('OrigAppleSubCACert.der')
+caCert = X509.load_cert_bio(BIO.MemoryBuffer(caCertFile.read()), format=0)
+caCertFile.close()
+certFile = open('OrigAppleServerCert.der')
+serverCert = X509.load_cert_bio(BIO.MemoryBuffer(certFile.read()), format=0)
+certFile.close()
+
+#setup database
+db.setup()
+
+#start server
 print "Opening Server on port 443"
 server = SiriServer('', 443)
 asyncore.loop()
