@@ -1,4 +1,7 @@
-This is a very early version of a siri server
+This is a very early version of a siri server.
+
+We have a new plugin system,
+check out the plugins folder and the example plugin for more infos
 
 The file SiriProtocol documents everything I found out about the protocol by now
 
@@ -10,5 +13,6 @@ you also need the python package M2Crypto (easy_install M2Crypto)
 you need to create a certificate and a key file for your domain
 
 place the certificate in a file server.passless.crt and the key in server.passless.key
+Just look at Plamoni's https://github.com/plamoni/SiriProxy scripts on how to create one
 
-make sure to install the certificate on your iDevice
+make sure to install the CA certificate on your iDevice
