@@ -10,7 +10,8 @@ class examplePlugin(Plugin):
     @register("en-US", ".*Meaning.*Life.*")
     def meaningOfLife(self, speech, language):
         if language == 'de-DE':
-            self.say(u"Das sollte ich dir nicht sagen!")
+            answer = self.ask(u"Willst du das wirklich wissen?")
+            self.say(u"Du hast \"{0}\" gesagt!".format(answer))
         else:
             self.say("I shouldn't tell you!")
         self.complete_request()

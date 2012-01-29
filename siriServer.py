@@ -137,7 +137,6 @@ class HandleConnection(ssl_dispatcher):
                 best_match = possible_matches[0]['utterance']
                 best_match_confidence = possible_matches[0]['confidence']
                 print u"Best matching result: \"{0}\" with a confidence of {1}%".format(best_match, round(float(best_match_confidence)*100,2))
-                
                 # construct a SpeechRecognized
                 token = speechObjects.Token(best_match, 0, 0, 1000.0, True, True)
                 interpretation = speechObjects.Interpretation([token])
@@ -145,7 +144,7 @@ class HandleConnection(ssl_dispatcher):
                 recognition = speechObjects.Recognition([phrase])
                 recognized = speechObjects.SpeechRecognized(requestId, recognition)
                 
-                self.send_object(recognized)
+                
                 
                 if self.current_running_plugin == None:
                     (clazz, method) = PluginManager.getPlugin(best_match, self.assistant.language)
@@ -156,11 +155,14 @@ class HandleConnection(ssl_dispatcher):
                         self.current_running_plugin = plugin
                         self.current_running_plugin_thread = thread.start_new_thread(method, (plugin, best_match, self.assistant.language))
                     else:
+                        self.send_object(recognized)
                         self.send_object(baseObjects.RequestCompleted(requestId))
                 elif self.current_running_plugin.waitForResponse != None:
                     self.current_running_plugin.response = best_match
+                    self.current_running_plugin.refId = requestId
                     self.current_running_plugin.waitForResponse.set()
                 else:
+                    self.send_object(recognized)
                     self.send_object(baseObjects.RequestCompleted(requestId))
             
 
@@ -187,10 +189,6 @@ class HandleConnection(ssl_dispatcher):
                     (decoder, encoder, dictation) = self.speech[reqObject['refId']]
                     pcm = decoder.decode(reqObject['properties']['packets'])
                     encoder.encode(pcm)
-            
-                elif reqObject['class'] == 'CancelRequest':
-                    # we should test if this stil exists..
-                    del self.speech[reqObject['refId']]
                         
                 elif reqObject['class'] == 'StartCorrectedSpeechRequest':
                     self.process_recognized_speech({u'hypotheses': [{'confidence': 1.0, 'utterance': str.lower(reqObject['properties']['utterance'])}]}, reqObject['aceId'], False)
@@ -209,19 +207,16 @@ class HandleConnection(ssl_dispatcher):
                 elif reqObject['class'] == 'CancelRequest':
                         # this is probably called when we need to kill a plugin
                         # wait for thread to finish a send
-                        self.sendLock.acquire()
-                        self.current_running_plugin_thread.exit()
-                        del self.current_running_plugin
-                        self.current_running_plugin = None
-                        self.current_running_plugin_thread = None
-                        self.sendLock.release()
+                        if reqObject['refId'] in self.speech:
+                            del self.speech[reqObject['refId']]
                         self.send_plist({"class": "CancelSucceeded", "group": "com.apple.ace.system", "aceId": str(uuid.uuid4()), "refId": reqObject['aceId'], "properties":{"callbacks": []}})
                         
                 # handle responses to plugin
-                elif self.current_running_plugin != None:
+                elif self.current_running_plugin != None and reqObject['group'] != "com.apple.ace.system" and "refId" in reqObject:
                     if self.current_running_plugin.waitForResponse != None:
                         # just forward the object to the 
                         self.current_running_plugin.response = reqObject
+                        self.current_running_plugin.refId = reqObject['refId']
                         self.current_running_plugin.waitForResponse.set()
                 else:
                     # handle other stuff
