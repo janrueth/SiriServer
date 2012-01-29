@@ -42,7 +42,7 @@ def getPlugin(speech, language):
         for (regex, clazz, method) in plugins[language]:
             if regex.match(speech) != None:
                 return (clazz, method)
-    return None
+    return (None, None)
                 
 
 

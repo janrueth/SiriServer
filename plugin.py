@@ -2,7 +2,8 @@
 import re
 import threading
 
-
+from siriObjects.baseObjects import ClientBoundCommand, RequestCompleted
+from siriObjects.uiObjects import AddViews, AssistantUtteranceView
 __criteria_key__ = "criterias"
 
 def register(lang, regex):
@@ -22,13 +23,29 @@ class Plugin(object):
         self.connection = None
 
     def complete_request(self):
-        pass
+        self.connection.current_running_plugin = None
+        self.connection.send_object(RequestCompleted(self.refId))
 
     def ask(self, text):
         self.waitForResponse = threading.Event()
-        self.connection.send_object() #<- this needs to be thread safe
+        view = AddViews(self.refId)
+        view.views += [AssistantUtteranceView(text, text, listenAfterSpeaking=True)]
+        self.connection.send_object(view)
         self.waitForResponse.wait()
+        self.waitForResponse = None
+        return self.response
+
+    def getResponseForResquest(self, clientBoundCommand):
+        self.waitForResponse = threading.Event()
+        if isinstance(clientBoundCommand, ClientBoundCommand):
+            self.connection.send_object(clientBoundCommand)
+        else:
+            self.connection.send_plist(clientBoundCommand)
+        self.waitForResponse.wait()
+        self.waitForResponse = None
         return self.response
     
     def say(self, text):
-        self.connection.send_object()
+        view = AddViews(self.refId)
+        view.views += [AssistantUtteranceView(text, text)]
+        self.connection.send_object(view)
