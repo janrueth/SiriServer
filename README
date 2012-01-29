@@ -10,9 +10,13 @@ you need libspeex libflac installed
 you also need the python package biplist (easy_install biplist)
 you also need the python package M2Crypto (easy_install M2Crypto)
 
-you need to create a certificate and a key file for your domain
+you need to generate a certificate, you can do this by going into "gen_certs" (example below)
+cd gen_certs
+./gen_certs.sh
 
-place the certificate in a file server.passless.crt and the key in server.passless.key
-Just look at Plamoni's https://github.com/plamoni/SiriProxy scripts on how to create one
+this will generate a certifcaite for "guzzoni.apple.com" or (example below)
+cd gen_certs
+./gen_certs.sh 192.168.1.1
+this will generate a certifcaite for "192.168.1.1"
 
 make sure to install the CA certificate on your iDevice
