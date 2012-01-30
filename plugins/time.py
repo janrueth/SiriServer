@@ -6,6 +6,7 @@ from plugin import *
 
 from siriObjects.baseObjects import AceObject, ClientBoundCommand
 from siriObjects.uiObjects import AddViews, AssistantUtteranceView
+from siriObjects.systemObjects import DomainObject
 
 class ClockSnippet(AceObject):
     def __init__(self, clocks=None):
@@ -16,9 +17,9 @@ class ClockSnippet(AceObject):
         self.add_property('clocks')
         return super(ClockSnippet, self).to_plist()
 
-class ClockObject(AceObject):
-    def __init__(self, identifier=""):
-        super(ClockObject, self).__init__("Object", "com.apple.ace.clock")
+class ClockObject(DomainObject):
+    def __init__(self):
+        super(ClockObject, self).__init__("com.apple.ace.clock")
         self.unlocalizedCountryName = None
         self.unlocalizedCityName = None
         self.timezoneId = None
