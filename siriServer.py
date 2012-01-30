@@ -153,6 +153,7 @@ class HandleConnection(ssl_dispatcher):
                         plugin.refId = requestId
                         plugin.connection = self
                         self.current_running_plugin = plugin
+                        self.send_object(recognized)
                         self.current_running_plugin_thread = thread.start_new_thread(method, (plugin, best_match, self.assistant.language))
                     else:
                         self.send_object(recognized)

@@ -8,10 +8,11 @@ class AceObject(object):
         self.properties = dict()
     
     def add_item(self, name):
-        self.plist[name] = getattr(self, name)
+        self.plist[name] = getattr(self, name) 
 
     def add_property(self, name):
-        self.properties[name] = getattr(self, name)
+        if getattr(self,name) != None:
+            self.properties[name] = getattr(self, name) 
 
     @staticmethod
     def list_to_plist(newList):

@@ -35,7 +35,7 @@ class Plugin(object):
         self.waitForResponse = None
         return self.response
 
-    def getResponseForResquest(self, clientBoundCommand):
+    def getResponseForRequest(self, clientBoundCommand):
         self.waitForResponse = threading.Event()
         if isinstance(clientBoundCommand, ClientBoundCommand):
             self.connection.send_object(clientBoundCommand)
@@ -45,6 +45,12 @@ class Plugin(object):
         self.waitForResponse = None
         return self.response
     
+    def sendRequestWithoutAnswer(self, clientBoundCommand):
+        if isinstance(clientBoundCommand, ClientBoundCommand):
+            self.connection.send_object(clientBoundCommand)
+        else:
+            self.connection.send_plist(clientBoundCommand)
+
     def say(self, text):
         view = AddViews(self.refId)
         view.views += [AssistantUtteranceView(text, text)]
