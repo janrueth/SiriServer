@@ -25,7 +25,7 @@ Check out the plugins folder and the [example plugin](https://github.com/Eichhoe
 It supports multi-language inputs.
 
 You should also checkput the [plugin.py](https://github.com/Eichhoernchen/SiriServer/blob/master/plugin.py) to see what a plugin has for predefined methods.
-You can also look at the [time](https://github.com/Eichhoernchen/SiriServer/blob/master/plugins/time.py) plugin, it sends more complexe objects and does meaningful localized output.
+You can also look at the [time](https://github.com/Eichhoernchen/SiriServer/blob/master/plugins/time.py) plugin, it sends more complexe objects and does meaningful localized output. And does more complex processing of different inputs
 
 What else is here?
 ------------------
