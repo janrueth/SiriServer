@@ -1,13 +1,38 @@
-This is a very early version of a Siri Server.
+Siri Server
+===========
+
+What is this?
+-------------
+This is a very early version of a Siri Server (not a proxy).
+
+Apple's Siri is an voice controlled assistant on iPhone 4S.
+
+With jailbreaking you can install it on other iDevices.
+However, Siri needs a server to communicate to do the speech processing.
+Apple only allows 4S devices on their servers.
+
+This project tries to recreate the Apple Siri Server to use it with other iDevices.
+
 You don't need any 4S keys to make it work, as it is independent from Apple.
+
 It uses Google Speech-To-Text API. And therefore we are currently limited to 
 commands that are shorter than 10 seconds (maybe we can overcome this).
 
+What's new?
+-----------
 We have a new plugin system:
-Check out the plugins folder and the example plugin for more infos.
+Check out the plugins folder and the [example plugin](https://github.com/Eichhoernchen/SiriServer/blob/master/plugins/examplePlugin.py) for more infos.
+It supports multi-language inputs.
 
-The file SiriProtocol documents everything I found out about the protocol by now
+What else is here?
+------------------
+The file SiriProtocol documents everything I (and others) found out about the protocol by now
 
+
+Setup, Notes and Instructions
+-----------------------------
+
+**Install audio libraries**
 For the audio handling you need 
 	libspeex http://www.speex.org/downloads/
 	libflac http://sourceforge.net/projects/flac/files/flac-src/
@@ -32,6 +57,7 @@ and compile and install them, or simply follow the following steps:
 	sudo make install
 Note: you can also install libspeex via MacPorts, but libflac is not available in 64bit you need to supply `--disable-asm-optimizations` in configure to make it compile
 
+**Python requirements**
 As this project is coded with python you need a python interpreter (this is usually already installed).
 I work with python 2.6.6 and 2.7.2 and both work.
 
@@ -49,6 +75,7 @@ After you installed it, run:
 	easy_install biplist
 	easy_install M2Crypto
 
+**Certificate Generation**
 We also need to generate certificates for`guzzoni.apple.com` or any other domain
 	cd gen_certs
 then
@@ -73,8 +100,23 @@ Please make sure to install the CA certificate on your iDevice (you can simply m
 It is the CA.pem file that was copied by gen_certs.sh to the servers root. 
 In your mail, just click on the certificate and install it.
 
+**Running the server**
 Now you are ready to go, start the server with:
 	sudo python siriServer.py
 Note: You need to run it as root, as we use https port 443
 (non root can only use ports > 1024) for incomming connections.
 
+
+Thanks
+------
+A bit thanks to [Applidium](http://applidium.com/en/news/cracking_siri/) and also [plamoni](https://github.com/plamoni/SiriProxy/) for his SiriProxy which inspired me
+Thanks to everyone that contributed code or ideas
+
+Licensing
+---------
+This is free software. You can reuse it under the terms of the [Creative Commons Attribution-NonCommercial-ShareAlike 3.0](http://creativecommons.org/licenses/by-nc-sa/3.0/) license. So you can do what ever you want with it. But you are not allowed to sell it.
+If you like to do more than the license allows, please contact me and ask for a special commercial license.
+
+Disclaimer
+----------
+Apple owns all the rights on Siri. I do not give any warranties or guaranteed support for this software. You it as it is.
