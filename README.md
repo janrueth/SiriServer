@@ -33,10 +33,8 @@ Setup, Notes and Instructions
 -----------------------------
 
 **Install audio libraries**
-For the audio handling you need 
 
-	libspeex http://www.speex.org/downloads/
-	libflac http://sourceforge.net/projects/flac/files/flac-src/
+For the audio handling you need [libspeex](http://www.speex.org/) and [libflac](http://flac.sourceforge.net/)
 
 On Linux simply install it via you packet manager e.g. (or see instructions and note for OS X):
 
@@ -117,6 +115,7 @@ In your mail, just click on the certificate and install it.
 **Running the server**
 
 Now you are ready to go, start the server with:
+
 	sudo python siriServer.py
 Note: You need to run it as root, as we use https port 443
 (non root can only use ports > 1024) for incomming connections.
