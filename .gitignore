@@ -1,0 +1,7 @@
+*.pyc
+*.pem
+*.key
+*.crt
+*.sqlite3
+*.log
+.DS_Store
