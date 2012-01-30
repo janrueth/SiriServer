@@ -24,6 +24,9 @@ We have a new plugin system:
 Check out the plugins folder and the [example plugin](https://github.com/Eichhoernchen/SiriServer/blob/master/plugins/examplePlugin.py) for more infos.
 It supports multi-language inputs.
 
+You should also checkput the [plugin.py](https://github.com/Eichhoernchen/SiriServer/blob/master/plugin.py) to see what a plugin has for predefined methods.
+You can also look at the [time](https://github.com/Eichhoernchen/SiriServer/blob/master/plugins/time.py) plugin, it sends more complexe objects and does meaningful localized output.
+
 What else is here?
 ------------------
 The file SiriProtocol documents everything I (and others) found out about the protocol by now

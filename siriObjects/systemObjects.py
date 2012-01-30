@@ -12,6 +12,15 @@ class GetRequestOrigin(ClientBoundCommand):
         return super(GetRequestOrigin, self).to_plist()
 
 
+class DomainObject(AceObject):
+    def __init__(self, group, identifier=None):
+        super(DomainObject, self).__init__("Object", group)
+        self.identifier = identifier
+    
+    def to_plist(self):
+        self.add_property('identifier')
+        return super(DomainObject, self).to_plist()
+
 class DomainObjectCreate(ClientBoundCommand):
     def __init__(self, refId, object=None):
         super(DomainObjectCreate, self).__init__("DomainObjectCreate", "com.apple.ace.system", None, refId)
