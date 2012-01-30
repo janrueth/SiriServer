@@ -109,7 +109,7 @@ class time(Plugin):
                     types = components[0]['types'] # <- this should be the city or country
                     if "country" in types:
                         # OK we have a country as input, that sucks, we need the capital, lets try again and ask for capital also
-                        components = filter(lambda x: True if "locality" in x['types'] else False, components)
+                        components = filter(lambda x: True if "country" in x['types'] else False, components)
                         url = "http://maps.googleapis.com/maps/api/geocode/json?address=capital%20{0}&sensor=false&language={1}".format(urllib.quote_plus(components[0]['long_name']), language)
                             # lets wait max 3 seconds
                         jsonString = None
@@ -135,7 +135,7 @@ class time(Plugin):
                         timeZoneResponse = json.loads(jsonString)
                         if "timezoneId" in timeZoneResponse:
                             timeZone = timeZoneResponse['timezoneId']
-                            city = filter(lambda x: True if "locality" in x['types'] else False, components)[0]['long_name']
+                            city = filter(lambda x: True if "locality" in x['types'] or "administrative_area_level_1" in x['types'] else False, components)[0]['long_name']
                             country = filter(lambda x: True if "country" in x['types'] else False, components)[0]['long_name']
                             countryCode = filter(lambda x: True if "country" in x['types'] else False, components)[0]['short_name']
                             
