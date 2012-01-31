@@ -1,4 +1,5 @@
 from uuid import uuid4
+import logging
 
 class AceObject(object):
     def __init__(self, encodedClassName, groupIdentifier):
@@ -11,8 +12,11 @@ class AceObject(object):
         self.plist[name] = getattr(self, name) 
 
     def add_property(self, name):
-        if getattr(self,name) != None:
-            self.properties[name] = getattr(self, name) 
+        try:
+            if getattr(self,name) != None:
+                self.properties[name] = getattr(self, name) 
+        except AttributeError:
+            logging.getLogger("logger").exception("You tried to set the property \"{0}\", but this instance of class: \"{1}\" does not have a member variable named like this".format(name, self.__class__))
 
     @staticmethod
     def list_to_plist(newList):
