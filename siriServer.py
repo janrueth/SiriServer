@@ -22,6 +22,7 @@ from sslDispatcher import ssl_dispatcher
 
 
 class HandleConnection(ssl_dispatcher):
+    __not_recognized = {"de-DE": "Entschuldigung, ich verstehe \"{0}\" nicht.", "en-US": "Sorry I don't understand {0}"}
     def __init__(self, conn):
         asyncore.dispatcher_with_send.__init__(self, conn)
         
@@ -153,6 +154,9 @@ class HandleConnection(ssl_dispatcher):
                         self.current_running_plugin.start()
                     else:
                         self.send_object(recognized)
+                        view = uiObjects.AddViews(requestId)
+                        view.views += [uiObjects.AssistantUtteranceView(HandleConnection.__not_recognized[self.assistant.language].format(best_match), HandleConnection.__not_recognized[self.assistant.language].format(best_match))]
+                        self.send_object(view)
                         self.send_object(baseObjects.RequestCompleted(requestId))
                 elif self.current_running_plugin.waitForResponse != None:
                     self.current_running_plugin.response = best_match
@@ -334,6 +338,7 @@ class SiriServer(asyncore.dispatcher):
         self.set_reuse_addr()
         self.bind((host, port))
         self.listen(5)
+	logging.getLogger("logger").info("Listening on port {0}".format(port))
 
     def handle_accept(self):
         pair = self.accept()
@@ -381,6 +386,6 @@ x.addHandler(h)
 
 
 #start server
-x.info("Opening Server on port 443")
+x.info("Starting Server")
 server = SiriServer('', 443)
 asyncore.loop()

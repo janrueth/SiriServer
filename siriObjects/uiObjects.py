@@ -30,6 +30,17 @@ class AssistantUtteranceView(AceObject):
         self.add_property('listenAfterSpeaking')
         return super(AssistantUtteranceView, self).to_plist()
 
+class Button(AceObject):
+    def __init__(self, text="", commands=None):
+        super(Button, self).__init__("Button", "com.apple.ace.assistant")
+        self.text = text
+        self.commands = commands if commands != None else []
+
+    def to_plist(self):
+        self.add_property('text')
+        self.add_property('commands')
+        return super(Button, self).to_plist()
+
 
 class ConfirmationOptions(AceObject):
     def __init__(self, denyCommands=None, submitCommands=None, confirmText="Confirm", denyText="Cancel", cancelCommands=None, cancelLabel="Cancel", submitLabel="Confirm", confirmCommands=None, cancelTrigger="Deny"):

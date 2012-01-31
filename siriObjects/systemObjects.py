@@ -52,10 +52,21 @@ class DomainObjectCommit(ClientBoundCommand):
         self.add_property('identifier')
         return super(DomainObjectCommit, self).to_plist()
 
+class StartRequest(AceObject):
+    def __init__(self, handsFree=False, utterance=""):
+        super(StartRequest, self).__init__("StartRequest", "com.apple.ace.system")
+        self.handsFree = handsFree
+        self.utterance = utterance
 
-class SendCommands(ClientBoundCommand):
-    def __init__(self, refId, commands=None):
-        super(SendCommands, self).__init__("SendCommands", "com.apple.ace.system", None, refId)
+    def to_plist(self):
+        self.add_property('handsFree')
+        self.add_property('utterance')
+        return super(StartRequest, self).to_plist()
+
+
+class SendCommands(AceObject):
+    def __init__(self, commands=None):
+        super(SendCommands, self).__init__("SendCommands", "com.apple.ace.system")
         self.commands = commands if commands != None else []
     
     def to_plist(self):
