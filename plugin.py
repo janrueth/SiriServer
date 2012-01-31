@@ -6,6 +6,8 @@ from siriObjects.baseObjects import ClientBoundCommand, RequestCompleted
 from siriObjects.uiObjects import AddViews, AssistantUtteranceView
 __criteria_key__ = "criterias"
 
+__error_responses__ = {"de-DE": "Es ist ein Fehler in der Verarbeitung ihrer Anfrage aufgetreten!", "en-US": "There was an error during the processing of your request!", "en-GB": "There was an error during the processing of your request!", "en-AU": "There was an error during the processing of your request!", "fr-FR": "Il y avait une erreur lors du traitement de votre demande!"}
+
 def register(lang, regex):
     def addInfosTo(func):
         if not __criteria_key__ in func.__dict__:
@@ -15,12 +17,28 @@ def register(lang, regex):
         return func
     return addInfosTo
 
-class Plugin(object):
-    def __init__(self):
+class Plugin(threading.Thread):
+    def __init__(self, method, speech, language):
+        super(Plugin, self).__init__()
+        self.__method = method
+        self.__lang = language
+        self.__speech = speech
         self.waitForResponse = None
         self.response = None
         self.refId = None
         self.connection = None
+    
+    def run(self):
+        try:
+            try:
+                self.__method(self, self.__speech, self.__lang)
+            except:
+                print "Unexpected error:", sys.exc_info()[0]   
+                self.say(__error_responses__[self.__lang])
+                self.complete_request()
+        except:
+            pass
+        self.connection.current_running_plugin = None
 
     def complete_request(self):
         self.connection.current_running_plugin = None
