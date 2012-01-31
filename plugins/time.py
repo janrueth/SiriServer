@@ -63,7 +63,7 @@ class time(Plugin):
                                 }
                     }
 
-    @register("de-DE", "(Wieviel Uhr.*)|(.*Uhrzeit.*)")     
+    @register("de-DE", "(Wie viel Uhr.*)|(.*Uhrzeit.*)")     
     @register("en-US", "(What.*time.*)|(.*current time.*)")
     def currentTime(self, speech, language):
         #first tell that we look it up
