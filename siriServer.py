@@ -52,7 +52,6 @@ class HandleConnection(ssl_dispatcher):
         self.assistant = None
         self.sendLock = threading.Lock()
         self.current_running_plugin = None
-        self.current_running_plugin_thread = None
     
     def handle_ssl_established(self):                
         self.ssled = True
@@ -149,12 +148,12 @@ class HandleConnection(ssl_dispatcher):
                 if self.current_running_plugin == None:
                     (clazz, method) = PluginManager.getPlugin(best_match, self.assistant.language)
                     if clazz != None and method != None:
-                        plugin = clazz()
+                        plugin = clazz(method, best_match, self.assistant.language)
                         plugin.refId = requestId
                         plugin.connection = self
                         self.current_running_plugin = plugin
                         self.send_object(recognized)
-                        self.current_running_plugin_thread = thread.start_new_thread(method, (plugin, best_match, self.assistant.language))
+                        self.current_running_plugin.start()
                     else:
                         self.send_object(recognized)
                         self.send_object(baseObjects.RequestCompleted(requestId))
