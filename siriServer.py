@@ -1,16 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import socket, ssl, sys, zlib, binascii, time, select, struct, biplist
+import socket, ssl, sys, zlib, binascii, time, select, struct, biplist, uuid, json, asyncore, re, threading, logging, pprint
+from optparse import OptionParser
 from email.utils import formatdate
-import uuid
+
 import speex
 import flac
-import json
-import asyncore
-import re
-import threading
-import thread
 import db
 from db import Assistant
 
@@ -52,6 +48,7 @@ class HandleConnection(ssl_dispatcher):
         self.assistant = None
         self.sendLock = threading.Lock()
         self.current_running_plugin = None
+        self.logger = logging.getLogger("logger")
     
     def handle_ssl_established(self):                
         self.ssled = True
@@ -72,14 +69,14 @@ class HandleConnection(ssl_dispatcher):
                 endOfHeader = self.data.find("\r\n\r\n")+4
                 self.header = self.data[:endOfHeader]
                 self.data = self.data[endOfHeader:]
-                print "Received new header from iDevice"
-                print self.header
-                print "Header end"
+                self.logger.debug("--------------------------------------Header start------------------------------------")
+                self.logger.debug(self.header)
+                self.logger.debug("---------------------------------------Header end-------------------------------------")
                 self.binary_mode = True
                 self.header_complete = True
         else:
             if not self.consumed_ace:
-                print "Received removing ace instruction: ", repr(self.data[:4])
+                self.logger.debug("Received removing ace instruction: {0}".format(repr(self.data[:4])))
                 self.data = self.data[4:]
                 self.consumed_ace = True
                 self.output_buffer = "HTTP/1.1 200 OK\r\nServer: Apache-Coyote/1.1\r\nDate: " +  formatdate(timeval=None, localtime=False, usegmt=True) + "\r\nConnection: close\r\n\r\n\xaa\xcc\xee\x02"
@@ -112,7 +109,7 @@ class HandleConnection(ssl_dispatcher):
 
     def send_plist(self, plist):
         self.sendLock.acquire()
-        print "Sending: ", plist
+        self.logger.debug("Sending:\n{0}".format(pprint.pformat(plist, width=40)))
         bplist = biplist.writePlistToString(plist);
         #
         self.unzipped_output_buffer = struct.pack('>BI', 2,len(bplist)) + bplist
@@ -135,7 +132,7 @@ class HandleConnection(ssl_dispatcher):
             if len(possible_matches) > 0:
                 best_match = possible_matches[0]['utterance']
                 best_match_confidence = possible_matches[0]['confidence']
-                print u"Best matching result: \"{0}\" with a confidence of {1}%".format(best_match, round(float(best_match_confidence)*100,2))
+                self.logger.info(u"Best matching result: \"{0}\" with a confidence of {1}%".format(best_match, round(float(best_match_confidence)*100,2)))
                 # construct a SpeechRecognized
                 token = speechObjects.Token(best_match, 0, 0, 1000.0, True, True)
                 interpretation = speechObjects.Interpretation([token])
@@ -172,8 +169,8 @@ class HandleConnection(ssl_dispatcher):
         while self.hasNextObj():
             reqObject = self.read_next_object_from_unzipped()
             if reqObject != None:
-                print "Packet with class: ", reqObject['class']
-                print "packet with content: ", reqObject
+                self.logger.debug("Packet with class: {0}".format(reqObject['class']))
+                self.logger.debug("packet with content:\n{0}".format(pprint.pformat(reqObject, width=40)))
                 
                 # first handle speech stuff
                 
@@ -228,7 +225,6 @@ class HandleConnection(ssl_dispatcher):
                         #self.send_plist({"class":"CommandFailed", "properties": {"reason":"Not authenticated", "errorCode":0, "callbacks":[]}, "aceId": str(uuid.uuid4()), "refId": reqObject['aceId'], "group":"com.apple.ace.system"})
                     if reqObject['class'] == 'CreateSessionInfoRequest':
                 # how does a positive answer look like?
-                        print "returning response"
                         self.send_plist({"class":"CommandFailed", "properties": {"reason":"Not authenticated", "errorCode":0, "callbacks":[]}, "aceId": str(uuid.uuid4()), "refId": reqObject['aceId'], "group":"com.apple.ace.system"})
                         #self.send_plist({"class":"SessionValidationFailed", "properties":{"errorCode":"UnsupportedHardwareVersion"}, "aceId": str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
                         
@@ -295,13 +291,13 @@ class HandleConnection(ssl_dispatcher):
     
     def read_next_object_from_unzipped(self):
         cmd, data = struct.unpack('>BI', self.unzipped_input[:5])
-        print cmd, data
         
         if cmd == 3: #ping
             self.ping = data
+            self.logger.info("Received a Ping ({0})".format(data))
+            self.logger.info("Returning a Pong ({0})".format(self.pong))
             self.send_pong(self.pong)
             self.pong += 1
-            print "Returning a Pong"
             self.unzipped_input = self.unzipped_input[5:]
             return None
 
@@ -345,7 +341,7 @@ class SiriServer(asyncore.dispatcher):
             pass
         else:
             sock, addr = pair
-            print 'Incoming connection from %s' % repr(addr)
+            logging.getLogger("logger").info('Incoming connection from {0}'.format(repr(addr)))
             handler = HandleConnection(sock)
 
 # load the certificates
@@ -362,7 +358,29 @@ db.setup()
 #load Plugins
 PluginManager.load_plugins()
 
+#setup logging
+
+log_levels = {'debug':logging.DEBUG,
+              'info':logging.INFO,
+              'warning':logging.WARNING,
+              'error':logging.ERROR,
+              'critical':logging.CRITICAL
+              }
+
+parser = OptionParser()
+parser.add_option('-l', '--loglevel', default='info', dest='logLevel', help='This sets the logging level you have these options: debug, info, warning, error, critical \t\tThe standard value is info')
+(options, args) = parser.parse_args()
+
+x = logging.getLogger("logger")
+x.setLevel(log_levels[options.logLevel])
+h = logging.StreamHandler()
+f = logging.Formatter("%(levelname)s %(funcName)s %(message)s")
+h.setFormatter(f)
+x.addHandler(h)
+
+
+
 #start server
-print "Opening Server on port 443"
+x.info("Opening Server on port 443")
 server = SiriServer('', 443)
 asyncore.loop()

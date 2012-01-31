@@ -1,6 +1,7 @@
 
 import re
 import threading
+import logging
 
 from siriObjects.baseObjects import ClientBoundCommand, RequestCompleted
 from siriObjects.uiObjects import AddViews, AssistantUtteranceView
@@ -27,13 +28,14 @@ class Plugin(threading.Thread):
         self.response = None
         self.refId = None
         self.connection = None
+        self.logger = logging.getLogger("logger")
     
     def run(self):
         try:
             try:
                 self.__method(self, self.__speech, self.__lang)
             except:
-                print "Unexpected error:", sys.exc_info()[0]   
+                self.logger.exception("Unexpected during plugin processing")
                 self.say(__error_responses__[self.__lang])
                 self.complete_request()
         except:
