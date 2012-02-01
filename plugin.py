@@ -1,4 +1,3 @@
-
 import re
 import threading
 import logging
@@ -71,7 +70,9 @@ class Plugin(threading.Thread):
         else:
             self.connection.send_plist(clientBoundCommand)
 
-    def say(self, text):
+    def say(self, text, speakableText=""):
         view = AddViews(self.refId)
-        view.views += [AssistantUtteranceView(text, text)]
+        if speakableText == "":
+            speakabletext = text
+        view.views += [AssistantUtteranceView(text, speakableText)]
         self.connection.send_object(view)
