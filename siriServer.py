@@ -22,7 +22,7 @@ from sslDispatcher import ssl_dispatcher
 
 
 class HandleConnection(ssl_dispatcher):
-    __not_recognized = {"de-DE": "Entschuldigung, ich verstehe \"{0}\" nicht.", "en-US": "Sorry I don't understand {0}"}
+    __not_recognized = {"de-DE": u"Entschuldigung, ich verstehe \"{0}\" nicht.", "en-US": u"Sorry I don't understand {0}"}
     def __init__(self, conn):
         asyncore.dispatcher_with_send.__init__(self, conn)
         
