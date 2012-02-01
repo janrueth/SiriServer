@@ -127,7 +127,7 @@ class HandleConnection(ssl_dispatcher):
         if googleJson == None:
             # there was a network failure
             self.send_object(speechObjects.SpeechFailure(requestId, "No connection to Google possible"))
-            self.send_object(baseObjects.RequestCompleted(requestID))
+            self.send_object(baseObjects.RequestCompleted(requestId))
         else:
             possible_matches = googleJson['hypotheses']
             if len(possible_matches) > 0:
