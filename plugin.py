@@ -73,6 +73,6 @@ class Plugin(threading.Thread):
     def say(self, text, speakableText=""):
         view = AddViews(self.refId)
         if speakableText == "":
-            speakabletext = text
+            speakableText = text
         view.views += [AssistantUtteranceView(text, speakableText)]
         self.connection.send_object(view)
