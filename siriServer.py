@@ -126,6 +126,7 @@ class HandleConnection(ssl_dispatcher):
     def process_recognized_speech(self, googleJson, requestId, dictation):
         if googleJson == None:
             # there was a network failure
+            # is this the correct command to send?
             self.send_object(speechObjects.SpeechFailure(requestId, "No connection to Google possible"))
             self.send_object(baseObjects.RequestCompleted(requestId))
         else:
@@ -141,31 +142,33 @@ class HandleConnection(ssl_dispatcher):
                 recognition = speechObjects.Recognition([phrase])
                 recognized = speechObjects.SpeechRecognized(requestId, recognition)
                 
-                
-                
-                if self.current_running_plugin == None:
-                    (clazz, method) = PluginManager.getPlugin(best_match, self.assistant.language)
-                    if clazz != None and method != None:
-                        plugin = clazz(method, best_match, self.assistant.language)
-                        plugin.refId = requestId
-                        plugin.connection = self
-                        self.current_running_plugin = plugin
-                        self.send_object(recognized)
-                        self.current_running_plugin.start()
+                if not dictation:
+                    if self.current_running_plugin == None:
+                        (clazz, method) = PluginManager.getPlugin(best_match, self.assistant.language)
+                        if clazz != None and method != None:
+                            plugin = clazz(method, best_match, self.assistant.language)
+                            plugin.refId = requestId
+                            plugin.connection = self
+                            self.current_running_plugin = plugin
+                            self.send_object(recognized)
+                            self.current_running_plugin.start()
+                        else:
+                            self.send_object(recognized)
+                            view = uiObjects.AddViews(requestId)
+                            view.views += [uiObjects.AssistantUtteranceView(HandleConnection.__not_recognized[self.assistant.language].format(best_match), HandleConnection.__not_recognized[self.assistant.language].format(best_match))]
+                            self.send_object(view)
+                            self.send_object(baseObjects.RequestCompleted(requestId))
+                    elif self.current_running_plugin.waitForResponse != None:
+                        # do we need to send a speech recognized here? i.d.k
+                        self.current_running_plugin.response = best_match
+                        self.current_running_plugin.refId = requestId
+                        self.current_running_plugin.waitForResponse.set()
                     else:
                         self.send_object(recognized)
-                        view = uiObjects.AddViews(requestId)
-                        view.views += [uiObjects.AssistantUtteranceView(HandleConnection.__not_recognized[self.assistant.language].format(best_match), HandleConnection.__not_recognized[self.assistant.language].format(best_match))]
-                        self.send_object(view)
                         self.send_object(baseObjects.RequestCompleted(requestId))
-                elif self.current_running_plugin.waitForResponse != None:
-                    self.current_running_plugin.response = best_match
-                    self.current_running_plugin.refId = requestId
-                    self.current_running_plugin.waitForResponse.set()
                 else:
                     self.send_object(recognized)
                     self.send_object(baseObjects.RequestCompleted(requestId))
-            
 
     def process_compressed_data(self):
         self.unzipped_input += self.decompressor.decompress(self.data)
