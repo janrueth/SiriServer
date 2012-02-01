@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import socket, ssl, sys, zlib, binascii, time, select, struct, biplist, uuid, json, asyncore, re, threading, logging, pprint
+import socket, ssl, sys, zlib, binascii, time, select, struct, biplist, uuid, json, asyncore, re, threading, logging, pprint, sqlite3
 from optparse import OptionParser
 from email.utils import formatdate
 
