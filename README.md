@@ -124,6 +124,37 @@ Note: You need to run it as root, as we use https port 443
 (non root can only use ports > 1024) for incomming connections.
 
 
+Common Errors
+-------------
+
+If we had the mid 90s this section would glow and sparkle to get your attention
+There are some errors that might occur even though you did everything that was written above...
+
+** The server just crashes after a SpeechPacket **
+
+You are running Linux right? Probably debian?
+There is probably already a libspeex on your machine which is optimized for SSE2 which does not work with python (reason???)
+Check if there is a `/usr/lib/sse2/libspeex.so.1`.
+Option A: delete it (there should also be a version in /usr/lib if you installed via apt, or in /usr/local/lib if you compiled by hand)
+Option B: ToDo
+
+** This M2Crypto thing is not working **
+
+Did you install all [dependencies](http://chandlerproject.org/Projects/MeTooCrypto#Requirements) of M2Crypto?
+
+** I cannot get a connection from device to server **
+
+Do you access your server over the internet? You need to setup your firewall and NAT to allow traffic for tcp port 443 directed to your server
+Do you have a local firewall on the machine running the server? Also check if tcp port 443 is allowed for incomming connections
+
+
+** There is an exception with something around a database lock **
+
+	error: uncaptured python exception, closing channel <main.HandleConnection connected xxx.xxx.xxx.xxx:XXXX at 0xa65c368> (:database is locked
+Solution: delete the .sqlite3 file and restart server
+
+
+
 Thanks
 ------
 A big thanks to [Applidium](http://applidium.com/en/news/cracking_siri/) and also [plamoni](https://github.com/plamoni/SiriProxy/) for his SiriProxy which inspired me
