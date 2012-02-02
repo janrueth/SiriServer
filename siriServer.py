@@ -156,7 +156,8 @@ class HandleConnection(ssl_dispatcher):
                         else:
                             self.send_object(recognized)
                             view = uiObjects.AddViews(requestId)
-                            view.views += [uiObjects.AssistantUtteranceView(HandleConnection.__not_recognized[self.assistant.language].format(best_match), HandleConnection.__not_recognized[self.assistant.language].format(best_match))]
+                            errorText = HandleConnection.__not_recognized[self.assistant.language] if self.assistant.language in HandleConnection.__not_recognized else HandleConnection.__not_recognized["en-US"]
+                            view.views += [uiObjects.AssistantUtteranceView(errorText.format(best_match), errorText.format(best_match))]
                             self.send_object(view)
                             self.send_object(baseObjects.RequestCompleted(requestId))
                     elif self.current_running_plugin.waitForResponse != None:
