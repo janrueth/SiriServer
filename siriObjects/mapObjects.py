@@ -15,7 +15,7 @@ class SiriMapItemSnippet(AceObject):
         return super(SiriMapItemSnippet, self).to_plist()
 
 class SiriLocation(AceObject):
-    def __init__(self, label="Apple", street="1 Infinite Loop", city="Cupertino", stateCode="CA", countryCode="US", postalCode="95014", latitude=37.3317031860352, longitude=-122.030089795589):
+    def __init__(self, label="", street="", city="", stateCode="", countryCode="", postalCode="", latitude="", longitude=""):
         super(SiriLocation, self).__init__("Location", "com.apple.ace.system")
         self.label = label
         self.street = street
@@ -38,11 +38,11 @@ class SiriLocation(AceObject):
         return super(SiriLocation, self).to_plist()
 
 class SiriMapItem(AceObject):
-    def __init__(self, label="Apple Headquarters", location=SiriLocation(), detailType="BUSINESS_ITEM"):
+    def __init__(self, label="", location=None, detailType="BUSINESS_ITEM"):
         super(SiriMapItem, self).__init__("MapItem", "com.apple.ace.localsearch")
         self.label = label
         self.detailType = detailType
-        self.location = location
+        self.location = location if location != None else SiriLocation()
     
     def to_plist(self):
         self.add_property('label')
