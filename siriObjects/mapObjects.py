@@ -3,7 +3,6 @@
 
 from siriObjects.baseObjects import AceObject, ClientBoundCommand
 
-
 class SiriMapItemSnippet(AceObject):
     def __init__(self, userCurrentLocation=True, items=None):
         super(SiriMapItemSnippet, self).__init__("MapItemSnippet", "com.apple.ace.localsearch")
