@@ -383,6 +383,7 @@ log_levels = {'debug':logging.DEBUG,
 
 parser = OptionParser()
 parser.add_option('-l', '--loglevel', default='info', dest='logLevel', help='This sets the logging level you have these options: debug, info, warning, error, critical \t\tThe standard value is info')
+parser.add_option('-p', '--port', default=443, type='int', dest='port', help='This options lets you use a custom port instead of 443 (use a port > 1024 to run as non root user)')
 (options, args) = parser.parse_args()
 
 x = logging.getLogger("logger")
@@ -396,7 +397,7 @@ x.addHandler(h)
 
 #start server
 x.info("Starting Server")
-server = SiriServer('', 443)
+server = SiriServer('', options.port)
 try:
     asyncore.loop()
 except (asyncore.ExitNow, KeyboardInterrupt, SystemExit):
