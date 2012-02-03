@@ -154,6 +154,56 @@ Do you have a local firewall on the machine running the server? Also check if tc
 	error: uncaptured python exception, closing channel <main.HandleConnection connected xxx.xxx.xxx.xxx:XXXX at 0xa65c368> (:database is locked
 Solution: delete the .sqlite3 file and restart server
 
+**There is something with SSL in the error**
+
+Have you installed the ca.pem file on your phone? Do you have more than one CA certificate installed for the same domain?
+
+=> Try deleting all certificates on the device and install the one created by gen_certs
+
+Can I somehow verify the correct certificate? YES!
+
+start siriServer.py, then take your ca.pem you think belongs to your servers certificate and run:
+
+	 echo | openssl s_client -connect [DOMAIN]:443 2>&1 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | openssl verify -CAfile ca.pem 
+Make sure to replace [DOMAIN] with the actual domain of the machine running siriServer.py (e.g. an IP address)
+If your ca.pem matches your server certificate you should see `stdin: OK` as output!
+
+OK, what else?
+We can also setup a small test server using openssl to check if SSL is working (and to check if the iPhone correctly validates the server certificate):
+
+	sudo openssl s_server -cert server.passless.crt -key server.passless.key -accept 443 -state
+When you run this (siriServer should NOT run) it opens a basis server on port 443 using your servers certificate.
+
+Now you can connect with your iPhone as if you would use Siri (of course Siri won't work, we are just testing the SSL layer)
+It should output something like this, note the Ace http request near the end:
+
+	 Using default temp DH parameters
+	 Using default temp ECDH parameters  
+	 ACCEPT
+	 SSL_accept:before/accept initialization
+	 SSL_accept:SSLv3 read client hello A
+	 SSL_accept:SSLv3 write server hello A
+	 SSL_accept:SSLv3 write certificate A
+	 SSL_accept:SSLv3 write server done A
+	 SSL_accept:SSLv3 flush data
+	 SSL_accept:SSLv3 read client key exchange A
+	 SSL_accept:SSLv3 read finished A
+	 SSL_accept:SSLv3 write change cipher spec A
+	 SSL_accept:SSLv3 write finished A
+	 SSL_accept:SSLv3 flush data
+	 -----BEGIN SSL SESSION PARAMETERS-----
+	 MIGKAgEBAgIDAQQCAC8EIJ3DOw2nTgOAjdCNMqiFi+OmYU1fszwfH3jDk4q1P/mq
+	 BDB7vM4nKFiGjLHpExNf4F1HZQ7ekRPaG/2X9EI/mqtpeWPp8vU1a/Em5JWomauK
+	 jDShBgIETyr5oaIEAgIBLKQGBAQBAAAAphMEEWVob2VybmNoZW4uYXRoLmN4
+	 -----END SSL SESSION PARAMETERS-----
+ 	 Shared ciphers:ECDHE-ECDSA-AES256-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-ECDSA-RC4-SHA:ECDHE-      ECDSA-DES-CBC3-SHA:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:ECDHE-RSA-RC4-SHA:ECDHE-RSA-DES-CBC3-SHA:ECDH-ECDSA-AES128-SHA:ECDH-ECDSA-AES256-SHA:ECDH-ECDSA-RC4-SHA:ECDH-ECDSA-DES-CBC3-SHA:ECDH-RSA-AES128-SHA:ECDH-RSA-AES256-SHA:ECDH-RSA-RC4-SHA:ECDH-RSA-DES-CBC3-   SHA:AES128-SHA:RC4-SHA:RC4-MD5:AES256-SHA:DES-CBC3-SHA:DHE-RSA-AES128-SHA:DHE-RSA-AES256-  SHA:EDH-RSA-DES-CBC3-SHA
+	 CIPHER is AES128-SHA
+	 Secure Renegotiation IS supported
+	 ACE /ace HTTP/1.0
+	 Host: DOMAIN REMOVED
+	 User-Agent: Assistant(iPhone/iPhone3,1; iPhone OS/5.0.1/9A405) Ace/1.0
+	 Content-Length: 2000000000
+
 
 
 Thanks

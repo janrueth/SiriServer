@@ -1,8 +1,8 @@
 from siriObjects.baseObjects import ClientBoundCommand, AceObject
 
 class AddViews(ClientBoundCommand):
-    def __init__(self, refId, scrollToTop=False, temporary=False, dialogPhase="Completion", views=None):
-        super(AddViews, self).__init__("AddViews", "com.apple.ace.assistant", None, refId)
+    def __init__(self, refId, scrollToTop=False, temporary=False, dialogPhase="Completion", views=None, callbacks=None):
+        super(AddViews, self).__init__("AddViews", "com.apple.ace.assistant", None, refId, callbacks)
         self.scrollToTop = scrollToTop
         self.temporary = temporary
         self.dialogPhase = dialogPhase

@@ -9,7 +9,11 @@ class AceObject(object):
         self.properties = dict()
     
     def add_item(self, name):
-        self.plist[name] = getattr(self, name) 
+        try:
+            if getattr(self, name) != None and getattr(self, name) != "":
+                self.plist[name] = getattr(self, name) 
+        except AttributeError:
+            logging.getLogger("logger").exception("You tried to set the item \"{0}\", but this instance of class: \"{1}\" does not have a member variable named like this".format(name, self.__class__))
 
     def add_property(self, name):
         try:
@@ -77,25 +81,22 @@ class ServerBoundCommand(AceObject):
 
 
 class ClientBoundCommand(AceObject):
-    def __init__(self, encodedClassName, groupIdentifier, aceId, refId):
+    def __init__(self, encodedClassName, groupIdentifier, aceId, refId, callbacks=None):
         super(ClientBoundCommand, self).__init__(encodedClassName, groupIdentifier)
         self.aceId= aceId if aceId != None else str.upper(str(uuid4()))
         self.refId = refId if refId != None else str.upper(str(uuid4()))
-
+        self.callbacks = callbacks if callbacks != None else []
+    
     def to_plist(self):
         self.add_item('aceId')
         self.add_item('refId')
+        self.add_property('callbacks')
         return super(ClientBoundCommand, self).to_plist()
 
 
 class RequestCompleted(ClientBoundCommand):
-    def __init__(self, refId, callbacks = []):
-        super(RequestCompleted, self).__init__("RequestCompleted", "com.apple.ace.system", None, refId)
-        self.callbacks = callbacks
-    
-    def to_plist(self):
-        self.add_property('callbacks')
-        return super(RequestCompleted, self).to_plist()
+    def __init__(self, refId, callbacks = None):
+        super(RequestCompleted, self).__init__("RequestCompleted", "com.apple.ace.system", None, refId, callbacks)
 
 #classToPyClassMapping = {'StartSpeechRequest': speechObjects.StartSpeechRequest,
 #    'SpeechSpacket': speechObjects.SpeechSpacket,

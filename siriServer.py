@@ -14,7 +14,7 @@ import PluginManager
 
 from M2Crypto import BIO, RSA, X509
 
-from siriObjects import speechObjects, baseObjects, uiObjects
+from siriObjects import speechObjects, baseObjects, uiObjects, systemObjects
 
 from httpClient import AsyncOpenHttp
 
@@ -24,6 +24,7 @@ import signal, os
 
 class HandleConnection(ssl_dispatcher):
     __not_recognized = {"de-DE": u"Entschuldigung, ich verstehe \"{0}\" nicht.", "en-US": u"Sorry I don't understand {0}"}
+    __websearch = {"de-DE": u"Websuche", "en-US": u"Websearch"}
     def __init__(self, conn):
         asyncore.dispatcher_with_send.__init__(self, conn)
         
@@ -158,6 +159,12 @@ class HandleConnection(ssl_dispatcher):
                             view = uiObjects.AddViews(requestId)
                             errorText = HandleConnection.__not_recognized[self.assistant.language] if self.assistant.language in HandleConnection.__not_recognized else HandleConnection.__not_recognized["en-US"]
                             view.views += [uiObjects.AssistantUtteranceView(errorText.format(best_match), errorText.format(best_match))]
+                            websearchText = HandleConnection.__websearch[self.assistant.language] if self.assistant.language in HandleConnection.__websearch else HandleConnection.__websearch["en-US"]
+                            button = uiObjects.Button(text=websearchText)
+                            cmd = systemObjects.SendCommands()
+                            cmd.commands = [systemObjects.StartRequest(utterance=u"^webSearchQuery^=^{0}^^webSearchConfirmation^=^Yes^".format(best_match))]
+                            button.commands = [cmd]
+                            view.views.append(button)
                             self.send_object(view)
                             self.send_object(baseObjects.RequestCompleted(requestId))
                     elif self.current_running_plugin.waitForResponse != None:
@@ -276,6 +283,10 @@ class HandleConnection(ssl_dispatcher):
                     self.dbConnection.commit()
                     c.close()
                     self.send_plist({"class": "AssistantDestroyed", "properties": {"assistantId": reqObject['properties']['assistantId']}, "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
+                elif reqObject['class'] == 'StartRequest':
+                    #this should also be handeled by special plugins, so lets call the plugin handling stuff
+                    self.process_recognized_speech({'hypotheses': [{'utterance': reqObject['properties']['utterance'], 'confidence': 1.0}]}, reqObject['aceId'], False)
+                        
                 # handle responses to plugin
                 elif self.current_running_plugin != None and "refId" in reqObject:
                     if self.current_running_plugin.waitForResponse != None:
@@ -383,6 +394,7 @@ log_levels = {'debug':logging.DEBUG,
 
 parser = OptionParser()
 parser.add_option('-l', '--loglevel', default='info', dest='logLevel', help='This sets the logging level you have these options: debug, info, warning, error, critical \t\tThe standard value is info')
+parser.add_option('-p', '--port', default=443, type='int', dest='port', help='This options lets you use a custom port instead of 443 (use a port > 1024 to run as non root user)')
 (options, args) = parser.parse_args()
 
 x = logging.getLogger("logger")
@@ -396,7 +408,7 @@ x.addHandler(h)
 
 #start server
 x.info("Starting Server")
-server = SiriServer('', 443)
+server = SiriServer('', options.port)
 try:
     asyncore.loop()
 except (asyncore.ExitNow, KeyboardInterrupt, SystemExit):
