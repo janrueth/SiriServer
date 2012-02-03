@@ -41,9 +41,9 @@ class Plugin(threading.Thread):
             pass
         self.connection.current_running_plugin = None
 
-    def complete_request(self):
+    def complete_request(self, callbacks=None):
         self.connection.current_running_plugin = None
-        self.connection.send_object(RequestCompleted(self.refId))
+        self.connection.send_object(RequestCompleted(self.refId, callbacks))
 
     def ask(self, text):
         self.waitForResponse = threading.Event()
