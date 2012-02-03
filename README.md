@@ -24,7 +24,7 @@ We have a new plugin system:
 Check out the plugins folder and the [example plugin](https://github.com/Eichhoernchen/SiriServer/blob/master/plugins/examplePlugin.py) for more infos.
 It supports multi-language inputs.
 
-You should also checkput the [plugin.py](https://github.com/Eichhoernchen/SiriServer/blob/master/plugin.py) to see what a plugin has for predefined methods.
+You should also checkout the [plugin.py](https://github.com/Eichhoernchen/SiriServer/blob/master/plugin.py) to see a plugin's predefined methods.
 You can also look at the [time](https://github.com/Eichhoernchen/SiriServer/blob/master/plugins/time.py) plugin, it sends more complexe objects and does meaningful localized output. And does more complex processing of different inputs
 
 What else is here?
@@ -122,6 +122,88 @@ Now you are ready to go, start the server with:
 	sudo python siriServer.py
 Note: You need to run it as root, as we use https port 443
 (non root can only use ports > 1024) for incomming connections.
+
+
+Common Errors
+-------------
+If we had the mid 90s this section would glow and sparkle to get your attention.
+There are some errors that might occur even though you did everything that was written above...
+
+**The server just crashes after a SpeechPacket**
+
+You are running Linux right? Probably debian?
+There is probably already a libspeex on your machine which is optimized for SSE2 which does not work with python (reason???)
+Check if there is a `/usr/lib/sse2/libspeex.so.1`.
+
+Option A: delete it (there should also be a version in /usr/lib if you installed via apt, or in /usr/local/lib if you compiled by hand)
+
+Option B: ToDo
+
+**This M2Crypto thing is not working**
+
+Did you install all [dependencies](http://chandlerproject.org/Projects/MeTooCrypto#Requirements) of M2Crypto?
+
+**I cannot get a connection from device to server**
+
+Do you access your server over the internet? You need to setup your firewall and NAT to allow traffic for tcp port 443 directed to your server
+Do you have a local firewall on the machine running the server? Also check if tcp port 443 is allowed for incomming connections
+
+
+**There is an exception with something around a database lock**
+
+	error: uncaptured python exception, closing channel <main.HandleConnection connected xxx.xxx.xxx.xxx:XXXX at 0xa65c368> (:database is locked
+Solution: delete the .sqlite3 file and restart server
+
+**There is something with SSL in the error**
+
+Have you installed the ca.pem file on your phone? Do you have more than one CA certificate installed for the same domain?
+
+=> Try deleting all certificates on the device and install the one created by gen_certs
+
+Can I somehow verify the correct certificate? YES!
+
+start siriServer.py, then take your ca.pem you think belongs to your servers certificate and run:
+
+	 echo | openssl s_client -connect [DOMAIN]:443 2>&1 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | openssl verify -CAfile ca.pem 
+Make sure to replace [DOMAIN] with the actual domain of the machine running siriServer.py (e.g. an IP address)
+If your ca.pem matches your server certificate you should see `stdin: OK` as output!
+
+OK, what else?
+We can also setup a small test server using openssl to check if SSL is working (and to check if the iPhone correctly validates the server certificate):
+
+	sudo openssl s_server -cert server.passless.crt -key server.passless.key -accept 443 -state
+When you run this (siriServer should NOT run) it opens a basis server on port 443 using your servers certificate.
+
+Now you can connect with your iPhone as if you would use Siri (of course Siri won't work, we are just testing the SSL layer)
+It should output something like this, note the Ace http request near the end:
+
+	 Using default temp DH parameters
+	 Using default temp ECDH parameters  
+	 ACCEPT
+	 SSL_accept:before/accept initialization
+	 SSL_accept:SSLv3 read client hello A
+	 SSL_accept:SSLv3 write server hello A
+	 SSL_accept:SSLv3 write certificate A
+	 SSL_accept:SSLv3 write server done A
+	 SSL_accept:SSLv3 flush data
+	 SSL_accept:SSLv3 read client key exchange A
+	 SSL_accept:SSLv3 read finished A
+	 SSL_accept:SSLv3 write change cipher spec A
+	 SSL_accept:SSLv3 write finished A
+	 SSL_accept:SSLv3 flush data
+	 -----BEGIN SSL SESSION PARAMETERS-----
+	 MIGKAgEBAgIDAQQCAC8EIJ3DOw2nTgOAjdCNMqiFi+OmYU1fszwfH3jDk4q1P/mq
+	 BDB7vM4nKFiGjLHpExNf4F1HZQ7ekRPaG/2X9EI/mqtpeWPp8vU1a/Em5JWomauK
+	 jDShBgIETyr5oaIEAgIBLKQGBAQBAAAAphMEEWVob2VybmNoZW4uYXRoLmN4
+	 -----END SSL SESSION PARAMETERS-----
+ 	 Shared ciphers:ECDHE-ECDSA-AES256-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-ECDSA-RC4-SHA:ECDHE-      ECDSA-DES-CBC3-SHA:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:ECDHE-RSA-RC4-SHA:ECDHE-RSA-DES-CBC3-SHA:ECDH-ECDSA-AES128-SHA:ECDH-ECDSA-AES256-SHA:ECDH-ECDSA-RC4-SHA:ECDH-ECDSA-DES-CBC3-SHA:ECDH-RSA-AES128-SHA:ECDH-RSA-AES256-SHA:ECDH-RSA-RC4-SHA:ECDH-RSA-DES-CBC3-   SHA:AES128-SHA:RC4-SHA:RC4-MD5:AES256-SHA:DES-CBC3-SHA:DHE-RSA-AES128-SHA:DHE-RSA-AES256-  SHA:EDH-RSA-DES-CBC3-SHA
+	 CIPHER is AES128-SHA
+	 Secure Renegotiation IS supported
+	 ACE /ace HTTP/1.0
+	 Host: DOMAIN REMOVED
+	 User-Agent: Assistant(iPhone/iPhone3,1; iPhone OS/5.0.1/9A405) Ace/1.0
+	 Content-Length: 2000000000
+
 
 
 Thanks

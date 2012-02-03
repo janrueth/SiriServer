@@ -20,6 +20,7 @@ from httpClient import AsyncOpenHttp
 
 from sslDispatcher import ssl_dispatcher
 
+import signal, os
 
 class HandleConnection(ssl_dispatcher):
     __not_recognized = {"de-DE": u"Entschuldigung, ich verstehe \"{0}\" nicht.", "en-US": u"Sorry I don't understand {0}"}
@@ -155,7 +156,8 @@ class HandleConnection(ssl_dispatcher):
                         else:
                             self.send_object(recognized)
                             view = uiObjects.AddViews(requestId)
-                            view.views += [uiObjects.AssistantUtteranceView(HandleConnection.__not_recognized[self.assistant.language].format(best_match), HandleConnection.__not_recognized[self.assistant.language].format(best_match))]
+                            errorText = HandleConnection.__not_recognized[self.assistant.language] if self.assistant.language in HandleConnection.__not_recognized else HandleConnection.__not_recognized["en-US"]
+                            view.views += [uiObjects.AssistantUtteranceView(errorText.format(best_match), errorText.format(best_match))]
                             self.send_object(view)
                             self.send_object(baseObjects.RequestCompleted(requestId))
                     elif self.current_running_plugin.waitForResponse != None:
@@ -338,7 +340,14 @@ class SiriServer(asyncore.dispatcher):
         self.set_reuse_addr()
         self.bind((host, port))
         self.listen(5)
-	logging.getLogger("logger").info("Listening on port {0}".format(port))
+        logging.getLogger("logger").info("Listening on port {0}".format(port))
+        signal.signal(signal.SIGTERM, self.handler)
+   
+    def handler(self, signum, frame):
+        if signum == signal.SIGTERM:
+            x.info("Got SIGTERM, closing server")
+            self.close()
+    
 
     def handle_accept(self):
         pair = self.accept()
@@ -388,4 +397,9 @@ x.addHandler(h)
 #start server
 x.info("Starting Server")
 server = SiriServer('', 443)
-asyncore.loop()
+try:
+    asyncore.loop()
+except (asyncore.ExitNow, KeyboardInterrupt, SystemExit):
+    x.info("Cought shutdown, closing server")
+    asyncore.dispatcher.close(server)
+    exit()
