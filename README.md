@@ -1,6 +1,14 @@
 Siri Server
 ===========
 
+IMPORTANT
+---------
+There are currently only 3 plugins here, you can chat a little bit with siri.
+You can ask it for the current time and the current time at a certain point in the world.
+And you can ask it for the meaning of life.
+
+You can contribute by making more plugins!
+
 What is this?
 -------------
 This is a very early version of a Siri Server (not a proxy).
