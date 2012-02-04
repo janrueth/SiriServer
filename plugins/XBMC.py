@@ -11,7 +11,7 @@ from plugin import *
 import urllib2, urllib, jsonrpclib, socket, struct
 
 class XBMC_object():
-    def __init__(self, host='localhost', port='8080', username=None, password=None, mac_address=None):
+    def __init__(self, host='appletv.local', port='8080', username=None, password=None, mac_address=None):
         self.username = username
         self.password = password
         self.port = port
@@ -19,35 +19,53 @@ class XBMC_object():
         self.mac_address = mac_address
         
     def get_url(self):
-        return 'http://%s@%s:%s' %(self.get_user_pass(), self.host, self.port)
+        return 'http://%s%s:%s' %(self.get_user_pass(), self.host, self.port)
         
     def get_user_pass(self):
         if self.username != None and self.password != None:
-            return '%s:%s' % (self.username, self.password)
+            return '%s:%s@' % (self.username, self.password)
         
         return ''
+
+    def replace_all(self, text, dic):
+        for i, j in dic.iteritems():
+            text = text.replace(i, j, 1)
+        return text
 
 class XBMC(Plugin):
     global xbmc
     xbmc = XBMC_object()
-    
+            
     @register("en-US", "(xbmc)|(xbmc.* [a-z]+)")
     def test2(self, speech, language):
         global xbmc
         command = str(speech).replace('xbmc ', '',1)
         if command != None:
-            jsonrpc = jsonrpclib.Server('%s/jsonrpc' % (xbmc.get_url()))
+            json = jsonrpclib.Server('%s/jsonrpc' % (xbmc.get_url()))
             if command == 'stop':
-                jsonrpc.Player.Stop("playerid=1")
-            elif command == 'play' or command == 'pause' or command == 'plate' or command == 'place':
-                jsonrpc.Player.PlayPause("playerid=1")
+                json.Player.Stop(playerid=1)
+            elif command == 'play' or command == 'pause' or command == 'plate' or command == 'place' or command == 'pas' or command == 'paws':
+                json.Player.PlayPause(playerid=1)
             elif 'play' in command or 'plate' in command or 'place' in command: #this elif needs to be located below command == 'play' part
-                title = command.replace('play ', '', 1)
-                result = jsonrpc.VideoLibrary.GetMovies()
+                remove = {'play ':'', 'plate ':'', 'place ':'', 'played ':'',}
+                title = xbmc.replace_all(command, remove)
+                print title
+                result = json.VideoLibrary.GetMovies()
+                matches = []
                 for movie in result['movies']:
-                    if movie['label'].lower() == title:
+                    if title in movie['label'].lower():
                         movieid = movie['movieid']
-                        jsonrpc.Player.Open("movieid="+movieid)
+                        matches.append(movie['label'])
+                if len(matches) > 1:
+                    self.say('Found multiple matches for %s:'%(title))
+                    names = ''
+                    for x in matches:
+                        names = x+', '+names 
+                    self.say(names)
+                else:
+                    json.Playlist.Clear(playlistid=1)
+                    json.Playlist.Add(playlistid=1, item={ 'movie' + 'id': movieid })
+                    json.Player.Open({ 'playlistid': 1 })
                 #code for playing tvshows latest unwatched episode
             elif command == 'info':
                 self.say("XBMC URL: %s" %(xbmc.get_url()))
