@@ -39,17 +39,22 @@ class XBMC(Plugin):
     @register("en-US", "(xbmc)|(xbmc.* [a-z]+)")
     def test2(self, speech, language):
         global xbmc
-        command = str(speech).replace('xbmc ', '',1)
+        firstword, command=speech.split(' ',1)
         if command != None:
             json = jsonrpclib.Server('%s/jsonrpc' % (xbmc.get_url()))
             if command == 'stop':
-                json.Player.Stop(playerid=1)
+                try:
+                    json.Player.Stop(playerid=1)
+                except:
+                    self.say('Nothing to stop...')
             elif command == 'play' or command == 'pause' or command == 'plate' or command == 'place' or command == 'pas' or command == 'paws':
-                json.Player.PlayPause(playerid=1)
+                try:
+                    json.Player.PlayPause(playerid=1)
+                except:
+                    self.say('Nothing to play/pause')
             elif 'play' in command or 'plate' in command or 'place' in command: #this elif needs to be located below command == 'play' part
-                remove = {'play ':'', 'plate ':'', 'place ':'', 'played ':'',}
-                title = xbmc.replace_all(command, remove)
-                print title
+                command, title=command.split(' ',1)
+                print 'Searching for: '+title
                 result = json.VideoLibrary.GetMovies()
                 matches = []
                 for movie in result['movies']:
