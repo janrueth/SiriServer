@@ -66,8 +66,8 @@ class XBMC(Plugin):
                         self.say('Found multiple matches for %s:'%(title))
                         names = ''
                         for x in matches:
-                            names = x+', '+names 
-                        self.say(names)
+                            names = x+'\n'+names 
+                        self.say(names, None)
                     else:
                         json.Playlist.Clear(playlistid=1)
                         json.Playlist.Add(playlistid=1, item={ 'movie' + 'id': movieid })
