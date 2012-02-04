@@ -10,7 +10,7 @@ class smalltalk(Plugin):
     @register("en-US", "(.*Hello.*)|(.*Hi.*Siri.*)")
     def st_hello(self, speech, language):
         if language == 'de-DE':
-         self.say("Hallo.")
+            self.say("Hallo.")
         else:
             self.say("Hello")
         self.complete_request()
@@ -19,7 +19,7 @@ class smalltalk(Plugin):
     @register("en-US", ".*your name.*")
     def st_name(self, speech, language):
         if language == 'de-DE':
-         self.say("Siri.")
+            self.say("Siri.")
         else:
             self.say("Siri.")
         self.complete_request()
@@ -28,7 +28,7 @@ class smalltalk(Plugin):
     @register("en-US", "How are you?")
     def st_howareyou(self, speech, language):
         if language == 'de-DE':
-         self.say("Gut danke der Nachfrage.")
+            self.say("Gut danke der Nachfrage.")
         else:
             self.say("Fine, thanks for asking!")
         self.complete_request()
