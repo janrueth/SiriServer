@@ -56,16 +56,19 @@ class XBMC(Plugin):
                     if title in movie['label'].lower():
                         movieid = movie['movieid']
                         matches.append(movie['label'])
-                if len(matches) > 1:
-                    self.say('Found multiple matches for %s:'%(title))
-                    names = ''
-                    for x in matches:
-                        names = x+', '+names 
-                    self.say(names)
+                if len(matches) > 0:
+                    if len(matches) > 1:
+                        self.say('Found multiple matches for %s:'%(title))
+                        names = ''
+                        for x in matches:
+                            names = x+', '+names 
+                        self.say(names)
+                    else:
+                        json.Playlist.Clear(playlistid=1)
+                        json.Playlist.Add(playlistid=1, item={ 'movie' + 'id': movieid })
+                        json.Player.Open({ 'playlistid': 1 })
                 else:
-                    json.Playlist.Clear(playlistid=1)
-                    json.Playlist.Add(playlistid=1, item={ 'movie' + 'id': movieid })
-                    json.Player.Open({ 'playlistid': 1 })
+                    self.say('No movies matching: %s.' % (title))
                 #code for playing tvshows latest unwatched episode
             elif command == 'info':
                 self.say("XBMC URL: %s" %(xbmc.get_url()))
