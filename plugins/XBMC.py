@@ -67,6 +67,7 @@ class XBMC(Plugin):
                         json.Playlist.Clear(playlistid=1)
                         json.Playlist.Add(playlistid=1, item={ 'movie' + 'id': movieid })
                         json.Player.Open({ 'playlistid': 1 })
+                        self.say('%s starting'%(matches[0]))
                 else:
                     self.say('No movies matching: %s.' % (title))
                 #code for playing tvshows latest unwatched episode
