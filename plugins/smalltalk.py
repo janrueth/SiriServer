@@ -88,3 +88,17 @@ class smalltalk(Plugin):
         else:
             self.say("I would prefer not to say.")
         self.complete_request()
+  
+    @register("de-DE", ".*klopf.*klopf.*")
+    @register("en-US", ".*knock.*knock.*")
+    def st_knock(self, speech, language):
+        if language == 'de-DE':
+            answer = self.ask(u"Wer ist da?")
+            answer = self.ask(u"\"{0}\" wer?".format(answer))
+            self.say(u"Wer nervt mich mit diesen Klopf Klopf Witzen?".format(answer))
+        else:
+            answer = self.ask(u"Who's there?")
+            answer = self.ask(u"\"{0}\" who?".format(answer))
+            self.say(u"Who is bugging me with knock knock jokes?".format(answer))
+        self.complete_request()
+
