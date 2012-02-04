@@ -63,6 +63,17 @@ class StartRequest(AceObject):
         self.add_property('utterance')
         return super(StartRequest, self).to_plist()
 
+class ResultCallback(AceObject):
+    def __init__(self, commands=None, code=0):
+        super(ResultCallback, self).__init__("ResultCallback", "com.apple.ace.system")
+        self.commands = commands if commands != None else []
+        self.code = code
+
+    def to_plist(self):
+        self.add_property('commands')
+        self.add_property('code')
+        return super(ResultCallback, self).to_plist()
+
 
 class SendCommands(AceObject):
     def __init__(self, commands=None):
