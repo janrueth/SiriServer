@@ -8,7 +8,13 @@
 #
 
 from plugin import *
-import urllib2, urllib, jsonrpclib, socket, struct
+import urllib2, urllib, socket, struct, logging
+
+try:
+    import jsonrpclib
+except:
+    print 'WARNING: XBMC plugin will not work: JSONRPCLIB not installed. If you wish to test it out run \"easy_install jsonrpclib\"'
+    
 
 class XBMC_object():
     def __init__(self, host='appletv.local', port='8080', username=None, password=None, mac_address=None):
@@ -77,7 +83,12 @@ class XBMC(Plugin):
                     self.say('No movies matching: %s.' % (title))
                 #code for playing tvshows latest unwatched episode
             elif command == 'info':
-                self.say("XBMC URL: %s" %(xbmc.get_url()))
+                self.say("XBMC URL: %s" %(xbmc.get_url()), None)
+                info = """username: %s\
+                password: %s\
+                hostname: %s\
+                port: %s """ %(xbmc.username, xbmc.password, xbmc.host, xbmc.port)
+                self.say(info, None)
             elif command == 'shut down' or command == 'shutdown' or command == 'turn off':
                 self.say("XBMC going down")
                 json.System.Shutdown()
