@@ -45,7 +45,7 @@ class ClockObject(DomainObject):
 ####### geonames.org API username ######
 geonames_user="test2"
 
-class time(Plugin):
+class timePlugin(Plugin):
     
     localizations = {"currentTime": 
                         {"search":{"de-DE": "Es wird gesucht ...", "en-US": "Looking up ..."}, 
@@ -68,12 +68,12 @@ class time(Plugin):
     def currentTime(self, speech, language):
         #first tell that we look it up
         view = AddViews(self.refId, dialogPhase="Reflection")
-        view.views = [AssistantUtteranceView(text=time.localizations['currentTime']['search'][language], speakableText=time.localizations['currentTime']['search'][language], dialogIdentifier="Clock#getTime")]
+        view.views = [AssistantUtteranceView(text=timePlugin.localizations['currentTime']['search'][language], speakableText=timePlugin.localizations['currentTime']['search'][language], dialogIdentifier="Clock#getTime")]
         self.sendRequestWithoutAnswer(view)
         
         # tell him to show the current time
         view = AddViews(self.refId, dialogPhase="Summary")
-        view1 = AssistantUtteranceView(text=time.localizations['currentTime']['currentTime'][language], speakableText=time.localizations['currentTime']['currentTime'][language], dialogIdentifier="Clock#showTimeInCurrentLocation")
+        view1 = AssistantUtteranceView(text=timePlugin.localizations['currentTime']['currentTime'][language], speakableText=timePlugin.localizations['currentTime']['currentTime'][language], dialogIdentifier="Clock#showTimeInCurrentLocation")
         clock = ClockObject()
         clock.timezoneId = self.connection.assistant.timeZoneId
         view2 = ClockSnippet(clocks=[clock])
@@ -85,7 +85,7 @@ class time(Plugin):
     @register("en-US", "(What.*time.*in [a-z]+)|(.*current time.*in [a-z]+)")
     def currentTimeIn(self, speech, language):
         view = AddViews(self.refId, dialogPhase="Reflection")
-        view.views = [AssistantUtteranceView(text=time.localizations['currentTimeIn']['search'][language], speakableText=time.localizations['currentTimeIn']['search'][language], dialogIdentifier="Clock#getTime")]
+        view.views = [AssistantUtteranceView(text=timePlugin.localizations['currentTimeIn']['search'][language], speakableText=timePlugin.localizations['currentTimeIn']['search'][language], dialogIdentifier="Clock#getTime")]
         self.sendRequestWithoutAnswer(view)
         
         error = False
@@ -140,7 +140,7 @@ class time(Plugin):
                             countryCode = filter(lambda x: True if "country" in x['types'] else False, components)[0]['short_name']
                             
                             view = AddViews(self.refId, dialogPhase="Summary")
-                            view1 = AssistantUtteranceView(text=time.localizations['currentTimeIn']['currentTimeIn']['text'][language].format(city, country, timeZone), speakableText=time.localizations['currentTimeIn']['currentTimeIn']['tts'][language].format(city, country, timeZone), dialogIdentifier="Clock#showTimeInOtherLocation")
+                            view1 = AssistantUtteranceView(text=timePlugin.localizations['currentTimeIn']['currentTimeIn']['text'][language].format(city, country, timeZone), speakableText=timePlugin.localizations['currentTimeIn']['currentTimeIn']['tts'][language].format(city, country, timeZone), dialogIdentifier="Clock#showTimeInOtherLocation")
                             clock = ClockObject()
                             clock.timezoneId = timeZone
                             clock.countryCode = countryCode
@@ -163,7 +163,7 @@ class time(Plugin):
             error = True
         if error:
             view = AddViews(self.refId, dialogPhase="Completion")
-            view.views = [AssistantUtteranceView(text=time.localizations['failure'][language], speakableText=time.localizations['failure'][language], dialogIdentifier="Clock#cannotShowClocks")]
+            view.views = [AssistantUtteranceView(text=timePlugin.localizations['failure'][language], speakableText=timePlugin.localizations['failure'][language], dialogIdentifier="Clock#cannotShowClocks")]
             self.sendRequestWithoutAnswer(view)
         self.complete_request()
 
