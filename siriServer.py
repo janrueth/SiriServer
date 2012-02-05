@@ -51,6 +51,8 @@ class HandleConnection(ssl_dispatcher):
         self.assistant = None
         self.sendLock = threading.Lock()
         self.current_running_plugin = None
+        self.current_location = None
+        self.plugin_lastAceId = None
         self.logger = logging.getLogger("logger")
     
     def handle_ssl_established(self):                
@@ -148,7 +150,7 @@ class HandleConnection(ssl_dispatcher):
                     if self.current_running_plugin == None:
                         (clazz, method) = PluginManager.getPlugin(best_match, self.assistant.language)
                         if clazz != None and method != None:
-                            plugin = clazz(method, best_match, self.assistant.language)
+                            plugin = clazz(method, best_match, self.assistant.language, self.send_object, self.send_plist, self.assistant, self.current_location)
                             plugin.refId = requestId
                             plugin.connection = self
                             self.current_running_plugin = plugin
@@ -189,6 +191,16 @@ class HandleConnection(ssl_dispatcher):
                 self.logger.debug("packet with content:\n{0}".format(pprint.pformat(reqObject, width=40)))
                 
                 # first handle speech stuff
+                
+                if 'refId' in reqObject:
+                    # if the following holds, this packet is an answer to a request by a plugin
+                    if reqObject['refId'] == self.plugin_lastAceId and self.current_running_plugin != None:
+                        if self.current_running_plugin.waitForResponse != None:
+                            # just forward the object to the 
+                            # don't change it's refId, further requests must reference last FinishSpeech
+                            self.plugin_lastAceId = None
+                            self.current_running_plugin.response = reqObject
+                            self.current_running_plugin.waitForResponse.set()
                 
                 if reqObject['class'] == 'StartSpeechRequest' or reqObject['class'] == 'StartSpeechDictation':
                         decoder = speex.Decoder()
@@ -286,14 +298,6 @@ class HandleConnection(ssl_dispatcher):
                 elif reqObject['class'] == 'StartRequest':
                     #this should also be handeled by special plugins, so lets call the plugin handling stuff
                     self.process_recognized_speech({'hypotheses': [{'utterance': reqObject['properties']['utterance'], 'confidence': 1.0}]}, reqObject['aceId'], False)
-                        
-                # handle responses to plugin
-                elif self.current_running_plugin != None and "refId" in reqObject:
-                    if self.current_running_plugin.waitForResponse != None:
-                        # just forward the object to the 
-                        self.current_running_plugin.response = reqObject
-                        self.current_running_plugin.refId = reqObject['refId']
-                        self.current_running_plugin.waitForResponse.set()
 
                     
     def hasNextObj(self):

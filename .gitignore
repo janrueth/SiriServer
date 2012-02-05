@@ -4,4 +4,5 @@
 *.crt
 *.sqlite3
 *.log
+*.cnf
 .DS_Store

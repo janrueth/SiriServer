@@ -41,6 +41,42 @@ class Button(AceObject):
         self.add_property('commands')
         return super(Button, self).to_plist()
 
+class OpenLink(AceObject):
+    def __init__(self, ref=""):
+        super(OpenLink, self).__init__("OpenLink", "com.apple.ace.assistant")
+        self.ref = ref
+    
+    def to_plist(self):
+        self.add_property('ref')
+        return super(OpenLink, self).to_plist()
+
+
+class HtmlView(AceObject):
+    def __init__(self, html=""):
+        super(HtmlView, self).__init__("HtmlView", "com.apple.ace.assistant")
+        self.html = html
+    
+    def to_plist(self):
+        self.add_property('html')
+        return super(HtmlView, self).to_plist()
+
+class MenuItem(AceObject):
+    def __init__(self, title="", subtitle="", ref="", icon="", commands=None):
+        super(MenuItem, self).__init__("MenuItem", "com.apple.ace.assistant")
+        self.title = title
+        self.subtitle = subtitle
+        self.ref = ref
+        self.icon = icon
+        self.commands = commands if commands != None else []
+    
+    def to_plist(self):
+        self.add_property('title')
+        self.add_property('subtitle')
+        self.add_property('ref')
+        self.add_property('icon')
+        self.add_property('commands')
+        return super(MenuItem, self).to_plist()
+
 
 class ConfirmationOptions(AceObject):
     def __init__(self, denyCommands=None, submitCommands=None, confirmText="Confirm", denyText="Cancel", cancelCommands=None, cancelLabel="Cancel", submitLabel="Confirm", confirmCommands=None, cancelTrigger="Deny"):

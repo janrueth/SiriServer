@@ -1,6 +1,14 @@
 Siri Server
 ===========
 
+IMPORTANT
+---------
+There are currently only 3 plugins here, you can chat a little bit with siri.
+You can ask it for the current time and the current time at a certain point in the world.
+And you can ask it for the meaning of life.
+
+You can contribute by making more plugins!
+
 What is this?
 -------------
 This is a very early version of a Siri Server (not a proxy).
@@ -59,7 +67,7 @@ and compile and install them, or simply follow the following steps:
 	./configure --disable-asm-optimizations
 	make
 	sudo make install
-Note: you can also install libspeex via MacPorts, but libflac is not available in 64bit you need to supply `--disable-asm-optimizations` in configure to make it compile
+Note: you can also install libspeex via MacPorts, but libflac is not available in 64bit through MacPorts, to make it build with 64bit support you need to supply `--disable-asm-optimizations` in configure of libflac to make it compile
 
 **Python requirements**
 
