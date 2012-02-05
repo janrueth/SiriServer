@@ -18,6 +18,27 @@ class TimerSet(ClientBoundCommand):
         self.add_property("timer")
         return super(TimerSet, self).to_plist()
 
+class TimerCancel(ClientBoundCommand):
+    def __init__(self, refId):
+        super(TimerCancel, self).__init__("Cancel", "com.apple.ace.timer", None, refId)
+           
+    def to_plist(self):
+        return super(TimerCancel, self).to_plist()
+
+
+class TimerPause(ClientBoundCommand):
+    def __init__(self, refId):
+        super(TimerPause, self).__init__("Pause", "com.apple.ace.timer", None, refId)
+           
+    def to_plist(self):
+        return super(TimerPause, self).to_plist()
+
+class TimerResume(ClientBoundCommand):
+    def __init__(self, refId):
+        super(TimerResume, self).__init__("Resume", "com.apple.ace.timer", None, refId)
+           
+    def to_plist(self):
+        return super(TimerResume, self).to_plist()
 
 class TimerSnippet(AceObject):                
     def __init__(self, timers = None, confirm = False):
