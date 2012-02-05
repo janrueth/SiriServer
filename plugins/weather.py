@@ -75,7 +75,7 @@ class weatherPlugin(Plugin):
             self.complete_Request()
             pass
         viewType ="DAILY"
-        if (speech.count("today") > 0 or speech.count("current") > 0 or speech.count(" for ") > 0) and language=="en-US":
+        if (speech.count("today") > 0 or speech.count("current") > 0 or speech.count(" for today") > 0) and language=="en-US":
             viewType = "HOURLY"
             speech = speech.replace("todays","")
             speech = speech.replace("today","")
@@ -92,6 +92,9 @@ class weatherPlugin(Plugin):
             speech = speech.replace("aktuell","")
             speech = speech.replace(u"in den nächsten Stunden","")
             speech = speech.replace(u"für heute","")
+        
+        if language=="en-US":
+            speech = speech.replace(" for "," in ")
             
         if language=="de-DE":
             speech = speech.replace(u"in den nächsten Tagen","")
