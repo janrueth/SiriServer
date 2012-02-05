@@ -1,5 +1,6 @@
 from siriObjects.baseObjects import ClientBoundCommand, AceObject
-
+from siriObjects.systemObjects import SendCommand, StartRequest
+from siriObjects.uiObjects import ConfirmationOptions
 
 class TimerGet(ClientBoundCommand):
     def __init__(self, refId):
@@ -19,12 +20,25 @@ class TimerSet(ClientBoundCommand):
 
 
 class TimerSnippet(AceObject):                
-    def __init__(self, timers = None):
+    def __init__(self, timers = None, confirm = False):
         super(TimerSnippet, self).__init__("Snippet", "com.apple.ace.timer")
         self.timers = timers if timers != None else []
+        if confirm:
+            self.confirmationOptions = ConfirmationOptions(
+                    submitCommands = SendCommands(StartRequest(utterance="^timerConfirmation^=^yes^ ^timerVerb^=^set^ ^timerNoun^=^timer^")),
+                    cancelCommands = SendCommands(StartRequest(utterance="^timerConfirmation^=^no^ ^timerVerb^=^set^ ^timerNoun^=^timer^")),
+                    denyCommands = SendCommands(StartRequest(utterance="^timerConfirmation^=^no^ ^timerVerb^=^set^ ^timerNoun^=^timer^")),
+                    confirmCommands = SendCommands(StartRequest(utterance="^timerConfirmation^=^yes^ ^timerVerb^=^set^ ^timerNoun^=^timer^")),
+                    denyText = "Keep it",
+                    cancelLabel = "Keep it",
+                    submitLabel = "Change it",
+                    confirmText = "Change it",
+                    cancelTrigger = "Confirm")
     
     def to_plist(self):
         self.add_property('timers')
+        if self.confirmationOptions:
+            self.add_property('confirmationOptions')
         return super(TimerSnippet, self).to_plist()
 
 class TimerObject(AceObject):
