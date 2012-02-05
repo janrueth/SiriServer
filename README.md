@@ -67,7 +67,7 @@ and compile and install them, or simply follow the following steps:
 	./configure --disable-asm-optimizations
 	make
 	sudo make install
-Note: you can also install libspeex via MacPorts, but libflac is not available in 64bit you need to supply `--disable-asm-optimizations` in configure to make it compile
+Note: you can also install libspeex via MacPorts, but libflac is not available in 64bit through MacPorts, to make it build with 64bit support you need to supply `--disable-asm-optimizations` in configure of libflac to make it compile
 
 **Python requirements**
 
