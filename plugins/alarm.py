@@ -3,7 +3,6 @@
 
 import re
 
-from time import localtime, mktime
 from fractions import Fraction
 
 from plugin import *
