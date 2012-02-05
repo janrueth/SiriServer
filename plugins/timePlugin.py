@@ -81,15 +81,15 @@ class timePlugin(Plugin):
         self.sendRequestWithoutAnswer(view)
         self.complete_request()
     
-    @register("de-DE", "(Wieviel Uhr.*in [a-z]+)|(Uhrzeit.*in [a-z]+)")
-    @register("en-US", "(What.*time.*in [a-z]+)|(.*current time.*in [a-z]+)")
+    @register("de-DE", "(Wieviel Uhr.*in ([\w ]+))|(Uhrzeit.*in ([\w ]+))")
+    @register("en-US", "(What.*time.*in ([\w ]+))|(.*current time.*in ([\w ]+))")
     def currentTimeIn(self, speech, language):
         view = AddViews(self.refId, dialogPhase="Reflection")
         view.views = [AssistantUtteranceView(text=timePlugin.localizations['currentTimeIn']['search'][language], speakableText=timePlugin.localizations['currentTimeIn']['search'][language], dialogIdentifier="Clock#getTime")]
         self.sendRequestWithoutAnswer(view)
         
         error = False
-        countryOrCity = re.match(".*in ([a-z, ]+)$", speech, re.IGNORECASE)
+        countryOrCity = re.match("(?u).* in ([\w ]+)$", speech, re.IGNORECASE)
         if countryOrCity != None:
             countryOrCity = countryOrCity.group(1).strip()
             # lets see what we got, a country or a city... 

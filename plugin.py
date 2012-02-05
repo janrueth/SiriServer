@@ -28,7 +28,7 @@ def register(lang, regex):
         if not __criteria_key__ in func.__dict__:
             func.__dict__[__criteria_key__] = dict()
         crits = func.__dict__[__criteria_key__]
-        crits[lang] = re.compile(regex, re.IGNORECASE)
+        crits[lang] = re.compile(regex, re.IGNORECASE | re.UNICODE)
         return func
     return addInfosTo
 
