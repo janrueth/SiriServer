@@ -1,13 +1,18 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+import socket, ssl, sys, zlib, binascii, time, select, struct, uuid, json, asyncore, re, threading, logging, pprint, sqlite3, os
 
-import socket, ssl, sys, zlib, binascii, time, select, struct, biplist, uuid, json, asyncore, re, threading, logging, pprint, sqlite3
+path_base = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, path_base)
+sys.path.insert(0, os.path.join(path_base, 'lib'))
+
 from optparse import OptionParser
 from email.utils import formatdate
 
 import speex
 import flac
 import db
+import biplist
 from db import Assistant
 
 import PluginManager
