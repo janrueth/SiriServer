@@ -63,7 +63,7 @@ class XBMC(Plugin):
                         matches.append(movie['label'])
                 if len(matches) > 0:
                     if len(matches) > 1:
-                        self.say('Found multiple matches for %s:'%(title))
+                        self.say('Found multiple matches for \'%s\':'%(title))
                         names = ''
                         for x in matches:
                             names = x+'\n'+names 
