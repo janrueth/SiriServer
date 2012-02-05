@@ -81,8 +81,8 @@ class time(Plugin):
         self.sendRequestWithoutAnswer(view)
         self.complete_request()
     
-    @register("de-DE", "(Wieviel Uhr.*in [a-z]+)|(Uhrzeit.*in [a-z]+)")
-    @register("en-US", "(What.*time.*in [a-z]+)|(.*current time.*in [a-z]+)")
+    @register("de-DE", "(Wieviel Uhr.*in ([\w ]+))|(Uhrzeit.*in ([\w ]+))")
+    @register("en-US", "(What.*time.*in ([\w ]+))|(.*current time.*in ([\w ]+))")
     def currentTimeIn(self, speech, language):
         view = AddViews(self.refId, dialogPhase="Reflection")
         view.views = [AssistantUtteranceView(text=time.localizations['currentTimeIn']['search'][language], speakableText=time.localizations['currentTimeIn']['search'][language], dialogIdentifier="Clock#getTime")]
