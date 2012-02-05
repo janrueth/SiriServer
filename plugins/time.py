@@ -89,7 +89,7 @@ class time(Plugin):
         self.sendRequestWithoutAnswer(view)
         
         error = False
-        countryOrCity = re.match(".*in ([a-z, ]+)$", speech, re.IGNORECASE)
+        countryOrCity = re.match("(?u).* in ([\w ]+)$", speech, re.IGNORECASE)
         if countryOrCity != None:
             countryOrCity = countryOrCity.group(1).strip()
             # lets see what we got, a country or a city... 
