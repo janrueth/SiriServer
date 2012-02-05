@@ -15,3 +15,10 @@ class examplePlugin(Plugin):
         else:
             self.say("I shouldn't tell you!")
         self.complete_request()
+
+    @register("de-DE", ".*standort.*test.*")
+    @register("en-US", ".*location.*test.*")
+    def locationTest(self, speech, language):
+        location = self.getCurrentLocation(force_reload=True)
+        self.say(u"lat: {0}, long: {1}".format(location.latitude, location.longitude))
+        self.complete_request()
