@@ -1,5 +1,5 @@
 from siriObjects.baseObjects import ClientBoundCommand, AceObject
-from siriObjects.systemObjects import SendCommand, StartRequest
+from siriObjects.systemObjects import SendCommands, StartRequest
 from siriObjects.uiObjects import ConfirmationOptions
 
 class TimerGet(ClientBoundCommand):
@@ -34,6 +34,8 @@ class TimerSnippet(AceObject):
                     submitLabel = "Change it",
                     confirmText = "Change it",
                     cancelTrigger = "Confirm")
+        else:
+            self.confirmationOptions = None
     
     def to_plist(self):
         self.add_property('timers')
