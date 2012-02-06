@@ -45,8 +45,10 @@ class XBMC(Plugin):
     @register("en-US", "(xbmc)|(xbmc.* [a-z]+)")
     def test2(self, speech, language):
         global xbmc
-        firstword, command=speech.split(' ',1)
-        if command != None:
+        if speech.lower() == 'xbmc':
+            self.say("XBMC currently supports the following commands: play [movie or tv show], pause, stop, shut down, start and info.")
+        else:
+            firstword, command=speech.split(' ',1)
             json = jsonrpclib.Server('%s/jsonrpc' % (xbmc.get_url()))
             if command == 'stop':
                 try:
@@ -134,7 +136,4 @@ class XBMC(Plugin):
                 s.sendto(msg, ("255.255.255.255", 9))
             else:
                 self.say("XBMC command not recognized: %s."%(command))
-        else:
-            self.say("XBMC currently supports the following commands: play [movie/tvshow], pause, stop, shutdown, start and info.")
-        
         self.complete_request()
