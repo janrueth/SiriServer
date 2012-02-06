@@ -72,6 +72,22 @@ class DomainObjectRetrieve(ClientBoundCommand):
         return super(DomainObjectRetrieve, self).to_plist()
 
 
+class DomainObjectUpdate(ClientBoundCommand):
+    def __init__(self, refId, identifier=None, addFields=None, setFields=None, removeFields=None):
+        super(DomainObjectUpdate, self).__init__("DomainObjectUpdate", "com.apple.ace.system", None, refId)
+        self.identifier = identifier if identifier != None else []
+        self.addFields = addFields if addFields != None else []
+        self.setFields = setFields if setFields != None else []
+        self.removeFields = removeFields if removeFields != None else []
+        
+    def to_plist(self):
+        self.add_property('identifier')
+        self.add_property('addFields')
+        self.add_property('setFields')
+        self.add_property('removeFields')
+        return super(DomainObjectUpdate, self).to_plist()
+
+
 
 class DomainObjectCommit(ClientBoundCommand):
     def __init__(self, refId, identifier=None):
