@@ -43,6 +43,11 @@ The file SiriProtocol documents everything I (and others) found out about the pr
 Setup, Notes and Instructions
 -----------------------------
 
+**Installer*
+
+There is an experimental installer by [johanberglind](https://github.com/johanberglind) which does the steps described below, you may try it instead of the manual method.
+You can get it here: [Installer on Github](https://github.com/johanberglind/InstallSiriServer)
+
 **Install audio libraries**
 
 For the audio handling you need [libspeex](http://www.speex.org/) and [libflac](http://flac.sourceforge.net/)
