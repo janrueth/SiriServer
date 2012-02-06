@@ -46,10 +46,10 @@ class TimerSnippet(AceObject):
         self.timers = timers if timers != None else []
         if confirm:
             self.confirmationOptions = ConfirmationOptions(
-                    submitCommands = SendCommands(StartRequest(utterance="^timerConfirmation^=^yes^ ^timerVerb^=^set^ ^timerNoun^=^timer^")),
-                    cancelCommands = SendCommands(StartRequest(utterance="^timerConfirmation^=^no^ ^timerVerb^=^set^ ^timerNoun^=^timer^")),
-                    denyCommands = SendCommands(StartRequest(utterance="^timerConfirmation^=^no^ ^timerVerb^=^set^ ^timerNoun^=^timer^")),
-                    confirmCommands = SendCommands(StartRequest(utterance="^timerConfirmation^=^yes^ ^timerVerb^=^set^ ^timerNoun^=^timer^")),
+                    submitCommands = [SendCommands([StartRequest(utterance="^timerConfirmation^=^yes^ ^timerVerb^=^set^ ^timerNoun^=^timer^")])],
+                    cancelCommands = [SendCommands([StartRequest(utterance="^timerConfirmation^=^no^ ^timerVerb^=^set^ ^timerNoun^=^timer^")])],
+                    denyCommands = [SendCommands([StartRequest(utterance="^timerConfirmation^=^no^ ^timerVerb^=^set^ ^timerNoun^=^timer^")])],
+                    confirmCommands = [SendCommands([StartRequest(utterance="^timerConfirmation^=^yes^ ^timerVerb^=^set^ ^timerNoun^=^timer^")])],
                     denyText = "Keep it",
                     cancelLabel = "Keep it",
                     submitLabel = "Change it",

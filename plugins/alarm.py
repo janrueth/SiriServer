@@ -49,6 +49,8 @@ class alarm(Plugin):
                 "en-US": "Your timer is set for {0}."
             }, "timerIsAlreadyRunning": {
                 "en-US": u"Your timer\u2019s already running:"
+            }, "wontSetTimer": {
+                "en-US": "OK."
             }
         }, 'resetTimer': {
             'timerWasReset': {
@@ -112,25 +114,23 @@ class alarm(Plugin):
             view1 = AssistantUtteranceView(speakableText=alarm.localizations['setTimer']['timerIsAlreadyRunning'][language], dialogIdentifier="Timer#timerIsAlreadyRunning")
             view2 = TimerSnippet(timers=[timer], confirm=True)
             view.views = [view1, view2]
-            # self.sendRequestWithoutAnswer(view)
-            # self.complete_request()
-            response = self.getResponseForRequest(view)
+            utterance = self.getResponseForRequest(view)
+            #if response['class'] == 'StartRequest':
+            view = AddViews(self.refId, dialogPhase="Reflection")
+            view.views = [AssistantUtteranceView(speakableText=alarm.localizations['setTimer']['settingTimer'][language], dialogIdentifier="Timer#settingTimer")]
+            self.sendRequestWithoutAnswer(view)
 
-            # currently freezing springboard if response is handled
-            # TODO: fix this
-            self.complete_request()
-            return
+            if re.match('\^timerConfirmation\^=\^no\^', utterance):
+                # user canceled
+                view = AddViews(self.refId, dialogPhase="Completion")
+                view.views = [AssistantUtteranceView(speakableText=alarm.localizations['setTimer']['wontSetTimer'][language], dialogIdentifier="Timer#wontSetTimer")]
+                self.sendRequestWithoutAnswer(view)
+                self.complete_request()
+                return
+            else:
+                # user wants to set the timer still - continue on
+                pass
 
-            # utterance = response['properties']['utterance']
-            # if re.match('\^timerConfirmation\^=\^yes\^', utterance):
-                # view = AddViews(self.refId, dialogPhase="Reflection")
-                # view.views = [AssistantUtteranceView(speakableText=alarm.localizations['setTimer']['settingTimer'][language], dialogIdentifier="Timer#settingTimer")]
-                # self.sendRequestWithoutAnswer(view)
-                # continue on below
-            # else:
-                # user canceled - complete the request and get out
-                # self.complete_request()
-                # return
 
         # start a new timer
         timer = TimerObject(timerValue = duration, state = "Running")
