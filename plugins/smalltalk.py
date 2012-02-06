@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+#by Joh Gerna
 
 from plugin import *
 
@@ -95,7 +96,7 @@ class smalltalk(Plugin):
         if language == 'de-DE':
             answer = self.ask(u"Wer ist da?")
             answer = self.ask(u"\"{0}\" wer?".format(answer))
-            self.say(u"Wer nervt mich mit diesen Klopf Klopf Witzen?".format(answer))
+            self.say(u"Wer nervt mich mit diesen Klopf Klopf Witzen?")
         else:
             answer = self.ask(u"Who's there?")
             answer = self.ask(u"\"{0}\" who?".format(answer))
