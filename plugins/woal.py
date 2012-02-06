@@ -57,7 +57,7 @@ class wolfram(Plugin):
     @register("en-US", "(What is [a-zA-Z0-9]+)|(Who is [a-zA-Z0-9]+)|(How many [a-zA-Z0-9]+)|(What was [a-zA-Z0-9]+)|(Who's [a-zA-Z0-9]+)|(How long [a-zA-Z0-9]+)|(What's [a-zA-Z0-9]+)|(How far [a-zA-Z0-9]+)|(When is [a-zA-Z0-9]+)|(Show me [a-zA-Z0-9]+)|(How high [a-zA-Z0-9]+)|(How deep [a-zA-Z0-9]+)")
     def wolfram(self, speech, language):
         wolframQuestion = speech.replace('who is ','').replace('what is ','').replace('what was ','').replace('wer ist ','').replace('was ist ','').replace('was war ','').replace('wie viel ','How much ').replace('wie lang ','how long ').replace('wie weit ','How far ').replace('Wann ist ','When is ').replace('zeig mir ','show me ').replace('wie hoch ','how high ').replace('wie tief ','how deep ').replace(' ', '%20')
-        google_weather = 'http://api.wolframalpha.com/v1/query.jsp?input=%s&appid=WE28G8-39AWVV38GJ' % wolframQuestion
+        google_weather = 'http://api.wolframalpha.com/v1/query.jsp?input=%s&appid=ADD_ID_HERE' % wolframQuestion
         print google_weather
         dom = minidom.parse(urlopen(google_weather))
         count_wolfram = 0
