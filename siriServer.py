@@ -15,6 +15,8 @@ import PluginManager
 from M2Crypto import BIO, RSA, X509
 
 from siriObjects import speechObjects, baseObjects, uiObjects, systemObjects
+from siriObjects.baseObjects import ObjectIsCommand
+from siriObjects.speechObjects import StartSpeech, StartSpeechRequest, StartSpeechDictation, SpeechPacket, SpeechFailure, FinishSpeech
 
 from httpClient import AsyncOpenHttp
 
@@ -199,35 +201,72 @@ class HandleConnection(ssl_dispatcher):
                         if self.current_running_plugin.waitForResponse != None:
                             # just forward the object to the 
                             # don't change it's refId, further requests must reference last FinishSpeech
+                            self.logger.info("Forwarding object to plugin")
                             self.plugin_lastAceId = None
                             self.current_running_plugin.response = reqObject
                             self.current_running_plugin.waitForResponse.set()
                 
-                if reqObject['class'] == 'StartSpeechRequest' or reqObject['class'] == 'StartSpeechDictation':
-                        decoder = speex.Decoder()
+                if ObjectIsCommand(reqObject, StartSpeechRequest) or ObjectIsCommand(reqObject, StartSpeechDictation):
+                    self.logger.info("New start of speech received")
+                    startSpeech = None
+                    if ObjectIsCommand(reqObject, StartSpeechDictation):
+                        dictation = True
+                        startSpeech = StartSpeechDictation(reqObject)
+                    else:
+                        dictation = False
+                        startSpeech = StartSpeechRequest(reqObject)
+            
+                    decoder = speex.Decoder()
+                    encoder = flac.Encoder()
+                    speexUsed = False
+                    if startSpeech.codec == StartSpeech.CodecSpeex_WB_Quality8Value:
                         decoder.initialize(mode=speex.SPEEX_MODEID_WB)
-                        encoder = flac.Encoder()
-                        encoder.initialize(16000, 1, 16) #16kHz sample rate, 1 channel, 16 bits per sample
-                        dictation=(reqObject['class'] == 'StartSpeechDictation')
-                        self.speech[reqObject['aceId']] = (decoder, encoder, dictation)
+                        encoder.initialize(16000, 1, 16)
+                        speexUsed = True
+                    elif startSpeech.codec == StartSpeech.CodecSpeex_NB_Quality7Value:
+                        decoder.initialize(mode=speex.SPEEX_MODEID_NB)
+                        encoder.initialize(16000, 1, 16)
+                        speexUsed = True
+                    elif startSpeech.codec == StartSpeech.CodecPCM_Mono_16Bit_8000HzValue:
+                        encoder.initialize(8000, 1, 16)
+                    elif startSpeech.codec == StartSpeech.CodecPCM_Mono_16Bit_11025HzValue:
+                        encoder.initialize(11025, 1, 16)
+                    elif startSpeech.coded == StartSpeech.CodecPCM_Mono_16Bit_16000HzValue:
+                        encoder.initialize(16000, 1, 16)
+                    elif startSpeech.coded == StartSpeech.CodecPCM_Mono_16Bit_22050HzValue:
+                        encoder.initialize(22050, 1, 16)
+                    elif startSpeech.coded == StartSpeech.CodecPCM_Mono_16Bit_32000HzValue:
+                        encoder.initialize(32000, 1, 16)
+                    # we probably need resampling for sample rates other than 16kHz...
+                    
+                    self.speech[startSpeech.aceId] = (decoder if speexUsed else None, encoder, dictation)
                 
-                elif reqObject['class'] == 'SpeechPacket':
-                    (decoder, encoder, dictation) = self.speech[reqObject['refId']]
-                    pcm = decoder.decode(reqObject['properties']['packets'])
+                elif ObjectIsCommand(reqObject, SpeechPacket):
+                    self.logger.info("Decoding speech packet")
+                    speechPacket = SpeechPacket(reqObject)
+                    (decoder, encoder, dictation) = self.speech[speechPacket.refId]
+                    if decoder:
+                        pcm = decoder.decode(speechPacket.packets)
+                    else:
+                        pcm = SpeechPacket.data # <- probably data... if pcm
                     encoder.encode(pcm)
                         
                 elif reqObject['class'] == 'StartCorrectedSpeechRequest':
                     self.process_recognized_speech({u'hypotheses': [{'confidence': 1.0, 'utterance': str.lower(reqObject['properties']['utterance'])}]}, reqObject['aceId'], False)
             
-                elif reqObject['class'] == 'FinishSpeech':
-                    (decoder, encoder, dictation) = self.speech[reqObject['refId']]
-                    decoder.destroy()
+                elif ObjectIsCommand(reqObject, FinishSpeech):
+                    self.logger.info("End of speech received")
+                    finishSpeech = FinishSpeech(reqObject)
+                    (decoder, encoder, dictation) = self.speech[finishSpeech.refId]
+                    if decoder:
+                        decoder.destroy()
                     encoder.finish()
                     flacBin = encoder.getBinary()
                     encoder.destroy()
-                    del self.speech[reqObject['refId']]
+                    del self.speech[finishSpeech.refId]
                     
-                    self.httpClient.make_google_request(flacBin, reqObject['refId'], dictation, language=self.assistant.language, allowCurses=True)
+                    self.logger.info("Sending flac to google for recognition")
+                    self.httpClient.make_google_request(flacBin, finishSpeech.refId, dictation, language=self.assistant.language, allowCurses=True)
                         
                         
                 elif reqObject['class'] == 'CancelRequest':
