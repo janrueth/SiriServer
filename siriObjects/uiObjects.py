@@ -19,7 +19,7 @@ class AddViews(ClientBoundCommand):
 class AssistantUtteranceView(AceObject):
     def __init__(self, text="", speakableText="", dialogIdentifier="Misc#ident", listenAfterSpeaking=False):
         super(AssistantUtteranceView, self).__init__("AssistantUtteranceView", "com.apple.ace.assistant")
-        self.text = text
+        self.text = text or speakableText
         self.speakableText = speakableText
         self.dialogIdentifier = dialogIdentifier
         self.listenAfterSpeaking = listenAfterSpeaking

@@ -396,11 +396,17 @@ log_levels = {'debug':logging.DEBUG,
 parser = OptionParser()
 parser.add_option('-l', '--loglevel', default='info', dest='logLevel', help='This sets the logging level you have these options: debug, info, warning, error, critical \t\tThe standard value is info')
 parser.add_option('-p', '--port', default=443, type='int', dest='port', help='This options lets you use a custom port instead of 443 (use a port > 1024 to run as non root user)')
+parser.add_option('--logfile', default=None, dest='logfile', help='Log to a file instead of stdout.')
 (options, args) = parser.parse_args()
 
 x = logging.getLogger("logger")
 x.setLevel(log_levels[options.logLevel])
-h = logging.StreamHandler()
+
+if options.logfile != None:
+    h = logging.FileHandler(options.logfile)
+else:
+    h = logging.StreamHandler()
+
 f = logging.Formatter(u"%(levelname)s %(funcName)s %(message)s")
 h.setFormatter(f)
 x.addHandler(h)
