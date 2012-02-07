@@ -76,14 +76,12 @@ class alarm(Plugin):
     }
 
     res = {
-        'setTimer': '.*timer.*\s+([0-9/ ]*|a|an|the)\s+'
-                    '(secs?|seconds?|mins?|minutes?|hrs?|hours?)',
-            'resetTimer': '.*(cancel|reset|stop).*timer',
-            'resumeTimer': '.*(resume|unfreeze|continue).*timer',
-            'pauseTimer': '.*(pause|freeze|hold).*timer',
-            'showTimer': '.*show.*timer',
-            'timerLength': '([0-9/ ]*|a|an|the)\s+'
-                           '(secs?|seconds?|mins?|minutes?|hrs?|hours?)'
+        'setTimer': '.*timer.*\s+([0-9/ ]*|a|an|the)\s+(secs?|seconds?|mins?|minutes?|hrs?|hours?)',
+        'resetTimer': '.*(cancel|reset|stop).*timer',
+        'resumeTimer': '.*(resume|unfreeze|continue).*timer',
+        'pauseTimer': '.*(pause|freeze|hold).*timer',
+        'showTimer': '.*(show|display|see).*timer',
+        'timerLength': '([0-9/ ]*|a|an|the)\s+(secs?|seconds?|mins?|minutes?|hrs?|hours?)'
     }
 
     @register("en-US", res['setTimer'])
@@ -168,7 +166,7 @@ class alarm(Plugin):
             self.complete_request()
 
     @register("en-US", res['resumeTimer'])
-    def resetTimer(self, speech, language):
+    def resumeTimer(self, speech, language):
         response = self.getResponseForRequest(TimerGet(self.refId))
         timer_properties = response['properties']['timer']['properties']
         timer = TimerObject(timerValue = timer_properties['timerValue'], state = timer_properties['state'])
@@ -192,7 +190,7 @@ class alarm(Plugin):
             self.complete_request()
 
     @register("en-US", res['pauseTimer'])
-    def resetTimer(self, speech, language):
+    def pauseTimer(self, speech, language):
         response = self.getResponseForRequest(TimerGet(self.refId))
         timer_properties = response['properties']['timer']['properties']
         timer = TimerObject(timerValue = timer_properties['timerValue'], state = timer_properties['state'])
@@ -228,8 +226,8 @@ class alarm(Plugin):
         timer_properties = response['properties']['timer']['properties']
         timer = TimerObject(timerValue = timer_properties['timerValue'], state = timer_properties['state'])
 
-        view = AddViews(self.refId, dialogPhase="Completion")
-        view1 = [AssistantUtteranceView(speakableText=alarm.localizations['showTimer']['showTheTimer'][language], dialogIdentifier="Timer#showTheTimer")]
+        view = AddViews(self.refId, dialogPhase="Summary")
+        view1 = AssistantUtteranceView(speakableText=alarm.localizations['showTimer']['showTheTimer'][language], dialogIdentifier="Timer#showTheTimer")
         view2 = TimerSnippet(timers=[timer])
         view.views = [view1, view2]
         self.sendRequestWithoutAnswer(view)
