@@ -45,7 +45,7 @@ class smalltalk(Plugin):
         self.complete_request()     
     
     @register("de-DE", "(.*möchtest.*heiraten.*)|(.*willst.*heiraten.*)")
-    @register("en-US", ".*Whant.*marry*")
+    @register("en-US", ".*Want.*marry*")
     def st_marry_me(self, speech, language):
         if language == 'de-DE':
             self.say("Nein Danke, ich stehe auf das schwarze iPhone von Deinem Kollegen.")            
