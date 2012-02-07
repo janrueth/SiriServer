@@ -8,7 +8,7 @@ import json
 from plugin import *
 
 from siriObjects.uiObjects import AddViews, AssistantUtteranceView
-from siriObjects.ClockObjects import ClockSnippet, ClockObject
+from siriObjects.clockObjects import ClockSnippet, ClockObject
 
 ####### geonames.org API username ######
 geonames_user="test2"
