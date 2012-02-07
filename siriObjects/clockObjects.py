@@ -4,8 +4,8 @@ from siriObjects.systemObjects import DomainObject
 
 
 class ClockAdd(ClientBoundCommand):
-    def __init__(self):
-        super(ClockAdd, self).__init__("Add", "com.apple.ace.clock")
+    def __init__(self, refId):
+        super(ClockAdd, self).__init__("Add", "com.apple.ace.clock", None, refId)
         self.clockToAdd = None # ClockObject
         self.targetAppId = None #url
 
@@ -23,8 +23,8 @@ class ClockAddCompleted(ServerBoundCommand):
         super(ClockAddCompleted, self).__init__(plist)
 
 class ClockDelete(ClientBoundCommand):
-    def __init__(self):
-        super(ClockDelete, self).__init__("Delete", "com.apple.ace.clock")
+    def __init__(self, refId):
+        super(ClockDelete, self).__init__("Delete", "com.apple.ace.clock", None, refId)
         self.clockIds = None # array
         self.targetAppId = None # url
 
@@ -62,7 +62,8 @@ class ClockObject(DomainObject):
         return super(ClockObject, self).to_plist()
 
 class ClockSearch(ClientBoundCommand):
-    def __init__(self):
+    def __init__(self, refId):
+        super(ClockSearch, self).__init__("Search", "com.apple.ace.clock", None, refId)
         self.unlocalizedCountryName = None # string 
         self.unlocalizedCityName = None # string
         self.identifier = None #url
