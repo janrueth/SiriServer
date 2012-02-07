@@ -1,0 +1,4 @@
+Issue these commands in a terminal to prepare the launch daemon. This will run as root; I do intend to try to fix that for the limited user account, on a higher port. For now, run
+
+sudo cp net.siriserver.plist /Library/LaunchDaemons
+sudo launchctl load /Library/LaunchDaemons/net.siriserver.plist
