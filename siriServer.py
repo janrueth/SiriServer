@@ -215,20 +215,37 @@ class HandleConnection(ssl_dispatcher):
                         startSpeech = StartSpeechRequest(reqObject)
             
                     decoder = speex.Decoder()
+                    encoder = flac.Encoder()
+                    speex = False
                     if startSpeech.codec == StartSpeech.CodecSpeex_WB_Quality8Value:
                         decoder.initialize(mode=speex.SPEEX_MODEID_WB)
+                        encoder.initialize(16000, 1, 16)
+                        speex = True
                     elif startSpeech.codec == StartSpeech.CodecSpeex_NB_Quality7Value:
                         decoder.initialize(mode=speex.SPEEX_MODEID_NB)
-                    else:
-                        self.logger.critical("Unsupported codec found, aborting request, PLEASE REPORT THIS")
-                    encoder = flac.Encoder()
-                    encoder.initialize(16000, 1, 16)
-                    self.speech[startSpeech.aceId] = (decoder, encoder, dictation)
+                        encoder.initialize(16000, 1, 16)
+                        speex = True
+                    elif startSpeech.codec == StartSpeech.CodecPCM_Mono_16Bit_8000HzValue:
+                        encoder.initialize(8000, 1, 16)
+                    elif startSpeech.codec == StartSpeech.CodecPCM_Mono_16Bit_11025HzValue:
+                        encoder.initialize(11025, 1, 16)
+                    elif startSpeech.coded == StartSpeech.CodecPCM_Mono_16Bit_16000HzValue:
+                        encoder.initialize(16000, 1, 16)
+                    elif startSpeech.coded == StartSpeech.CodecPCM_Mono_16Bit_22050HzValue:
+                        encoder.initialize(22050, 1, 16)
+                    elif startSpeech.coded == StartSpeech.CodecPCM_Mono_16Bit_32000HzValue:
+                        encoder.initialize(32000, 1, 16)
+                    # we probably need resampling for sample rates other than 16kHz...
+                    
+                    self.speech[startSpeech.aceId] = (decoder if speex else None, encoder, dictation)
                 
                 elif ObjectIsCommand(reqObject, SpeechPacket):
                     speechPacket = SpeechPacket(reqObject)
                     (decoder, encoder, dictation) = self.speech[speechPacket.refId]
-                    pcm = decoder.decode(SpeechPacket.packets)
+                    if decoder:
+                        pcm = decoder.decode(SpeechPacket.packets)
+                    else
+                        pcm = SpeechPacket.data # <- probably data... if pcm
                     encoder.encode(pcm)
                         
                 elif reqObject['class'] == 'StartCorrectedSpeechRequest':
@@ -237,7 +254,8 @@ class HandleConnection(ssl_dispatcher):
                 elif ObjectIsCommand(reqObject, FinishSpeech):
                     finishSpeech = FinishSpeech(reqObject)
                     (decoder, encoder, dictation) = self.speech[finishSpeech.refId]
-                    decoder.destroy()
+                    if decoder:
+                        decoder.destroy()
                     encoder.finish()
                     flacBin = encoder.getBinary()
                     encoder.destroy()
