@@ -48,8 +48,8 @@ class EmailEmail(DomainObject):
         return super(EmailEmail, self).to_plist()
 
 class EmailRetrieve(ClientBoundCommand):
-    def __init__(self):
-        super(EmailRetrieve, self).__init__("Retrieve", "com.apple.ace.email")
+    def __init__(self, refid):
+        super(EmailRetrieve, self).__init__("Retrieve", "com.apple.ace.email", None, refId)
         self.requestedHeaders = None # array
         self.identifiers = None # array
         self.targetAppId = None # url
@@ -68,8 +68,8 @@ class EmailRetrieveCompleted(ServerBoundCommand):
         super(EmailRetrieveCompleted, self).__init__(plist)
 
 class EmailSearch(ClientBoundCommand):
-    def __init__(self):
-        super(EmailSearch, self).__init__("Search", "com.apple.ace.email")
+    def __init__(self, refId):
+        super(EmailSearch, self).__init__("Search", "com.apple.ace.email", None, refId)
         self.toEmail = None # string
         self.timeZoneId = None #string
         self.subject = None # string
