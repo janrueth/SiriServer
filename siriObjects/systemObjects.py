@@ -43,8 +43,8 @@ class SetRequestOrigin(ServerBoundCommand):
 
 
 class DomainObject(AceObject):
-    def __init__(self, group, identifier=None):
-        super(DomainObject, self).__init__("Object", group)
+    def __init__(self, group, identifier=None, clazz="Object"):
+        super(DomainObject, self).__init__(clazz, group)
         self.identifier = identifier
     
     def to_plist(self):
@@ -130,4 +130,41 @@ class SendCommands(AceObject):
         self.add_property('commands')
         return super(SendCommands, self).to_plist()
 
+class Person(DomainObject):
+    def __init__(self):
+        super(Person, self).__init__("com.apple.ace.system", clazz="Person")
+        self.suffix = None # string
+        self.relatedNames = None # array
+        self.prefix = None # string
+        self.phones = None # array
+        self.nickName = None # string
+        self.middleName = None # string
+        self.me = None # number
+        self.lastNamePhonetic = None # string
+        self.lastName = None # string
+        self.fullName = None # string
+        self.firstNamePhonetic = None # string
+        self.firstName = None # string
+        self.emails = None # array
+        self.compary = None # string
+        self.birthday = None # date
+        self.addresses = None # array
 
+    def to_plist(self):
+        self.add_property('suffix')
+        self.add_property('relatedNames')
+        self.add_property('prefix')
+        self.add_property('phones')
+        self.add_property('nickName')
+        self.add_property('middleName')
+        self.add_property('me')
+        self.add_property('lastNamePhonetic')
+        self.add_property('lastName')
+        self.add_property('fullName')
+        self.add_property('firstNamePhonetic')
+        self.add_property('firstName')
+        self.add_property('emails')
+        self.add_property('compary')
+        self.add_property('birthday')
+        self.add_property('addresses')
+        super(Person, self).to_plist()
