@@ -101,6 +101,10 @@ class AceObject(object):
                     setattr(self, key, self.properties[key])
                 except:
                     pass
+
+    def initWithPList(self, plist):
+        self.plist = plist
+        self.from_plist()
         
 class ServerBoundCommand(AceObject):
     def __init__(self, plist):
@@ -128,17 +132,15 @@ class RequestCompleted(ClientBoundCommand):
     def __init__(self, refId, callbacks = None):
         super(RequestCompleted, self).__init__("RequestCompleted", "com.apple.ace.system", None, refId, callbacks)
 
-#classToPyClassMapping = {'StartSpeechRequest': speechObjects.StartSpeechRequest,
-#    'SpeechSpacket': speechObjects.SpeechSpacket,
-#    'FinishSpeech': speechObjects.FinishSpeech
-#}
 
-
-#def ServerBoundPlistToObject(plist):
-#    clazz = plist['class']
-#    try:
-#        obj = classToPyClassMapping[clazz]
-#        return obj(plist)
-#    except:
-#        raise Exception('ClassNotFound', 'The class you were looking for is not implemented')
+def ObjectIsCommand(obj, command):
+    try:
+        if issubclass(command, ServerBoundCommand):
+            group = obj['group']
+            clazz = obj['class']
+            if command.classIdentifier == clazz and command.groupIdentifier == group:
+                return True
+    except:
+        pass
+    return False
     
