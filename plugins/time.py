@@ -7,40 +7,8 @@ import json
 
 from plugin import *
 
-from siriObjects.baseObjects import AceObject, ClientBoundCommand
 from siriObjects.uiObjects import AddViews, AssistantUtteranceView
-from siriObjects.systemObjects import DomainObject
-
-class ClockSnippet(AceObject):
-    def __init__(self, clocks=None):
-        super(ClockSnippet, self).__init__("Snippet", "com.apple.ace.clock")
-        self.clocks = clocks if clocks != None else []
-
-    def to_plist(self):
-        self.add_property('clocks')
-        return super(ClockSnippet, self).to_plist()
-
-class ClockObject(DomainObject):
-    def __init__(self):
-        super(ClockObject, self).__init__("com.apple.ace.clock")
-        self.unlocalizedCountryName = None
-        self.unlocalizedCityName = None
-        self.timezoneId = None
-        self.countryName = None
-        self.countryCode = None
-        self.cityName = None
-        self.alCityId = None
-    
-    def to_plist(self):
-        self.add_property('unlocalizedCountryName')
-        self.add_property('unlocalizedCityName')
-        self.add_property('timezoneId') 
-        self.add_property('countryName')
-        self.add_property('countryCode')
-        self.add_property('cityName')
-        self.add_property('alCityId')
-        return super(ClockObject, self).to_plist()
-
+from siriObjects.ClockObjects import ClockSnippet, ClockObject
 
 ####### geonames.org API username ######
 geonames_user="test2"
