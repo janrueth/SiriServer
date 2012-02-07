@@ -21,8 +21,8 @@ class AlarmObject(DomainObject):
         return super(AlarmObject, self).to_plist()
 
 class AlarmCreate(ClientBoundCommand):
-    def __init__(self):
-        super(AlarmCreate, self).__init__("Create", "com.apple.ace.alarm")      
+    def __init__(self, refId):
+        super(AlarmCreate, self).__init__("Create", "com.apple.ace.alarm", None, refId)      
         self.alarmToCreate = None
         self.targetAppId = None
     
@@ -39,8 +39,8 @@ class AlarmCreateCompleted(ServerBoundCommand):
         super(AlarmCreateCompleted, self).__init__(plist)
 
 class AlarmDelete(ClientBoundCommand):
-    def __init__(self):
-        super(AlarmDelete, self).__init__("Delete", "com.apple.ace.alarm")
+    def __init__(self, refId):
+        super(AlarmDelete, self).__init__("Delete", "com.apple.ace.alarm", None, refId)
         self.alarmIds = None #array
         self.targetAppId = None
 
@@ -58,8 +58,8 @@ class AlarmDeleteCompleted(ServerBoundCommand):
 
 
 class AlarmSearch(ClientBoundCommand):
-    def __init__(self):
-        super(AlarmSearch, self).__init__("Search", "com.apple.ace.alarm")
+    def __init__(self, refId):
+        super(AlarmSearch, self).__init__("Search", "com.apple.ace.alarm", None, refId)
         self.minute = None # number
         self.label = None # string
         self.identifier = None #url
@@ -97,8 +97,8 @@ class AlarmSnippet(Snippet):
         return super(AlarmSnippet, self).to_plist()
 
 class AlarmUpdate(ClientBoundCommand):
-    def __init__(self):
-        super(AlarmUpdate, self).__init__("Update", "com.apple.ace.alarm")
+    def __init__(self, refId):
+        super(AlarmUpdate, self).__init__("Update", "com.apple.ace.alarm", None, refId)
         self.removedFrequency = None # array
         self.minute = None # number
         self.label = None #string
