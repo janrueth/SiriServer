@@ -1,11 +1,13 @@
 
 import os
 import re
+import logging
 
 from plugin import Plugin, __criteria_key__
 from types import FunctionType
 
 
+logger = logging.getLogger("logger")
 pluginPath = "plugins"
 
 config_file = "plugins.conf"
@@ -19,7 +21,10 @@ def load_plugins():
             if line.startswith("#") or line == "":
                 continue
             # just load the whole shit...
-            __import__(pluginPath+"."+line,  globals(), locals(), [], -1)
+            try:
+                __import__(pluginPath+"."+line,  globals(), locals(), [], -1)
+            except:
+                logger.exception("Plugin loading failed")
             
     # as they are loaded in the order in the file we will have the same order in __subclasses__()... I hope
 
