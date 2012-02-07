@@ -112,10 +112,12 @@ class Plugin(threading.Thread):
         self.connection.current_running_plugin = None
         self.send_object(RequestCompleted(self.refId, callbacks))
 
-    def ask(self, text):
+    def ask(self, text, speakableText=""):
         self.waitForResponse = threading.Event()
+        if speakableText == "":
+            speakableText = text
         view = AddViews(self.refId)
-        view.views += [AssistantUtteranceView(text, text, listenAfterSpeaking=True)]
+        view.views += [AssistantUtteranceView(text, speakableText, listenAfterSpeaking=True)]
         self.send_object(view)
         self.waitForResponse.wait()
         self.waitForResponse = None
