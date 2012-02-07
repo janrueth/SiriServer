@@ -10,9 +10,9 @@ class wwwSearch(Plugin):
     def webSearch(self, speech, language):
 
         if (speech.find('Web search') == 0):
-            speech = speech.replace('Web search', '',1)
+            speech = speech.replace('Web search', ' ',1)
         elif (speech.find('Web') == 0):
-            speech = speech.replace('Web','',1)
+            speech = speech.replace('Web',' ',1)
         speech = speech.strip()
         if speech == "":
             speech = self.ask("What is your query?")
