@@ -382,11 +382,7 @@ certFile = open('OrigAppleServerCert.der')
 serverCert = X509.load_cert_bio(BIO.MemoryBuffer(certFile.read()), format=0)
 certFile.close()
 
-#setup database
-db.setup()
 
-#load Plugins
-PluginManager.load_plugins()
 
 #setup logging
 
@@ -409,6 +405,12 @@ f = logging.Formatter(u"%(levelname)s %(funcName)s %(message)s")
 h.setFormatter(f)
 x.addHandler(h)
 
+
+#setup database
+db.setup()
+
+#load Plugins
+PluginManager.load_plugins()
 
 
 #start server
