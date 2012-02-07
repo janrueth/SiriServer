@@ -201,11 +201,13 @@ class HandleConnection(ssl_dispatcher):
                         if self.current_running_plugin.waitForResponse != None:
                             # just forward the object to the 
                             # don't change it's refId, further requests must reference last FinishSpeech
+                            self.logger.info("Forwarding object to plugin")
                             self.plugin_lastAceId = None
                             self.current_running_plugin.response = reqObject
                             self.current_running_plugin.waitForResponse.set()
                 
                 if ObjectIsCommand(reqObject, StartSpeechRequest) or ObjectIsCommand(reqObject, StartSpeechDictation):
+                    self.logger.info("New start of speech received")
                     startSpeech = None
                     if ObjectIsCommand(reqObject, StartSpeechDictation):
                         dictation = True
@@ -216,15 +218,15 @@ class HandleConnection(ssl_dispatcher):
             
                     decoder = speex.Decoder()
                     encoder = flac.Encoder()
-                    speex = False
+                    speexUsed = False
                     if startSpeech.codec == StartSpeech.CodecSpeex_WB_Quality8Value:
                         decoder.initialize(mode=speex.SPEEX_MODEID_WB)
                         encoder.initialize(16000, 1, 16)
-                        speex = True
+                        speexUsed = True
                     elif startSpeech.codec == StartSpeech.CodecSpeex_NB_Quality7Value:
                         decoder.initialize(mode=speex.SPEEX_MODEID_NB)
                         encoder.initialize(16000, 1, 16)
-                        speex = True
+                        speexUsed = True
                     elif startSpeech.codec == StartSpeech.CodecPCM_Mono_16Bit_8000HzValue:
                         encoder.initialize(8000, 1, 16)
                     elif startSpeech.codec == StartSpeech.CodecPCM_Mono_16Bit_11025HzValue:
@@ -237,14 +239,15 @@ class HandleConnection(ssl_dispatcher):
                         encoder.initialize(32000, 1, 16)
                     # we probably need resampling for sample rates other than 16kHz...
                     
-                    self.speech[startSpeech.aceId] = (decoder if speex else None, encoder, dictation)
+                    self.speech[startSpeech.aceId] = (decoder if speexUsed else None, encoder, dictation)
                 
                 elif ObjectIsCommand(reqObject, SpeechPacket):
+                    self.logger.info("Decoding speech packet")
                     speechPacket = SpeechPacket(reqObject)
                     (decoder, encoder, dictation) = self.speech[speechPacket.refId]
                     if decoder:
-                        pcm = decoder.decode(SpeechPacket.packets)
-                    else
+                        pcm = decoder.decode(speechPacket.packets)
+                    else:
                         pcm = SpeechPacket.data # <- probably data... if pcm
                     encoder.encode(pcm)
                         
@@ -252,6 +255,7 @@ class HandleConnection(ssl_dispatcher):
                     self.process_recognized_speech({u'hypotheses': [{'confidence': 1.0, 'utterance': str.lower(reqObject['properties']['utterance'])}]}, reqObject['aceId'], False)
             
                 elif ObjectIsCommand(reqObject, FinishSpeech):
+                    self.logger.info("End of speech received")
                     finishSpeech = FinishSpeech(reqObject)
                     (decoder, encoder, dictation) = self.speech[finishSpeech.refId]
                     if decoder:
@@ -261,6 +265,7 @@ class HandleConnection(ssl_dispatcher):
                     encoder.destroy()
                     del self.speech[finishSpeech.refId]
                     
+                    self.logger.info("Sending flac to google for recognition")
                     self.httpClient.make_google_request(flacBin, finishSpeech.refId, dictation, language=self.assistant.language, allowCurses=True)
                         
                         
