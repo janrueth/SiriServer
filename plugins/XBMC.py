@@ -45,8 +45,10 @@ class XBMC(Plugin):
     @register("en-US", "(xbmc)|(xbmc.* [a-z]+)")
     def test2(self, speech, language):
         global xbmc
-        firstword, command=speech.split(' ',1)
-        if command != None:
+        if speech.lower() == 'xbmc':
+            self.say("XBMC currently supports the following commands: play [movie or tv show], pause, stop, shut down, start and info.")
+        else:
+            firstword, command=speech.split(' ',1)
             json = jsonrpclib.Server('%s/jsonrpc' % (xbmc.get_url()))
             if command == 'stop':
                 try:
@@ -58,7 +60,7 @@ class XBMC(Plugin):
                     json.Player.PlayPause(playerid=1)
                 except:
                     self.say('Nothing to play/pause')
-            elif 'play' in command or 'plate' in command or 'place' in command: #this elif needs to be located below command == 'play' part
+            elif 'play' in command or 'plate' in command or 'place' in command or 'played' in command: #this elif needs to be located below command == 'play' part
                 command, title=command.split(' ',1)
                 print 'Searching for: '+title
                 result = json.VideoLibrary.GetMovies()
@@ -80,8 +82,35 @@ class XBMC(Plugin):
                         json.Player.Open({ 'playlistid': 1 })
                         self.say('%s starting'%(matches[0]))
                 else:
-                    self.say('No movies matching: %s.' % (title))
-                #code for playing tvshows latest unwatched episode
+                    result = json.VideoLibrary.GetTVShows()
+                    tvmatches = []
+                    for tvshow in result['tvshows']:
+                        if title in tvshow['label'].lower():
+                            tvshowid = tvshow['tvshowid']
+                            matches.append(tvshow['label'])
+                    if len(matches) > 0:
+                        if len(matches) > 1:
+                            self.say('Found multiple matches for \'%s\':'%(title))
+                            names = ''
+                            for x in matches:
+                                names = x+'\n'+names 
+                            self.say(names, None)
+                        else:
+                            result = json.VideoLibrary.GetEpisodes(tvshowid=tvshowid,properties=['playcount','showtitle','season','episode'])
+                            allwatched = True
+                            for episode in result['episodes']:
+                                if episode['playcount'] == 0:
+                                    episodeid=episode['episodeid']
+                                    self.say('Playing %s, season %s, episode %s.' %(episode['showtitle'], episode['season'], episode['episode']))
+                                    json.Playlist.Clear(playlistid=1)
+                                    json.Playlist.Add(playlistid=1, item={ 'episode' + 'id': episodeid })
+                                    json.Player.Open({ 'playlistid': 1 })
+                                    allwatched = False
+                                    break
+                            if allwatched == True:
+                                self.say('There are no unwatched and/or new episodes of %s' %(title))
+                    else:
+                        self.say('No movies or TV shows matching: %s.' % (title))
             elif command == 'info':
                 self.say("XBMC URL: %s" %(xbmc.get_url()), None)
                 info = """username: %s\
@@ -107,7 +136,4 @@ class XBMC(Plugin):
                 s.sendto(msg, ("255.255.255.255", 9))
             else:
                 self.say("XBMC command not recognized: %s."%(command))
-        else:
-            self.say("XBMC currently supports the following commands: play [movie], pause, stop, shutdown, start and info.")
-        
         self.complete_request()
