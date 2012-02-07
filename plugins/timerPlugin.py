@@ -15,7 +15,7 @@ from siriObjects.timerObjects import *
 
 def parse_number(s, language):
     # check for simple article usage (a, an, the)
-    if re.match(timer.res['articles'][language], s, re.IGNORECASE):
+    if re.match(timerPlugin.res['articles'][language], s, re.IGNORECASE):
         return 1
     f = 0
     for part in s.split(' '):
@@ -24,7 +24,7 @@ def parse_number(s, language):
 
 
 def parse_timer_length(t, language):
-    m = re.search(timer.res['timerLength'][language], t, re.IGNORECASE)
+    m = re.search(timerPlugin.res['timerLength'][language], t, re.IGNORECASE)
     if m:
         unit = m.group(2)[0]
         count = parse_number(m.group(1), language)
@@ -39,7 +39,7 @@ def parse_timer_length(t, language):
             return count * 60
 
 
-class timer(Plugin):
+class timerPlugin(Plugin):
 
     localizations = {
         'Timer': {
@@ -87,14 +87,14 @@ class timer(Plugin):
 
     @register("en-US", res['setTimer']['en-US'])
     def setTimer(self, speech, language):
-        m = re.match(timer.res['setTimer'][language], speech, re.IGNORECASE)
+        m = re.match(timerPlugin.res['setTimer'][language], speech, re.IGNORECASE)
         timer_length = ' '.join(m.group(1, 2))
         duration = parse_timer_length(timer_length, language)
 
         view = AddViews(self.refId, dialogPhase="Reflection")
         view.views = [
             AssistantUtteranceView(
-                speakableText=timer.localizations['Timer']['settingTimer'][language],
+                speakableText=timerPlugin.localizations['Timer']['settingTimer'][language],
                 dialogIdentifier="Timer#settingTimer")]
         self.sendRequestWithoutAnswer(view)
 
@@ -110,19 +110,19 @@ class timer(Plugin):
         if timer.state == "Running":
             # timer is already running!
             view = AddViews(self.refId, dialogPhase="Completion")
-            view1 = AssistantUtteranceView(speakableText=timer.localizations['Timer']['timerIsAlreadyRunning'][language], dialogIdentifier="Timer#timerIsAlreadyRunning")
+            view1 = AssistantUtteranceView(speakableText=timerPlugin.localizations['Timer']['timerIsAlreadyRunning'][language], dialogIdentifier="Timer#timerIsAlreadyRunning")
             view2 = TimerSnippet(timers=[timer], confirm=True)
             view.views = [view1, view2]
             utterance = self.getResponseForRequest(view)
             #if response['class'] == 'StartRequest':
             view = AddViews(self.refId, dialogPhase="Reflection")
-            view.views = [AssistantUtteranceView(speakableText=timer.localizations['Timer']['settingTimer'][language], dialogIdentifier="Timer#settingTimer")]
+            view.views = [AssistantUtteranceView(speakableText=timerPlugin.localizations['Timer']['settingTimer'][language], dialogIdentifier="Timer#settingTimer")]
             self.sendRequestWithoutAnswer(view)
 
             if re.match('\^timerConfirmation\^=\^no\^', utterance):
                 # user canceled
                 view = AddViews(self.refId, dialogPhase="Completion")
-                view.views = [AssistantUtteranceView(speakableText=timer.localizations['Timer']['wontSetTimer'][language], dialogIdentifier="Timer#wontSetTimer")]
+                view.views = [AssistantUtteranceView(speakableText=timerPlugin.localizations['Timer']['wontSetTimer'][language], dialogIdentifier="Timer#wontSetTimer")]
                 self.sendRequestWithoutAnswer(view)
                 self.complete_request()
                 return
@@ -134,9 +134,9 @@ class timer(Plugin):
         timer = TimerObject(timerValue = duration, state = "Running")
         response = self.getResponseForRequest(TimerSet(self.refId, timer=timer))
         
-        print(timer.localizations['Timer']['timerWasSet'][language].format(timer_length))
+        print(timerPlugin.localizations['Timer']['timerWasSet'][language].format(timer_length))
         view = AddViews(self.refId, dialogPhase="Completion")
-        view1 = AssistantUtteranceView(speakableText=timer.localizations['Timer']['timerWasSet'][language].format(timer_length), dialogIdentifier="Timer#timerWasSet")
+        view1 = AssistantUtteranceView(speakableText=timerPlugin.localizations['Timer']['timerWasSet'][language].format(timer_length), dialogIdentifier="Timer#timerWasSet")
         view2 = TimerSnippet(timers=[timer])
         view.views = [view1, view2]
         self.sendRequestWithoutAnswer(view)
@@ -152,12 +152,12 @@ class timer(Plugin):
             response = self.getResponseForRequest(TimerCancel(self.refId))
             if response['class'] == "CancelCompleted":
                 view = AddViews(self.refId, dialogPhase="Completion")
-                view.views = [AssistantUtteranceView(speakableText=timer.localizations['Timer']['timerWasReset'][language], dialogIdentifier="Timer#timerWasReset")]
+                view.views = [AssistantUtteranceView(speakableText=timerPlugin.localizations['Timer']['timerWasReset'][language], dialogIdentifier="Timer#timerWasReset")]
                 self.sendRequestWithoutAnswer(view)
             self.complete_request()
         else:
             view = AddViews(self.refId, dialogPhase="Completion")
-            view1 = AssistantUtteranceView(speakableText=timer.localizations['Timer']['timerIsAlreadyStopped'][language], dialogIdentifier="Timer#timerIsAlreadyStopped")
+            view1 = AssistantUtteranceView(speakableText=timerPlugin.localizations['Timer']['timerIsAlreadyStopped'][language], dialogIdentifier="Timer#timerIsAlreadyStopped")
             view2 = TimerSnippet(timers=[timer])
             view.views = [view1, view2]
 
@@ -174,14 +174,14 @@ class timer(Plugin):
             response = self.getResponseForRequest(TimerResume(self.refId))
             if response['class'] == "ResumeCompleted":
                 view = AddViews(self.refId, dialogPhase="Completion")
-                view1 = AssistantUtteranceView(speakableText=timer.localizations['Timer']['timerWasResumed'][language], dialogIdentifier="Timer#timerWasResumed")
+                view1 = AssistantUtteranceView(speakableText=timerPlugin.localizations['Timer']['timerWasResumed'][language], dialogIdentifier="Timer#timerWasResumed")
                 view2 = TimerSnippet(timers=[timer])
                 view.views = [view1, view2]
                 self.sendRequestWithoutAnswer(view)
             self.complete_request()
         else:
             view = AddViews(self.refId, dialogPhase="Completion")
-            view1 = AssistantUtteranceView(speakableText=timer.localizations['Timer']['timerIsAlreadyStopped'][language], dialogIdentifier="Timer#timerIsAlreadyStopped")
+            view1 = AssistantUtteranceView(speakableText=timerPlugin.localizations['Timer']['timerIsAlreadyStopped'][language], dialogIdentifier="Timer#timerIsAlreadyStopped")
             view2 = TimerSnippet(timers=[timer])
             view.views = [view1, view2]
 
@@ -198,12 +198,12 @@ class timer(Plugin):
             response = self.getResponseForRequest(TimerPause(self.refId))
             if response['class'] == "PauseCompleted":
                 view = AddViews(self.refId, dialogPhase="Completion")
-                view.views = [AssistantUtteranceView(speakableText=timer.localizations['Timer']['timerWasPaused'][language], dialogIdentifier="Timer#timerWasPaused")]
+                view.views = [AssistantUtteranceView(speakableText=timerPlugin.localizations['Timer']['timerWasPaused'][language], dialogIdentifier="Timer#timerWasPaused")]
                 self.sendRequestWithoutAnswer(view)
             self.complete_request()
         elif timer.state == "Paused":
             view = AddViews(self.refId, dialogPhase="Completion")
-            view1 = AssistantUtteranceView(speakableText=timer.localizations['Timer']['timerIsAlreadyPaused'][language], dialogIdentifier="Timer#timerIsAlreadyPaused")
+            view1 = AssistantUtteranceView(speakableText=timerPlugin.localizations['Timer']['timerIsAlreadyPaused'][language], dialogIdentifier="Timer#timerIsAlreadyPaused")
             view2 = TimerSnippet(timers=[timer])
             view.views = [view1, view2]
 
@@ -211,7 +211,7 @@ class timer(Plugin):
             self.complete_request()
         else:
             view = AddViews(self.refId, dialogPhase="Completion")
-            view1 = AssistantUtteranceView(speakableText=timer.localizations['Timer']['timerIsAlreadyStopped'][language], dialogIdentifier="Timer#timerIsAlreadyStopped")
+            view1 = AssistantUtteranceView(speakableText=timerPlugin.localizations['Timer']['timerIsAlreadyStopped'][language], dialogIdentifier="Timer#timerIsAlreadyStopped")
             view2 = TimerSnippet(timers=[timer])
             view.views = [view1, view2]
 
@@ -225,7 +225,7 @@ class timer(Plugin):
         timer = TimerObject(timerValue = timer_properties['timerValue'], state = timer_properties['state'])
 
         view = AddViews(self.refId, dialogPhase="Summary")
-        view1 = AssistantUtteranceView(speakableText=timer.localizations['Timer']['showTheTimer'][language], dialogIdentifier="Timer#showTheTimer")
+        view1 = AssistantUtteranceView(speakableText=timerPlugin.localizations['Timer']['showTheTimer'][language], dialogIdentifier="Timer#showTheTimer")
         view2 = TimerSnippet(timers=[timer])
         view.views = [view1, view2]
         self.sendRequestWithoutAnswer(view)
