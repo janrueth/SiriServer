@@ -110,4 +110,30 @@ class CancelSnippet(AceObject):
 class ConfirmSnippet(AceObject):
     def __init__(self):
         super(ConfirmSnippet, self).__init__("ConfirmSnippet", "com.apple.ace.assistant")
+
+class AceView(AceObject):
+    def __init__(self, clazz, group):
+        super(AceView, self).__init__(clazz, group)
+        self.viewId = None # string
+        self.speakableText = None # string
+        self.listenAfterSpeaking = None # number
+
+    def to_plist(self):
+        self.add_property('viewId')
+        self.add_property('speakableText')
+        self.add_property('listenAfterSpeaking')
+        return super(AceView, self).to_plist()
+
+class Snippet(AceView):
+    def __init__(self, group):
+        super(Snippet, self).__init__("Snippet", group)
+        self.otherOptions = None # array
+        self.confirmationOptions = None # ConfirmationOptions obj
+    
+    def to_plist(self):
+        self.add_property('otherOptions')
+        self.add_property('confirmationOptions')
+        return super(Snippet, self).to_plist()
+
+
     
