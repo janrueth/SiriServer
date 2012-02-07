@@ -1,0 +1,122 @@
+#! /bin/sh
+
+
+### BEGIN INIT INFO
+# Provides:          SiriServer application instance
+# Required-Start:    $all
+# Required-Stop:     $all
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: starts instance of SiriServer
+# Description:       starts instance of SiriServer using start-stop-daemon
+### END INIT INFO
+
+# main variables
+DAEMON=/usr/bin/python
+SETTINGS_LOADED=FALSE
+
+DESC=SiriServer
+####### EDIT THESE LINES #########
+# you may change RUN_AS parameter to your username if you select ports over 1024 #
+PORT=443
+RUN_AS=root
+APP_PATH=/path/to/siriServer/folder/
+####### END | NO MORE EDITING #####
+
+. /lib/lsb/init-functions
+
+[ -x $DAEMON ] || {
+    log_warning_msg "$DESC: Can't execute daemon, aborting. See $DAEMON";
+    return 1; }
+
+check_retval() {
+    if [ $? -eq 0 ]; then
+        log_end_msg 0
+        return 0
+    else
+        log_end_msg 1
+        exit 1
+    fi
+}
+
+load_settings() {
+    if [ $SETTINGS_LOADED != "TRUE" ]; then
+        . $SETTINGS
+
+        [ -n "$APP_PATH" ] || {
+            log_warning_msg "$DESC: path to $DESC not set, aborting. See $SETTINGS";
+            return 1; }
+
+        [ -z "$RUN_AS" ] && {
+            log_warning_msg "$DESC: daemon username not set, aborting. See $SETTINGS";
+            return 1; }
+        [ -z "${RUN_AS%:*}" ] && exit 1
+
+        DAEMON_OPTS="siriServer.py"
+        [ -n "$PORT" ] && DAEMON_OPTS="$DAEMON_OPTS -p $PORT"
+
+        [ -n "$PID_FILE" ] && PID_FILE=$PID_FILE
+        [ -n "$PID_FILE" ] || PID_FILE=/var/run/siriServer/siriServer.pid
+        SETTINGS_LOADED=TRUE
+    fi
+    return 0
+}
+
+load_settings || exit 0
+
+is_running () {
+    # returns 1 when running, else 0.
+    PID=$(pgrep -f "$DAEMON_OPTS")
+    RET=$?
+    [ $RET -gt 1 ] && exit 1 || return $RET
+}
+
+handle_pid () {
+    PID_PATH=`dirname $PID_FILE`
+    [ -d $PID_PATH ] || mkdir -p $PID_PATH && chown -R $RUN_AS $PID_PATH > /dev/null || {
+        log_warning_msg "$DESC: Could not create $PID_FILE, aborting.";
+        return 1;}
+}
+
+start_siriServer () {
+    if ! is_running; then
+        log_daemon_msg "Starting $DESC"
+        [ "$WEB_UPDATE" = 1 ] && enable_updates
+        handle_pid
+        start-stop-daemon -o -d $APP_PATH -c $RUN_AS --start --background --pidfile $PID_FILE  --make-pidfile --exec $DAEMON -- $DAEMON_OPTS
+        check_retval
+    else
+        log_success_msg "$DESC: already running (pid $PID)"
+    fi
+}
+
+stop_siriServer () {
+    if is_running; then
+        log_daemon_msg "Stopping $DESC"
+        start-stop-daemon -o --stop --pidfile $PID_FILE --retry 15
+        check_retval
+    else
+        log_success_msg "$DESC: not running"
+    fi
+}
+
+case "$1" in
+    start)
+        start_siriServer
+        ;;
+    stop)
+        stop_siriServer
+        ;;
+    restart|force-reload)
+        stop_siriServer
+        start_siriServer
+        ;;
+    *)
+        N=/etc/init.d/$NAME
+        echo "Usage: $N {start|stop|restart|force-reload}" >&2
+        exit 1
+        ;;
+esac
+
+exit 0
+
