@@ -43,26 +43,28 @@ class timerPlugin(Plugin):
 
     localizations = {
         'Timer': {
-            "settingTimer": {
+            'durationTooBig': {
+               'en-US': 'Sorry, I can only set timers up to 24 hours.'
+            }, "settingTimer": {
                 "en-US": u"Setting the timer\u2026"
-            }, "timerWasSet": {
-                "en-US": "Your timer is set for {0}."
-            }, "timerIsAlreadyRunning": {
-                "en-US": u"Your timer\u2019s already running:"
-            }, "wontSetTimer": {
-                "en-US": "OK."
-            }, 'timerWasReset': {
-                'en-US': u'I\u2019ve canceled the timer.'
-            }, 'timerIsAlreadyStopped': {
-                'en-US': u'It\u2019s already stopped.'
-            }, 'timerWasResumed': {
-                'en-US': u'It\u2019s resumed.'
-            }, 'timerWasPaused': {
-                'en-US': u'It\u2019s paused.'
-            }, 'timerIsAlreadyPaused': {
-                'en-US': u'It\u2019s already paused.'
             }, 'showTheTimer': {
                 'en-US': u'Here\u2019s the timer:'
+            }, 'timerIsAlreadyPaused': {
+                'en-US': u'It\u2019s already paused.'
+            }, "timerIsAlreadyRunning": {
+                "en-US": u"Your timer\u2019s already running:"
+            }, 'timerIsAlreadyStopped': {
+                'en-US': u'It\u2019s already stopped.'
+            }, 'timerWasPaused': {
+                'en-US': u'It\u2019s paused.'
+            }, 'timerWasReset': {
+                'en-US': u'I\u2019ve canceled the timer.'
+            }, 'timerWasResumed': {
+                'en-US': u'It\u2019s resumed.'
+            }, "timerWasSet": {
+                "en-US": "Your timer is set for {0}."
+            }, "wontSetTimer": {
+                "en-US": "OK."
             }
         }
     }
@@ -129,6 +131,13 @@ class timerPlugin(Plugin):
             else:
                 # user wants to set the timer still - continue on
                 pass
+
+        if duration > 24 * 60 * 60:
+            view = AddViews(self.refId, dialogPhase='Clarification')
+            view.views = [AssistantUtteranceView(speakableText=timerPlugin.localizations['Timer']['durationTooBig'][language], dialogIdentifier='Timer#durationTooBig')]
+            self.sendRequestWithoutAnswer(view)
+            self.complete_request()
+            return
 
         # start a new timer
         timer = TimerObject(timerValue = duration, state = "Running")
