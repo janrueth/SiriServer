@@ -71,14 +71,48 @@ class AceObject(object):
                     pass
         return self.plist
 
+    @staticmethod
+    def list_from_plist_list(plistList):
+        def parseList(x):
+            if type(x) == list:
+                return AceObject.list_from_plist_list(x)
+            elif type(x) == dict:
+                return ServerBoundCommand(x)
+            else:
+                # do nothing.. primitive
+                return x
+        return map(parseList, plistList)
+
+
+    def from_plist(self):
+        # get basic properties
+        self.groupId = self.plist['group']
+        self.className = self.plist['class']
+        self.properties = self.plist['properties'] if 'properties' in self.plist else dict()
+        
+        #expand properties to
+        for key in self.properties.keys():
+            if type(self.properties[key]) == list:
+                setattr(self, key, AceObject.list_from_plist_list(self.properties[key]))
+            elif type(self.properties[key]) == dict: #unwrap 
+                setattr(self, key, ServerBoundCommand(self.properties[key]))
+            else:
+                try:
+                    setattr(self, key, self.properties[key])
+                except:
+                    pass
+
+    def initWithPList(self, plist):
+        self.plist = plist
+        self.from_plist()
+        
 class ServerBoundCommand(AceObject):
     def __init__(self, plist):
         super(ServerBoundCommand, self).__init__(None, None)
+        self.aceId = plist['aceId'] if 'aceId' in plist else None
+        self.refId = plist['refId'] if 'refId' in plist else None
         self.plist = plist
-        
-    def getAceId(self):
-        return self.plist['aceId']
-
+        self.from_plist()
 
 class ClientBoundCommand(AceObject):
     def __init__(self, encodedClassName, groupIdentifier, aceId, refId, callbacks=None):
@@ -98,17 +132,15 @@ class RequestCompleted(ClientBoundCommand):
     def __init__(self, refId, callbacks = None):
         super(RequestCompleted, self).__init__("RequestCompleted", "com.apple.ace.system", None, refId, callbacks)
 
-#classToPyClassMapping = {'StartSpeechRequest': speechObjects.StartSpeechRequest,
-#    'SpeechSpacket': speechObjects.SpeechSpacket,
-#    'FinishSpeech': speechObjects.FinishSpeech
-#}
 
-
-#def ServerBoundPlistToObject(plist):
-#    clazz = plist['class']
-#    try:
-#        obj = classToPyClassMapping[clazz]
-#        return obj(plist)
-#    except:
-#        raise Exception('ClassNotFound', 'The class you were looking for is not implemented')
+def ObjectIsCommand(obj, command):
+    try:
+        if issubclass(command, ServerBoundCommand):
+            group = obj['group']
+            clazz = obj['class']
+            if command.classIdentifier == clazz and command.groupIdentifier == group:
+                return True
+    except:
+        pass
+    return False
     

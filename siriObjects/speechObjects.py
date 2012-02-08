@@ -1,46 +1,137 @@
 from siriObjects.baseObjects import ServerBoundCommand, ClientBoundCommand, AceObject
 
 import uuid
-class StartSpeechRequest(ServerBoundCommand):
-    def getCodec(self):
-        try:
-            return self.getProperties()['codec']
-        except:
-            return ""
 
-    def getHandsFree(self):
-        try:
-            return self.getProperties()['handsFree']
-        except:
-            return False
+class StartSpeech(ServerBoundCommand):
+    classIdentifier = "StartSpeech"
+    groupIdentifier = "com.apple.ace.speech"
     
-    def getAudioSource(self):
-        try:
-            return self.getProperties()['audioSource']
-        except:
-            return ""
+    CodecPCM_Mono_16Bit_8000HzValue = "PCM_Mono_16Bit_8000Hz"
+    CodecPCM_Mono_16Bit_11025HzValue = "PCM_Mono_16Bit_11025Hz"
+    CodecPCM_Mono_16Bit_16000HzValue = "PCM_Mono_16Bit_16000Hz"
+    CodecPCM_Mono_16Bit_22050HzValue = "PCM_Mono_16Bit_22050Hz"
+    CodecPCM_Mono_16Bit_32000HzValue = "PCM_Mono_16Bit_32000Hz"
+    CodecSpeex_NB_Quality7Value = "Speex_NB_Quality7"
+    CodecSpeex_WB_Quality8Value =  "Speex_WB_Quality8"
+    
+    AudioSourceLineInValue = "LineIn"
+    AudioSourceBuiltInMicValue = "BuiltInMic"
+    AudioSourceWiredHeadsetMicValue = "WiredHeadsetMic"
+    AudioSourceBluetoothHandsFreeDeviceValue = "BluetoothHandsFreeDevice"
+    AudioSourceUsbAudioValue = "UsbAudio"
 
-class SpeechSpacket(ServerBoundCommand):
-    def getSpeechPackets(self):
-        try:
-            return self.getProperties()['packets']
-        except:
-            return []
+    MotionActivityUnknownValue = "Unknown"
+    MotionActivityFrozenValue = "Frozen"
+    MotionActivityStaticValue = "Static"
+    MotionActivityMovingValue = "Moving"
+    MotionActivityWalkingValue = "Walking"
+    MotionActivityDrivingValue = "Driving"
+    MotionActivityCyclingValue = "Cycling"
+    MotionActivitySemiStationaryValue = "SemiStationary"
+    MotionActivityRunningValue = "Running"
+    MotionActivityMovingCoarseValue = "MovingCoarse"
+    MotionActivityInVehicleFrozenValue =  "InVehicleFrozen"
+    MotionActivityInVehicleStaticValue = "InVehicleStatic"
+    MotionActivityWalkingSlowValue = "WalkingSlow"
+    MotionActivityDrivingInHandValue = "DrivingInHand"
+    MotionActivityDrivingOtherValue = "DrivingOther"
+
+    DspTypeNoneValue = "None"
+    DspTypeNoiseCancellationValue = "NoiseCancellation"
+    def __init__(self, plist):
+        self.origin = None # string
+        self.noiseReductionLevel = None # number
+        self.motionConfidence = None # number
+        self.motionActivity = None # string
+        self.headsetName = None # string
+        self.headsetId = None # string
+        self.headsetAddress = None # string
+        self.dspStatus = None # string
+        self.codec = None # int ?? -> string mapping
+        self.audioSource = None # string
+        super(StartSpeech, self).__init__(plist)
+
+class StartSpeechRequest(StartSpeech):
+    classIdentifier = "StartSpeechRequest"
+    groupIdentifier = "com.apple.ace.speech"
+    def __init__(self, plist):
+        self.handsFree = None # bool
+        super(StartSpeechRequest, self).__init__(plist)
     
-    def getPacketNumber(self):
-        try:
-            return self.getProperties()['packetNumber']
-        except:
-            return -1
+
+class StartSpeechDictation(StartSpeech):
+    classIdentifier = "StartSpeechDictation"
+    groupIdentifier = "com.apple.ace.speech"
+    
+    FieldKeyboardReturnKeyDefaultValue =  "Default"
+    FieldKeyboardReturnKeyGoValue = "Go"
+    FieldKeyboardReturnKeyGoogleValue = "Google"
+    FieldKeyboardReturnKeyJoinValue = "Join"
+    FieldKeyboardReturnKeyNextValue = "Next"
+    FieldKeyboardReturnKeyRouteValue = "Route"
+    FieldKeyboardReturnKeySearchValue = "Search"
+    FieldKeyboardReturnKeySendValue = "Send"
+    FieldKeyboardReturnKeyYahooValue = "Yahoo"
+    FieldKeyboardReturnKeyDoneValue = "Done"
+    FieldKeyboardReturnKeyEmergencyCallValue = "EmergencyCall"
+
+    FieldKeyboardTypeDefaultValue = "Default"
+    FieldKeyboardTypeASCIICapableValue = "ASCIICapable"
+    FieldKeyboardTypeAlphabetValue = "Alphabet"
+    FieldKeyboardTypeNumbersAndPunctuationValue = "NumbersAndPunctuation"
+    FieldKeyboardTypeNumberPadValue = "NumberPad"
+    FieldKeyboardTypeDecimalPadValue = "DecimalPad"
+    FieldKeyboardTypeURLValue = "URL"
+    FieldKeyboardTypeEmailAddressValue = "EmailAddress"
+    FieldKeyboardTypePhonePadValue = "PhonePad"
+    FieldKeyboardTypeNamePhonePadValue = "NamePhonePad"
+    FieldKeyboardTypeTwitterValue = "Twitter"
+
+    def __init__(self, plist):
+        self.selectedText = None # string
+        self.region = None # string
+        self.prefixText = None # string
+        self.postfixText = None # string
+        self.language = None # string
+        self.keyboardType = None # string
+        self.keyboardReturnKey = None # string
+        self.interactionId = None # string
+        self.fieldLabel = None # string
+        self.fieldId = None # string
+        self.censorSpeech = None # bool
+        self.applicationVersion = None # string
+        self.applicationName = None # string
+        super(StartSpeechDictation, self).__init__(plist)
+
+class SpeechPacket(ServerBoundCommand):
+    classIdentifier = "SpeechPacket"
+    groupIdentifier = "com.apple.ace.speech"
+    
+    def __init__(self, plist):
+        self.packets = None # array
+        self.packetNumber = None # int
+        self.data = None # binary
+        super(SpeechPacket, self).__init__(plist)
 
 class FinishSpeech(ServerBoundCommand):
-    def getPacketCount(self):
-        try:
-            return self.getProperties()['packetCount']
-        except:
-            return -1
+    classIdentifier = "FinishSpeech"
+    groupIdentifier = "com.apple.ace.speech"
+
+    def __init__(self, plist):
+        self.packetCount = None # int
+        self.orderedContext = None # array
+        super(FinishSpeech, self).__init__(plist)
 
 class SpeechFailure(ClientBoundCommand):
+    FailureReasonTimeoutValue = "Timeout"
+    FailureReasonCorruptValue = "Corrupt"
+    FailureReasonInvalidValue = "Invalid"
+    FailureReasonInaudibleValue = "Inaudible"
+    FailureReasonErrorValue = "Error"
+    FailureReasonRetryValue = "Retry"
+    FailureReasonUnsupportedValue = "Unsupported"
+    FailureReasonQuotaExceededValue = "QuotaExceeded"
+    
     def __init__(self, refId, reasonDescription, reason=0):
         super(SpeechFailure, self).__init__("SpeechFailure", "com.apple.ace.speech", None, refId)
         self.reasonDescription = reasonDescription

@@ -19,7 +19,7 @@ class AddViews(ClientBoundCommand):
 class AssistantUtteranceView(AceObject):
     def __init__(self, text="", speakableText="", dialogIdentifier="Misc#ident", listenAfterSpeaking=False):
         super(AssistantUtteranceView, self).__init__("AssistantUtteranceView", "com.apple.ace.assistant")
-        self.text = text
+        self.text = text or speakableText
         self.speakableText = speakableText
         self.dialogIdentifier = dialogIdentifier
         self.listenAfterSpeaking = listenAfterSpeaking
@@ -40,6 +40,42 @@ class Button(AceObject):
         self.add_property('text')
         self.add_property('commands')
         return super(Button, self).to_plist()
+
+class OpenLink(AceObject):
+    def __init__(self, ref=""):
+        super(OpenLink, self).__init__("OpenLink", "com.apple.ace.assistant")
+        self.ref = ref
+    
+    def to_plist(self):
+        self.add_property('ref')
+        return super(OpenLink, self).to_plist()
+
+
+class HtmlView(AceObject):
+    def __init__(self, html=""):
+        super(HtmlView, self).__init__("HtmlView", "com.apple.ace.assistant")
+        self.html = html
+    
+    def to_plist(self):
+        self.add_property('html')
+        return super(HtmlView, self).to_plist()
+
+class MenuItem(AceObject):
+    def __init__(self, title="", subtitle="", ref="", icon="", commands=None):
+        super(MenuItem, self).__init__("MenuItem", "com.apple.ace.assistant")
+        self.title = title
+        self.subtitle = subtitle
+        self.ref = ref
+        self.icon = icon
+        self.commands = commands if commands != None else []
+    
+    def to_plist(self):
+        self.add_property('title')
+        self.add_property('subtitle')
+        self.add_property('ref')
+        self.add_property('icon')
+        self.add_property('commands')
+        return super(MenuItem, self).to_plist()
 
 
 class ConfirmationOptions(AceObject):
@@ -74,4 +110,30 @@ class CancelSnippet(AceObject):
 class ConfirmSnippet(AceObject):
     def __init__(self):
         super(ConfirmSnippet, self).__init__("ConfirmSnippet", "com.apple.ace.assistant")
+
+class AceView(AceObject):
+    def __init__(self, clazz, group):
+        super(AceView, self).__init__(clazz, group)
+        self.viewId = None # string
+        self.speakableText = None # string
+        self.listenAfterSpeaking = None # number
+
+    def to_plist(self):
+        self.add_property('viewId')
+        self.add_property('speakableText')
+        self.add_property('listenAfterSpeaking')
+        return super(AceView, self).to_plist()
+
+class Snippet(AceView):
+    def __init__(self, group):
+        super(Snippet, self).__init__("Snippet", group)
+        self.otherOptions = None # array
+        self.confirmationOptions = None # ConfirmationOptions obj
+    
+    def to_plist(self):
+        self.add_property('otherOptions')
+        self.add_property('confirmationOptions')
+        return super(Snippet, self).to_plist()
+
+
     

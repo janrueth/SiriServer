@@ -15,6 +15,8 @@ import PluginManager
 from M2Crypto import BIO, RSA, X509
 
 from siriObjects import speechObjects, baseObjects, uiObjects, systemObjects
+from siriObjects.baseObjects import ObjectIsCommand
+from siriObjects.speechObjects import StartSpeech, StartSpeechRequest, StartSpeechDictation, SpeechPacket, SpeechFailure, FinishSpeech
 
 from httpClient import AsyncOpenHttp
 
@@ -51,6 +53,8 @@ class HandleConnection(ssl_dispatcher):
         self.assistant = None
         self.sendLock = threading.Lock()
         self.current_running_plugin = None
+        self.current_location = None
+        self.plugin_lastAceId = None
         self.logger = logging.getLogger("logger")
     
     def handle_ssl_established(self):                
@@ -135,6 +139,7 @@ class HandleConnection(ssl_dispatcher):
             possible_matches = googleJson['hypotheses']
             if len(possible_matches) > 0:
                 best_match = possible_matches[0]['utterance']
+                best_match = best_match[0].upper()+best_match[1:]
                 best_match_confidence = possible_matches[0]['confidence']
                 self.logger.info(u"Best matching result: \"{0}\" with a confidence of {1}%".format(best_match, round(float(best_match_confidence)*100,2)))
                 # construct a SpeechRecognized
@@ -148,7 +153,7 @@ class HandleConnection(ssl_dispatcher):
                     if self.current_running_plugin == None:
                         (clazz, method) = PluginManager.getPlugin(best_match, self.assistant.language)
                         if clazz != None and method != None:
-                            plugin = clazz(method, best_match, self.assistant.language)
+                            plugin = clazz(method, best_match, self.assistant.language, self.send_object, self.send_plist, self.assistant, self.current_location)
                             plugin.refId = requestId
                             plugin.connection = self
                             self.current_running_plugin = plugin
@@ -190,31 +195,78 @@ class HandleConnection(ssl_dispatcher):
                 
                 # first handle speech stuff
                 
-                if reqObject['class'] == 'StartSpeechRequest' or reqObject['class'] == 'StartSpeechDictation':
-                        decoder = speex.Decoder()
-                        decoder.initialize(mode=speex.SPEEX_MODEID_WB)
-                        encoder = flac.Encoder()
-                        encoder.initialize(16000, 1, 16) #16kHz sample rate, 1 channel, 16 bits per sample
-                        dictation=(reqObject['class'] == 'StartSpeechDictation')
-                        self.speech[reqObject['aceId']] = (decoder, encoder, dictation)
+                if 'refId' in reqObject:
+                    # if the following holds, this packet is an answer to a request by a plugin
+                    if reqObject['refId'] == self.plugin_lastAceId and self.current_running_plugin != None:
+                        if self.current_running_plugin.waitForResponse != None:
+                            # just forward the object to the 
+                            # don't change it's refId, further requests must reference last FinishSpeech
+                            self.logger.info("Forwarding object to plugin")
+                            self.plugin_lastAceId = None
+                            self.current_running_plugin.response = reqObject
+                            self.current_running_plugin.waitForResponse.set()
                 
-                elif reqObject['class'] == 'SpeechPacket':
-                    (decoder, encoder, dictation) = self.speech[reqObject['refId']]
-                    pcm = decoder.decode(reqObject['properties']['packets'])
+                if ObjectIsCommand(reqObject, StartSpeechRequest) or ObjectIsCommand(reqObject, StartSpeechDictation):
+                    self.logger.info("New start of speech received")
+                    startSpeech = None
+                    if ObjectIsCommand(reqObject, StartSpeechDictation):
+                        dictation = True
+                        startSpeech = StartSpeechDictation(reqObject)
+                    else:
+                        dictation = False
+                        startSpeech = StartSpeechRequest(reqObject)
+            
+                    decoder = speex.Decoder()
+                    encoder = flac.Encoder()
+                    speexUsed = False
+                    if startSpeech.codec == StartSpeech.CodecSpeex_WB_Quality8Value:
+                        decoder.initialize(mode=speex.SPEEX_MODEID_WB)
+                        encoder.initialize(16000, 1, 16)
+                        speexUsed = True
+                    elif startSpeech.codec == StartSpeech.CodecSpeex_NB_Quality7Value:
+                        decoder.initialize(mode=speex.SPEEX_MODEID_NB)
+                        encoder.initialize(16000, 1, 16)
+                        speexUsed = True
+                    elif startSpeech.codec == StartSpeech.CodecPCM_Mono_16Bit_8000HzValue:
+                        encoder.initialize(8000, 1, 16)
+                    elif startSpeech.codec == StartSpeech.CodecPCM_Mono_16Bit_11025HzValue:
+                        encoder.initialize(11025, 1, 16)
+                    elif startSpeech.coded == StartSpeech.CodecPCM_Mono_16Bit_16000HzValue:
+                        encoder.initialize(16000, 1, 16)
+                    elif startSpeech.coded == StartSpeech.CodecPCM_Mono_16Bit_22050HzValue:
+                        encoder.initialize(22050, 1, 16)
+                    elif startSpeech.coded == StartSpeech.CodecPCM_Mono_16Bit_32000HzValue:
+                        encoder.initialize(32000, 1, 16)
+                    # we probably need resampling for sample rates other than 16kHz...
+                    
+                    self.speech[startSpeech.aceId] = (decoder if speexUsed else None, encoder, dictation)
+                
+                elif ObjectIsCommand(reqObject, SpeechPacket):
+                    self.logger.info("Decoding speech packet")
+                    speechPacket = SpeechPacket(reqObject)
+                    (decoder, encoder, dictation) = self.speech[speechPacket.refId]
+                    if decoder:
+                        pcm = decoder.decode(speechPacket.packets)
+                    else:
+                        pcm = SpeechPacket.data # <- probably data... if pcm
                     encoder.encode(pcm)
                         
                 elif reqObject['class'] == 'StartCorrectedSpeechRequest':
                     self.process_recognized_speech({u'hypotheses': [{'confidence': 1.0, 'utterance': str.lower(reqObject['properties']['utterance'])}]}, reqObject['aceId'], False)
             
-                elif reqObject['class'] == 'FinishSpeech':
-                    (decoder, encoder, dictation) = self.speech[reqObject['refId']]
-                    decoder.destroy()
+                elif ObjectIsCommand(reqObject, FinishSpeech):
+                    self.logger.info("End of speech received")
+                    finishSpeech = FinishSpeech(reqObject)
+                    (decoder, encoder, dictation) = self.speech[finishSpeech.refId]
+                    if decoder:
+                        decoder.destroy()
                     encoder.finish()
                     flacBin = encoder.getBinary()
                     encoder.destroy()
-                    del self.speech[reqObject['refId']]
+                    del self.speech[finishSpeech.refId]
                     
-                    self.httpClient.make_google_request(flacBin, reqObject['refId'], dictation, language=self.assistant.language, allowCurses=True)
+                    self.logger.info("Sending flac to google for recognition")
+                    self.httpClient.make_google_request(flacBin, finishSpeech.refId, dictation, language=self.assistant.language, allowCurses=True)
                         
                         
                 elif reqObject['class'] == 'CancelRequest':
@@ -286,14 +338,6 @@ class HandleConnection(ssl_dispatcher):
                 elif reqObject['class'] == 'StartRequest':
                     #this should also be handeled by special plugins, so lets call the plugin handling stuff
                     self.process_recognized_speech({'hypotheses': [{'utterance': reqObject['properties']['utterance'], 'confidence': 1.0}]}, reqObject['aceId'], False)
-                        
-                # handle responses to plugin
-                elif self.current_running_plugin != None and "refId" in reqObject:
-                    if self.current_running_plugin.waitForResponse != None:
-                        # just forward the object to the 
-                        self.current_running_plugin.response = reqObject
-                        self.current_running_plugin.refId = reqObject['refId']
-                        self.current_running_plugin.waitForResponse.set()
 
                     
     def hasNextObj(self):
@@ -377,11 +421,7 @@ certFile = open('OrigAppleServerCert.der')
 serverCert = X509.load_cert_bio(BIO.MemoryBuffer(certFile.read()), format=0)
 certFile.close()
 
-#setup database
-db.setup()
 
-#load Plugins
-PluginManager.load_plugins()
 
 #setup logging
 
@@ -395,15 +435,27 @@ log_levels = {'debug':logging.DEBUG,
 parser = OptionParser()
 parser.add_option('-l', '--loglevel', default='info', dest='logLevel', help='This sets the logging level you have these options: debug, info, warning, error, critical \t\tThe standard value is info')
 parser.add_option('-p', '--port', default=443, type='int', dest='port', help='This options lets you use a custom port instead of 443 (use a port > 1024 to run as non root user)')
+parser.add_option('--logfile', default=None, dest='logfile', help='Log to a file instead of stdout.')
 (options, args) = parser.parse_args()
 
 x = logging.getLogger("logger")
 x.setLevel(log_levels[options.logLevel])
-h = logging.StreamHandler()
+
+if options.logfile != None:
+    h = logging.FileHandler(options.logfile)
+else:
+    h = logging.StreamHandler()
+
 f = logging.Formatter(u"%(levelname)s %(funcName)s %(message)s")
 h.setFormatter(f)
 x.addHandler(h)
 
+
+#setup database
+db.setup()
+
+#load Plugins
+PluginManager.load_plugins()
 
 
 #start server
