@@ -36,7 +36,7 @@ class wwwSearch(Plugin):
                 speech = speech.replace('Internet',' ',1)
             speech = speech.strip()
             if speech == "":
-                speech = self.ask("Was ist Ihre Frage?")
+                speech = self.ask("Nach was soll ich suchen?")
 
         search = WebSearch(refId="", aceId="", query=speech)
         self.send_object(search)

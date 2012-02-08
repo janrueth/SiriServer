@@ -5,7 +5,6 @@ from plugin import *
 from siriObjects.websearchObjects import WebSearch
 
 class wwwSearch(Plugin):
-    
     @register("de-DE", "(websuche.*)|(web suche.*)|(internetsuche.*)|(internet suche.*)|(web.*)|(internet.*)")
     @register("en-US", "(web search.*)|(web.*)|(internet.*)|(internet search.*)")
     def webSearch(self, speech, language):
