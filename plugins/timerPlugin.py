@@ -70,20 +70,20 @@ class timerPlugin(Plugin):
     }
 
     res = {
-        'setTimer': {
-            'en-US': '.*timer.*\s+([0-9/ ]*|a|an|the)\s+(secs?|seconds?|mins?|minutes?|hrs?|hours?)'
+        'articles': {
+            'en-US': 'a|an|the'
+        }, 'pauseTimer': {
+            'en-US': '.*(pause|freeze|hold).*timer'
         }, 'resetTimer': {
             'en-US': '.*(cancel|reset|stop).*timer'
         }, 'resumeTimer': {
             'en-US': '.*(resume|thaw|continue).*timer'
-        }, 'pauseTimer': {
-            'en-US': '.*(pause|freeze|hold).*timer'
+        }, 'setTimer': {
+            'en-US': '.*timer.*\s+([0-9/ ]*|a|an|the)\s+(secs?|seconds?|mins?|minutes?|hrs?|hours?)'
         }, 'showTimer': {
             'en-US': '.*(show|display|see).*timer'
         }, 'timerLength': {
             'en-US': '([0-9/ ]*|a|an|the)\s+(secs?|seconds?|mins?|minutes?|hrs?|hours?)'
-        }, 'articles': {
-            'en-US': 'a|an|the'
         }
     }
 
