@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 
 #Author: WebScript
-#Todo: translate it to german
+#Todo: Nothing that I know
 #For: SiriServer
 #Commands: The same as in original Wolfram Alpha in Siri
 #If you find bug: email me - admin@game-host.eu
 
-import re
+import re, urlparse
 import urllib2, urllib
 import json
 from urllib2 import urlopen
@@ -18,7 +18,7 @@ from plugin import *
 from siriObjects.baseObjects import AceObject, ClientBoundCommand
 from siriObjects.uiObjects import AddViews, AssistantUtteranceView
 
-APPID = '' #Insert your API key from wolframalpha.com
+APPID = "" #Add your APPID between the ""
 
 class SiriAnswerSnippet(AceObject):
     def __init__(self, answers=None):
@@ -55,13 +55,13 @@ class SiriAnswerLine(AceObject):
 
 class wolfram(Plugin):
     
-    @register("de-DE", ".*mach was.*")     
+    @register("de-DE", "(Was ist [a-zA-Z0-9]+)|(Wer ist [a-zA-Z0-9]+)|(Wie viel [a-zA-Z0-9]+)|(Was war [a-zA-Z0-9]+)|(Wer ist [a-zA-Z0-9]+)|(Wie lang [a-zA-Z0-9]+)|(Was ist [a-zA-Z0-9]+)|(Wie weit [a-zA-Z0-9]+)|(Wann ist [a-zA-Z0-9]+)|(Zeig mir [a-zA-Z0-9]+)|(Wie hoch [a-zA-Z0-9]+)|(Wie tief [a-zA-Z0-9]+)")     
     @register("en-US", "(What is [a-zA-Z0-9]+)|(Who is [a-zA-Z0-9]+)|(How many [a-zA-Z0-9]+)|(What was [a-zA-Z0-9]+)|(Who's [a-zA-Z0-9]+)|(How long [a-zA-Z0-9]+)|(What's [a-zA-Z0-9]+)|(How far [a-zA-Z0-9]+)|(When is [a-zA-Z0-9]+)|(Show me [a-zA-Z0-9]+)|(How high [a-zA-Z0-9]+)|(How deep [a-zA-Z0-9]+)")
     def wolfram(self, speech, language):
-        wolframQuestion = speech.replace('who is ','').replace('what is ','').replace('what was ','').replace(' ', '%20')
-        google_weather = 'http://api.wolframalpha.com/v1/query.jsp?input=%s&appid=%s' % (wolframQuestion,APPID)
-        print google_weather
-        dom = minidom.parse(urlopen(google_weather))
+        wolframQuestion = speech.replace('who is ','').replace('what is ','').replace('what was ','').replace('Who is ','').replace('What is ','').replace('What was ','').replace('wer ist ','').replace('was ist ', '').replace('Wer ist ','').replace('Was ist ', '').replace('Wie viel ','How much ').replace('Wie lang ','How long ').replace('Wie weit ','How far ').replace('Wann ist ','When is ').replace('Zeig mir ','Show me ').replace('Wie hoch ','How high ').replace('Wie tief ','How deep ').replace('ist','is').replace('der','the').replace('die','the').replace('das','the').replace('wie viel ','how much ').replace('wie lang ','how long ').replace('wie weit ','how far ').replace('wann ist ','when is ').replace('zeig mir ','show me ').replace('wie hoch ','how high ').replace('wie tief ','how deep ').replace('ist','is').replace('der','the').replace('die','the').replace('das','the').replace(' ', '%20').replace(u'ä', 'a').replace(u'ö', 'o').replace(u'ü', 'u').replace(u'ß', 's')
+        wolfram_alpha = 'http://api.wolframalpha.com/v1/query.jsp?input=%s&appid=%s' % (wolframQuestion, APPID)
+        print wolfram_alpha
+        dom = minidom.parse(urlopen(wolfram_alpha))
         count_wolfram = 0
         wolfram0 = 12
         wolfram_pod0 = 12
@@ -160,7 +160,10 @@ class wolfram(Plugin):
                   wolfram8 = xmlData
                   wolfram_pod8 = pod.getAttribute('title')
                count_wolfram += 1
-        self.say("This might answer your question:")
+        if language == 'de-DE':
+            self.say("Dies könnte Ihre Frage zu beantworten:")
+        else:
+            self.say("This might answer your question:")
         view = AddViews(self.refId, dialogPhase="Completion")
         if wolfram_pod0 != 12:
             if wolfram0_img == 1:
@@ -203,20 +206,27 @@ class wolfram(Plugin):
             else:
                 wolframAnswer8 = SiriAnswer(title=wolfram_pod8,lines=[SiriAnswerLine(text=wolfram8)])
         if wolfram_pod0 == 12:
-            self.say("Nothing has found for your query!")
-        else:
-            if wolfram_pod1 == 12:
-                view1 = SiriAnswerSnippet(answers=[wolframAnswer])
-            elif wolfram_pod2 == 12:
-                view1 = SiriAnswerSnippet(answers=[wolframAnswer, wolframAnswer1])
-            elif wolfram_pod3 == 12:
-                view1 = SiriAnswerSnippet(answers=[wolframAnswer, wolframAnswer1, wolframAnswer2])
-            elif wolfram_pod4 == 12:
-                view1 = SiriAnswerSnippet(answers=[wolframAnswer, wolframAnswer1, wolframAnswer2, wolframAnswer3])
-            elif wolfram_pod8 == 12:
-                view1 = SiriAnswerSnippet(answers=[wolframAnswer, wolframAnswer1, wolframAnswer2, wolframAnswer3, wolframAnswer4])
+            if APPID == "":
+                self.say("Sorry I can't process your request. Your APPID is not set! Please register free dev account at http://wolframalpha.com and edit line 21 with you APPID.")
             else:
-                view1 = SiriAnswerSnippet(answers=[wolframAnswer, wolframAnswer1, wolframAnswer2, wolframAnswer3, wolframAnswer4, wolframAnswer8])
-            view.views = [view1]
-            self.sendRequestWithoutAnswer(view)
+                if language == 'de-DE':
+                    self.say("Nichts hat sich auf Ihre Anfrage!")
+                else:
+                    self.say("Nothing has found for your query!")
+            self.complete_request()
+            view1 = 0
+        elif wolfram_pod1 == 12:
+            view1 = SiriAnswerSnippet(answers=[wolframAnswer])
+        elif wolfram_pod2 == 12:
+            view1 = SiriAnswerSnippet(answers=[wolframAnswer, wolframAnswer1])
+        elif wolfram_pod3 == 12:
+            view1 = SiriAnswerSnippet(answers=[wolframAnswer, wolframAnswer1, wolframAnswer2])
+        elif wolfram_pod4 == 12:
+            view1 = SiriAnswerSnippet(answers=[wolframAnswer, wolframAnswer1, wolframAnswer2, wolframAnswer3])
+        elif wolfram_pod8 == 12:
+            view1 = SiriAnswerSnippet(answers=[wolframAnswer, wolframAnswer1, wolframAnswer2, wolframAnswer3, wolframAnswer4])
+        else:
+            view1 = SiriAnswerSnippet(answers=[wolframAnswer, wolframAnswer1, wolframAnswer2, wolframAnswer3, wolframAnswer4, wolframAnswer8])
+        view.views = [view1]
+        self.sendRequestWithoutAnswer(view)
         self.complete_request()
