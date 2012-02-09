@@ -248,7 +248,7 @@ class smalltalk(Plugin):
     @register("en-US",".*wood.could.*woodchuck.chuck.*")
     def st_woodchuck(self, speech, language):
         if language == 'en-US':
-            self.say("42? That can't be right.")
+            self.say("It depends on whether you are talking about African or European woodchucks.")
         self.complete_request()
     
     @register("en-US",".*nearest.*glory.hole.*")
