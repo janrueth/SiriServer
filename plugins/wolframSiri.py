@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #Author: WebScript
-#Todo: Nothing that I know
+#Todo: Translate with my GTranslate API
 #For: SiriServer
 #Commands: The same as in original Wolfram Alpha in Siri
 #If you find bug: email me - admin@game-host.eu
