@@ -88,6 +88,19 @@ class XBMC(Plugin):
                 else:
                     result = json.VideoLibrary.GetTVShows()
                     tvmatches = []
+                    
+                    if 'thelatestepisodeof' in stripped_title:
+                        stripped_title = stripped_title.replace('thelatestepisodeof','')
+                        latest_episode = True
+                    elif 'latestepisodeof' in stripped_title:
+                        stripped_title = stripped_title.replace('latestepisodeof','')
+                        latest_episode = True
+                    elif 'latestepisode' in stripped_title:
+                        stripped_title = stripped_title.replace('latestepisode','')
+                        latest_episode = True
+                    else:
+                        latest_episode = False
+                    
                     for tvshow in result['tvshows']:
                         if stripped_title in ''.join(ch for ch in tvshow['label'] if ch.isalnum()).lower():
                             tvshowid = tvshow['tvshowid']
@@ -101,18 +114,29 @@ class XBMC(Plugin):
                             self.say(names, None)
                         else:
                             result = json.VideoLibrary.GetEpisodes(tvshowid=tvshowid,properties=['playcount','showtitle','season','episode'])
-                            allwatched = True
-                            for episode in result['episodes']:
-                                if episode['playcount'] == 0:
-                                    episodeid=episode['episodeid']
-                                    self.say('Playing %s, season %s, episode %s.' %(episode['showtitle'], episode['season'], episode['episode']))
-                                    json.Playlist.Clear(playlistid=1)
-                                    json.Playlist.Add(playlistid=1, item={ 'episode' + 'id': episodeid })
-                                    json.Player.Open({ 'playlistid': 1 })
-                                    allwatched = False
-                                    break
-                            if allwatched == True:
-                                self.say('There are no unwatched and/or new episodes of %s' %(title))
+                            print (result['episodes'])
+                            print (len(result['episodes']))
+                            if latest_episode == True:
+                                episode = result['episodes'][len(result['episodes'])-1]
+                                if episode['playcount'] > 0:
+                                    self.say("Warning: it seems that you already watched this episode.")
+                                self.say('Playing %s, season %s, episode %s.' %(episode['showtitle'], episode['season'], episode['episode']))
+                                json.Playlist.Clear(playlistid=1)
+                                json.Playlist.Add(playlistid=1, item={ 'episode' + 'id': episode['episodeid'] })
+                                json.Player.Open({ 'playlistid': 1 })
+                            else: 
+                                allwatched = True
+                                for episode in result['episodes']:
+                                    if episode['playcount'] == 0:
+                                        episodeid=episode['episodeid']
+                                        self.say('Playing %s, season %s, episode %s.' %(episode['showtitle'], episode['season'], episode['episode']))
+                                        json.Playlist.Clear(playlistid=1)
+                                        json.Playlist.Add(playlistid=1, item={ 'episode' + 'id': episodeid })
+                                        json.Player.Open({ 'playlistid': 1 })
+                                        allwatched = False
+                                        break
+                                if allwatched == True:
+                                    self.say('There are no unwatched and/or new episodes of %s' %(title))
                     else:
                         self.say('No movies or TV shows matching: %s.' % (title))
             elif command == 'info':
