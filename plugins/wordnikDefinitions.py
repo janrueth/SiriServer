@@ -8,31 +8,26 @@
 #http://developer.wordnik.com/docs/
 
 from plugin import *
-from plugin import __criteria_key__
 #you will need to install the Wordnik API to use this
 #this can be done from the commandline by typing: easy_install Wordnik
 try:
    from wordnik import Wordnik
 except ImportError:
-   raise Exception("Wordnik library not found. Please install wordnik library! e.g. sudo easy_install wordnik")
+   raise NecessaryModuleNotFound("Wordnik library not found. Please install wordnik library! e.g. sudo easy_install wordnik")
 
-#if below does not have a long alphanumeric string for the api key, you can get yours at http://developer.wordnik.com/ (first you sign up for a username in the upp$
+#You need a wordnik api key, you can get yours at http://developer.wordnik.com/ (first you sign up for a username in the upp$
 ########################################################
 
-wordnik_api_key = "" # PUT YOUR API KEY HERE in " "
+wordnik_api_key = APIKeyForAPI("wordnik")
 
 #########################################################
 
-if wordnik_api_key == "":
-   raise Exception("APIKeyNotFound", "You must specify a wordnik API key")
 w = Wordnik(api_key=wordnik_api_key)
 
 class define(Plugin):
     
     @register("en-US", "define ([\w ]+)")
-    def defineword(self, speech, language):
-        matcher = self.defineword.__dict__[__criteria_key__][language]
-        regMatched = matcher.match(speech)
+    def defineword(self, speech, language, regMatched):
         Question = regMatched.group(1)
         output = w.word_get_definitions(Question, limit=1)
         if len(output) == 1:

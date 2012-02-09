@@ -464,6 +464,7 @@ x.addHandler(h)
 db.setup()
 
 #load Plugins
+PluginManager.load_api_keys()
 PluginManager.load_plugins()
 
 
