@@ -6,4 +6,5 @@
 *.log
 *.cnf
 .DS_Store
-*.conf
+plugins.conf
+apiKeys.conf
