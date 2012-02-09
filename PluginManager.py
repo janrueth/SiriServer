@@ -3,7 +3,7 @@ import os
 import re
 import logging
 
-from plugin import Plugin, __criteria_key__
+from plugin import Plugin, __criteria_key__, NecessaryModuleNotFound
 from types import FunctionType
 
 
@@ -27,6 +27,8 @@ def load_plugins():
             # just load the whole shit...
             try:
                 __import__(pluginPath+"."+line,  globals(), locals(), [], -1)
+            except NecessaryModuleNotFound as e:
+                logger.critical("Failed loading Plugin due to missing module: "+e)
             except:
                 logger.exception("Plugin loading failed")
             
