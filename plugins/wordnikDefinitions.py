@@ -13,7 +13,7 @@ from plugin import *
 try:
    from wordnik import Wordnik
 except ImportError:
-   raise Exception("Wordnik library not found. Please install wordnik library! e.g. sudo easy_install wordnik")
+   raise NecessaryModuleNotFound("Wordnik library not found. Please install wordnik library! e.g. sudo easy_install wordnik")
 
 #You need a wordnik api key, you can get yours at http://developer.wordnik.com/ (first you sign up for a username in the upp$
 ########################################################
