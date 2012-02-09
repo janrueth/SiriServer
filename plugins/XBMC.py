@@ -60,7 +60,7 @@ class XBMC(Plugin):
                     json.Player.PlayPause(playerid=1)
                 except:
                     self.say('Nothing to play/pause')
-            elif 'play' in command or 'plate' in command or 'place' in command or 'played' in command: #this elif needs to be located below command == 'play' part
+            elif 'play' in command or 'plate' in command or 'place' in command or 'played' in command or 'start' in command: #this elif needs to be located below command == 'play' part
                 command, title=command.split(' ',1)
                 print 'Searching for: '+title
                 result = json.VideoLibrary.GetMovies()
