@@ -6,7 +6,10 @@
 import re
 import threading
 import logging
+import PluginManager
+import inspect
 
+from PluginManager import apikeys_file
 from siriObjects.baseObjects import ClientBoundCommand, RequestCompleted
 from siriObjects.uiObjects import AddViews, AssistantUtteranceView, OpenLink, Button
 from siriObjects.systemObjects import GetRequestOrigin, SetRequestOrigin
@@ -38,6 +41,18 @@ class StopPluginExecution(Exception):
     def __str__(self):
         return repr(self.reason)
 
+class ApiKeyNotFoundException(Exception):
+    def __init__(self, reason)
+        self.reason = reason
+    def __str__(self):
+        return repr(self.reason)
+
+def APIKeyForAPI(apiName):
+    apiKey = PluginManager.getAPIKeyForAPI(apiName)
+    if apiKey == None or apiKey == "":
+        raise ApiKeyNotFoundException("Could not find API key for: "+ apiName + ". Please check your " + apikeys_file)
+    return apiKey
+
 class Plugin(threading.Thread):
     def __init__(self, method, speech, language, send_object, send_plist, assistant, location):
         super(Plugin, self).__init__()
@@ -57,7 +72,11 @@ class Plugin(threading.Thread):
     def run(self):
         try:
             try:
-                self.__method(self, self.__speech, self.__lang)
+                arguments = inspect.getargspec(self.__method).args
+                if len(arguments) == 3:
+                    self.__method(self, self.__speech, self.__lang)
+                elif len(arguments) == 4:
+                    self.__method(self, self.__speech, self.__lang, self.__method.__dict__[__criteria_key__][self.__lang].match(self.__speech))
             except StopPluginExecution, instance:
                 self.logger.info("Plugin stopped executing with reason: {0}".format(instance))
             except:
