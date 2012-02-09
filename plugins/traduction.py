@@ -2,19 +2,21 @@
 # -*- coding: utf-8 -*-
 # Bing Traduction
 # Par Cédric Boverie (cedbv)
+# Clé API nécessaire disponible sur https://be.ssl.bing.com/webmaster/Developers/
 
 import re
 import json
 import urllib2, urllib
 from plugin import *
 
+APIKEY = APIKeyForAPI("bingtranslation")
+
+
 class Traduction(Plugin):
     
     @register("fr-FR", u"(Traduit|Traduire)(.*) en anglais")
     def traduire(self, speech, language):
 
-        apiKey = "D402B21244D8B56BE514BE9D32A7D64F8EB0860D"
-        query = "Bonjour tout le monde"
         target = "en"
 
         query = re.match(u"(Traduit|Traduire)(.*)en anglais", speech, re.IGNORECASE)
@@ -23,7 +25,7 @@ class Traduction(Plugin):
 		
         traduction = None
         try:
-            url = "http://api.bing.net/json.aspx?Query=%s&Translation.SourceLanguage=fr&Translation.TargetLanguage=%s&Version=2.2&AppId=%s&Sources=Translation" % (urllib.quote_plus(query.encode("utf-8")),target,apiKey)
+            url = "http://api.bing.net/json.aspx?Query=%s&Translation.SourceLanguage=fr&Translation.TargetLanguage=%s&Version=2.2&AppId=%s&Sources=Translation" % (urllib.quote_plus(query.encode("utf-8")),target,APIKEY)
             response = urllib2.urlopen(url, timeout=3).read()
             jsonObj = json.loads(response);
             traduction = jsonObj["SearchResponse"]["Translation"]["Results"][0]["TranslatedTerm"]
