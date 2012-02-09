@@ -10,14 +10,16 @@ from types import FunctionType
 logger = logging.getLogger("logger")
 pluginPath = "plugins"
 
-config_file = "plugins.conf"
-apikeys_file = "apiKeys.conf"
+__config_file__ = "plugins.conf"
+__apikeys_file__ = "apiKeys.conf"
+
+
 
 plugins = dict()
 apiKeys = dict()
 
 def load_plugins():
-    with open(config_file, "r") as fh:
+    with open(__config_file__, "r") as fh:
         for line in fh:
             line = line.strip()
             if line.startswith("#") or line == "":
@@ -49,7 +51,7 @@ def reload_api_keys():
     load_api_keys()
 
 def load_api_keys():
-    with open(apiKeys.conf, "r") as fh:
+    with open(__apikeys_file__, "r") as fh:
         for line in fh:
             line = line.strip()
             if line.startswith("#") or line == "":
@@ -65,7 +67,7 @@ def load_api_keys():
 
 def getAPIKeyForAPI(APIname):
     apiName = str.lower(APIname) 
-    if apiName in apiKeys
+    if apiName in apiKeys:
         return apiKeys[apiName]
     return None
 
