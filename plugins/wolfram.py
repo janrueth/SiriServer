@@ -28,9 +28,14 @@ class wolfram(Plugin):
     
     @register("de-DE", "(Was ist [a-zA-Z0-9]+)|(Wer ist [a-zA-Z0-9]+)|(Wie viel [a-zA-Z0-9]+)|(Was war [a-zA-Z0-9]+)|(Wer ist [a-zA-Z0-9]+)|(Wie lang [a-zA-Z0-9]+)|(Was ist [a-zA-Z0-9]+)|(Wie weit [a-zA-Z0-9]+)|(Wann ist [a-zA-Z0-9]+)|(Zeig mir [a-zA-Z0-9]+)|(Wie hoch [a-zA-Z0-9]+)|(Wie tief [a-zA-Z0-9]+)")     
     @register("en-US", "(What is [a-zA-Z0-9]+)|(Who is [a-zA-Z0-9]+)|(How many [a-zA-Z0-9]+)|(What was [a-zA-Z0-9]+)|(Who's [a-zA-Z0-9]+)|(How long [a-zA-Z0-9]+)|(What's [a-zA-Z0-9]+)|(How far [a-zA-Z0-9]+)|(When is [a-zA-Z0-9]+)|(Show me [a-zA-Z0-9]+)|(How high [a-zA-Z0-9]+)|(How deep [a-zA-Z0-9]+)")
+    @register("fr-FR", u"(Wolfram [a-zA-Z0-9]+)|(Qu'est ce que [a-zA-Z0-9]+)|(Quesque [a-zA-Z0-9]+)|(Qui est [a-zA-Z0-9]+)|(Combien de [a-zA-Z0-9]+)|(Qu'étais [a-zA-Z0-9]+)|(Combien de temps [a-zA-Z0-9]+)|(Combien font [a-zA-Z0-9]+)|(A quelle distance [a-zA-Z0-9]+)|(Quand est [a-zA-Z0-9]+)|(Montre moi [a-zA-Z0-9]+)|(A quelle hauteur [a-zA-Z0-9]+)|(A quelle profondeur [a-zA-Z0-9]+)")
     def wolfram(self, speech, language):
         wolframQuestion = speech.replace('who is ','').replace('what is ','').replace('what was ','').replace('Who is ','').replace('What is ','').replace('What was ','').replace('wer ist ','').replace('was ist ', '').replace('Wer ist ','').replace('Was ist ', '').replace('Wie viel ','How much ').replace('Wie lang ','How long ').replace('Wie weit ','How far ').replace('Wann ist ','When is ').replace('Zeig mir ','Show me ').replace('Wie hoch ','How high ').replace('Wie tief ','How deep ').replace('ist','is').replace('der','the').replace('die','the').replace('das','the').replace('wie viel ','how much ').replace('wie lang ','how long ').replace('wie weit ','how far ').replace('wann ist ','when is ').replace('zeig mir ','show me ').replace('wie hoch ','how high ').replace('wie tief ','how deep ').replace('ist','is').replace('der','the').replace('die','the').replace('das','the').replace(' ', '%20').replace(u'ä', 'a').replace(u'ö', 'o').replace(u'ü', 'u').replace(u'ß', 's')
-        wolfram_alpha = 'http://api.wolframalpha.com/v1/query.jsp?input=%s&appid=%s' % (wolframQuestion, APPID)
+        wolframQuestion = re.match(u"(Wolfram |Qu'est ce que |Quesque |Qui est |Combien de |Qu'étais |Combien de temps |Combien font |A quelle distance |Quand est |Montre moi |A quelle hauteur|A quelle profondeur)(.*)", speech, re.IGNORECASE)
+        if wolframQuestion != None:
+            wolframQuestion = wolframQuestion.group(2).strip()		
+
+        wolfram_alpha = 'http://api.wolframalpha.com/v1/query.jsp?input=%s&appid=%s' % (urllib.quote_plus(wolframQuestion.encode("utf-8")), APPID)
         print wolfram_alpha
         dom = minidom.parse(urlopen(wolfram_alpha))
         count_wolfram = 0
@@ -133,6 +138,8 @@ class wolfram(Plugin):
                 count_wolfram += 1
         if language == 'de-DE':
             self.say("Dies könnte Ihre Frage zu beantworten:")
+        elif language == 'fr-FR':
+			self.say(u"Cela pourrait répondre à votre question : ");
         else:
             self.say("This might answer your question:")
         view = AddViews(self.refId, dialogPhase="Completion")
@@ -182,6 +189,8 @@ class wolfram(Plugin):
             else:
                 if language == 'de-DE':
                     self.say("Nichts hat sich auf Ihre Anfrage!")
+                elif language == 'fr-FR':
+                    self.say(u"Je n'ai rien trouvé !");
                 else:
                     self.say("Nothing was found for your query!")
             self.complete_request()
