@@ -33,11 +33,6 @@ class XBMC_object():
         
         return ''
 
-    def replace_all(self, text, dic):
-        for i, j in dic.iteritems():
-            text = text.replace(i, j, 1)
-        return text
-
 class XBMC(Plugin):
     global xbmc
     xbmc = XBMC_object()
@@ -62,21 +57,29 @@ class XBMC(Plugin):
                     self.say('Nothing to play/pause')
             elif 'play' in command or 'plate' in command or 'place' in command or 'played' in command or 'start' in command: #this elif needs to be located below command == 'play' part
                 command, title=command.split(' ',1)
+                if 'first occurrence' in title:
+                    first_match = True
+                    title = title.replace(' first occurrence', '')
+                else:
+                    first_match = False
                 print 'Searching for: '+title
                 result = json.VideoLibrary.GetMovies()
-                matches = []
                 stripped_title = ''.join(ch for ch in title if ch.isalnum()).lower()
+                matches = []
                 for movie in result['movies']:
                     if stripped_title in ''.join(ch for ch in movie['label'] if ch.isalnum()).lower():
                         movieid = movie['movieid']
                         matches.append(movie['label'])
+                        if first_match == True:
+                            break
                 if len(matches) > 0:
                     if len(matches) > 1:
-                        self.say('Found multiple matches for \'%s\':'%(title))
+                        self.say("Found multiple matches for '%s':" %(title))
                         names = ''
                         for x in matches:
-                            names = x+'\n'+names 
+                            names = names + x + '\n' 
                         self.say(names, None)
+                        self.say("To play the first one add 'first occurrence' at the end of your command")
                     else:
                         json.Playlist.Clear(playlistid=1)
                         json.Playlist.Add(playlistid=1, item={ 'movie' + 'id': movieid })
@@ -91,10 +94,10 @@ class XBMC(Plugin):
                             matches.append(tvshow['label'])
                     if len(matches) > 0:
                         if len(matches) > 1:
-                            self.say('Found multiple matches for \'%s\':'%(title))
+                            self.say("Found multiple matches for '%s':" %(title))
                             names = ''
                             for x in matches:
-                                names = x+'\n'+names 
+                                names = names + x + '\n'
                             self.say(names, None)
                         else:
                             result = json.VideoLibrary.GetEpisodes(tvshowid=tvshowid,properties=['playcount','showtitle','season','episode'])
