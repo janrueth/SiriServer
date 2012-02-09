@@ -19,7 +19,7 @@ class vieDeMerde(Plugin):
             pass
 
         if vdm != None:
-            self.say(vdm.text)
+            self.say(vdm.text.replace("&quot;",'"'))
         else:
             self.say(u"Désolé, l'API Vie De Merde autorise très peu de requête.")
         self.complete_request()
