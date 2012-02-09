@@ -14,7 +14,7 @@ class examplePlugin(Plugin):
             answer = self.ask(u"Willst du das wirklich wissen?")
             self.say(u"Du hast \"{0}\" gesagt!".format(answer))
         elif language == 'fr-FR':
-		    self.say(u"Je ne sais pas, mais je crois qu'il y a une application pour ça.");
+		    self.say(u"Je ne sais pas, mais je crois qu'il y a une application pour Ã§a.");
         else:
             self.say("I shouldn't tell you!")
         self.complete_request()
