@@ -464,8 +464,9 @@ x.addHandler(h)
 db.setup()
 
 #load Plugins
-PluginManager.load_plugins()
 PluginManager.load_api_keys()
+PluginManager.load_plugins()
+
 
 #start server
 x.info("Starting Server")
