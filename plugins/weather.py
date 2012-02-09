@@ -44,31 +44,32 @@ class SiriWeatherFunctions():
 class weatherPlugin(Plugin):
     localizations = {"weatherForecast": 
                         {"search":{
-                            0:{"de-DE": u"Einen Moment Geduld bitte...", "en-US": "Checking my sources..."},
-                            1:{"de-DE": u"Ich suche nach der Vorhersage ...", "en-US": "Please wait while I check that..."},
-                            2:{"de-DE": u"Einen Moment bitte ...", "en-US": "One moment please..."},
-                            3:{"de-DE": u"Ich suche nach Wetterdaten...", "en-US": "Trying to get weather data for this location..."},
+                            0:{"de-DE": u"Einen Moment Geduld bitte...", "en-US": "Checking my sources...", "fr-FR": u"Je vérifie mes sources..."},
+                            1:{"de-DE": u"Ich suche nach der Vorhersage ...", "en-US": "Please wait while I check that...", "fr-FR": "Je regarde..."},
+                            2:{"de-DE": u"Einen Moment bitte ...", "en-US": "One moment please...", "fr-FR":"Un instant..."},
+                            3:{"de-DE": u"Ich suche nach Wetterdaten...", "en-US": "Trying to get weather data for this location...","fr-FR": u"Je récupère la météo de cet endroit..."},
                             }, 
                         "forecast":{
                             "DAILY": {
-                                0:{"de-DE": u"Hier ist die Vorhersage für {0}, {1}", "en-US": "Here is the forecast for {0}, {1}"},
-                                1:{"de-DE": u"Hier ist die Wetterprognose für {0}, {1}", "en-US": "This is the forecast for {0}, {1}"},
-                                2:{"de-DE": u"Ich habe folgende Vorhersage für {0}, {1} gefunden", "en-US": "I found the following forecast for {0}, {1}"},
+                                0:{"de-DE": u"Hier ist die Vorhersage für {0}, {1}", "en-US": "Here is the forecast for {0}, {1}", "fr-FR": u"Voici les prévisions pour {0}, {1}"},
+                                1:{"de-DE": u"Hier ist die Wetterprognose für {0}, {1}", "en-US": "This is the forecast for {0}, {1}", "fr-FR": u"Voilà les prévisions pour {0}, {1}"},
+                                2:{"de-DE": u"Ich habe folgende Vorhersage für {0}, {1} gefunden", "en-US": "I found the following forecast for {0}, {1}", "fr-FR": u"J'ai trouvé les prévisions suivantes pour {0}, {1}"},
                                 },
                             "HOURLY": {
-                                0:{"de-DE": u"Hier ist die heutige Vorhersage für {0}, {1}", "en-US": "Here is today's forecast for {0}, {1}"},
-                                1:{"de-DE": u"Hier ist die Wetterprognose von heute für {0}, {1}", "en-US": "This is today's forecast for {0}, {1}"},
-                                2:{"de-DE": u"Ich habe folgende Tagesprognose für {0}, {1} gefunden", "en-US": "I found the following hourly forecast for {0}, {1}"},
+                                0:{"de-DE": u"Hier ist die heutige Vorhersage für {0}, {1}", "en-US": "Here is today's forecast for {0}, {1}","fr-FR": u"Voici les prévisions d'aujourd'hui pour {0}, {1}"},
+                                1:{"de-DE": u"Hier ist die Wetterprognose von heute für {0}, {1}", "en-US": "This is today's forecast for {0}, {1}", "fr-FR": u"Voici les prévisions d'aujourd'hui pour {0}, {1}"},
+                                2:{"de-DE": u"Ich habe folgende Tagesprognose für {0}, {1} gefunden", "en-US": "I found the following hourly forecast for {0}, {1}","fr-FR": u"J'ai trouvé les prévisions pour {0}, {1}"},
                                 }
                             },
                         "failure": {
-                                   "de-DE": "Ich konnte leider keine Wettervorhersage finden!", "en-US": "I'm sorry but I could not find the forecast for this location!"
+                                   "de-DE": "Ich konnte leider keine Wettervorhersage finden!", "en-US": "I'm sorry but I could not find the forecast for this location!","fr-FR": u"Je suis désolé, je ne trouve pas cet endroit !"
                                    }
                             }
                         }
         
     @register("de-DE", "(.*Wetter.*)|(.*Vorhersage.*)")     
     @register("en-US", "(.*Weather.*)|(.*forecast.*)")
+    @register("fr-FR", u"(.*Météo.*)|(.*prévision.*)|(Quel.*temps.*)")
     def weatherForecastLookUp(self, speech, language):
         if weatherApiKey =="":
             self.say("Please obtain an API key from http://api.wunderground.com/weather/api/ and enter it in line 17!")
@@ -84,6 +85,16 @@ class weatherPlugin(Plugin):
             speech = speech.replace("current","")
             speech = speech.replace(" for today"," in ")
             speech = speech.replace(" for "," in ")
+        if (speech.count("aujourd'hui") > 0 or speech.count("actuel") > 0 or speech.count("maintenant") > 0 or speech.count(" pour aujourd'hui") > 0 and language == "fr-FR"):
+            viewType = "HOURLY"
+            speech = speech.replace(" pour aujourd'hui","")
+            speech = speech.replace("aujourd'hui","")
+            speech = speech.replace("pour maintenant","")
+            speech = speech.replace("de maintenant","")
+            speech = speech.replace("maintenant","")
+            speech = speech.replace("actuellement","")
+            speech = speech.replace("actuelle","")
+            speech = speech.replace("actuel","")
         if (speech.count("heute") > 0 or speech.count("moment") > 0 or speech.count(u"nächsten Stunden") > 0 or speech.count(u"für heute") > 0) and language=="de-DE":
             viewType = "HOURLY"
             speech = speech.replace("heute","")
@@ -117,9 +128,9 @@ class weatherPlugin(Plugin):
         
                 
         
-        countryOrCity = re.match("(?u).* in ([\w ]+)", speech, re.IGNORECASE)
+        countryOrCity = re.match(u"(?u).* (a|à|de|pour) ([\w ]+)", speech, re.IGNORECASE)
         if countryOrCity != None:
-            countryOrCity = countryOrCity.group(1).strip()
+            countryOrCity = countryOrCity.group(countryOrCity.lastindex).strip()
             print "found forecast"
             # lets see what we got, a country or a city... 
             # lets use google geocoding API for that
