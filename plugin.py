@@ -6,22 +6,19 @@
 import re
 import threading
 import logging
+import PluginManager
+import inspect
+
 
 from siriObjects.baseObjects import ClientBoundCommand, RequestCompleted
 from siriObjects.uiObjects import AddViews, AssistantUtteranceView, OpenLink, Button
 from siriObjects.systemObjects import GetRequestOrigin, SetRequestOrigin
 
 __criteria_key__ = "criterias"
-
 __error_responses__ = {"de-DE": "Es ist ein Fehler in der Verarbeitung ihrer Anfrage aufgetreten!", "en-US": "There was an error during the processing of your request!", "en-GB": "There was an error during the processing of your request!", "en-AU": "There was an error during the processing of your request!", "fr-FR": "Il y eu une erreur lors du traitement de votre demande!"}
-
 __error_location_help__ = {"de-DE": u"Ich weiß nicht wo du bist… Aber du kannst mir helfen es heraus zu finden…", "en-US": u"I don’t know where you are… But you can help me find out…", "en-GB": u"I don’t know where you are… But you can help me find out…", "en-AU": u"I don’t know where you are… But you can help me find out…", "fr-FR": u"Je ne sais pas où vous êtes... Mais vous pouvez m'aider à en savoir plus sur..."}
-
 __error_location_saysettings__ = {"de-DE": u"In den Ortungsdienst Einstellungen, schalte Ortungsdienst und Siri ein.", "en-US": u"In Location Services Settings, turn on both Location Services and Siri.", "en-GB": u"In Location Services Settings, turn on both Location Services and Siri.", "en-AU": u"In Location Services Settings, turn on both Location Services and Siri.", "fr-FR": u"Dans les réglages de Service de localisation, activez les services de localisation et Siri."}
-
 __error_location_settings__ = {"de-DE": u"Ortungsdienst Einstellungen", "en-US": u"Location Services Settings", "en-GB": u"Location Services Settings", "en-AU": u"Location Services Settings", "fr-FR": u"Service de localisation"}
-
-
 
 def register(lang, regex):
     def addInfosTo(func):
@@ -37,6 +34,24 @@ class StopPluginExecution(Exception):
         self.reason = reason
     def __str__(self):
         return repr(self.reason)
+
+class ApiKeyNotFoundException(Exception):
+    def __init__(self, reason):
+        self.reason = reason
+    def __str__(self):
+        return repr(self.reason)
+
+class NecessaryModuleNotFound(Exception):
+    def __init__(self, reason):
+        self.reason = reason
+    def __str__(self):
+        return repr(self.reason)
+
+def APIKeyForAPI(apiName):
+    apiKey = PluginManager.getAPIKeyForAPI(apiName)
+    if apiKey == None or apiKey == "":
+        raise ApiKeyNotFoundException("Could not find API key for: "+ apiName + ". Please check your " + PluginManager.__apikeys_file__)
+    return apiKey
 
 class Plugin(threading.Thread):
     def __init__(self, method, speech, language, send_object, send_plist, assistant, location):
@@ -57,7 +72,11 @@ class Plugin(threading.Thread):
     def run(self):
         try:
             try:
-                self.__method(self, self.__speech, self.__lang)
+                arguments = inspect.getargspec(self.__method).args
+                if len(arguments) == 3:
+                    self.__method(self, self.__speech, self.__lang)
+                elif len(arguments) == 4:
+                    self.__method(self, self.__speech, self.__lang, self.__method.__dict__[__criteria_key__][self.__lang].match(self.__speech))
             except StopPluginExecution, instance:
                 self.logger.info("Plugin stopped executing with reason: {0}".format(instance))
             except:

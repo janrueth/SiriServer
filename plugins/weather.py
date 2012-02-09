@@ -14,7 +14,7 @@ from siriObjects.uiObjects import AddViews, AssistantUtteranceView
 from siriObjects.forecastObjects import *
 
 #Obtain API Key from wundergrounds.com
-weatherApiKey =""
+weatherApiKey = APIKeyForAPI('wundergrounds')
 
 class SiriWeatherFunctions():
     def __init__(self):

@@ -23,8 +23,7 @@ class define(Plugin):
     
     @register("de-DE", "(zeig mir|zeige|zeig).*(bild|zeichnung) (vo. ein..|vo. ein..|aus)* ([\w ]+)")
     @register("en-US", "(display|show me|show).*(picture|image|drawing|illustration) (of|an|a)* ([\w ]+)")
-    def defineword(self, speech, language):
-	regex = self.defineword.__dict__[__criteria_key__][language].match(speech)
+    def defineword(self, speech, language, regex):
         Title = regex.group(regex.lastindex)
         Query = urllib.quote_plus(Title.encode("utf-8"))
         SearchURL = u'https://ajax.googleapis.com/ajax/services/search/images?v=1.0&imgsz=xlarge&q=' + str(Query)
