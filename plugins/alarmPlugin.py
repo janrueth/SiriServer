@@ -42,7 +42,7 @@ class alarmPlugin(Plugin):
     }
 
     @register("en-US", res['setAlarm']['en-US'])
-    def setTimer(self, speech, language):
+    def setAlarm(self, speech, language):
         alarmString = re.match(alarmPlugin.res['setAlarm'][language], speech, re.IGNORECASE)
         
         alarmHour = int(alarmString.group(1))
