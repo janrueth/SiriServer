@@ -13,7 +13,7 @@ import urllib2, urllib, socket, struct, logging
 try:
     import jsonrpclib
 except:
-    raise Exception('XBMC plugin will not work: JSONRPCLIB not installed. If you wish to test it out run \"easy_install jsonrpclib\"')
+    raise NecessaryModuleNotFound('XBMC plugin will not work: JSONRPCLIB not installed. If you wish to test it out run \"easy_install jsonrpclib\"')
     
 
 class XBMC_object():
