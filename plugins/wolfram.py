@@ -17,41 +17,12 @@ from plugin import *
 
 from siriObjects.baseObjects import AceObject, ClientBoundCommand
 from siriObjects.uiObjects import AddViews, AssistantUtteranceView
+from siriObjects.answerObjects import AnswerSnippet, AnswerObject, AnswerObjectLine
 
-APPID = "" #Add your APPID between the ""
 
-class SiriAnswerSnippet(AceObject):
-    def __init__(self, answers=None):
-        super(SiriAnswerSnippet, self).__init__("Snippet", "com.apple.ace.answer")
-        self.answers = answers if answers != None else []
-        self.confirmationOptions = None
-    
-    def to_plist(self):
-        self.add_property('answers')
-        self.add_property('confirmationOptions')
-        return super(SiriAnswerSnippet, self).to_plist()
+APPID = APIKeyForAPI("wolframalpha")
 
-class SiriAnswer(AceObject):
-    def __init__(self, title=None, lines=None):
-        super(SiriAnswer, self).__init__("Object", "com.apple.ace.answer")
-        self.title = title
-        self.lines = lines if lines != None else []
-    
-    def to_plist(self):
-        self.add_property('title')
-        self.add_property('lines')
-        return super(SiriAnswer, self).to_plist()
 
-class SiriAnswerLine(AceObject):
-    def __init__(self, text="", image=""):
-        super(SiriAnswerLine, self).__init__("ObjectLine", "com.apple.ace.answer")
-        self.text = text
-        self.image = image
-    
-    def to_plist(self):
-        self.add_property('text')
-        self.add_property('image')
-        return super(SiriAnswerLine, self).to_plist()
 
 class wolfram(Plugin):
     
@@ -99,67 +70,67 @@ class wolfram(Plugin):
         query_type = query_list.getAttribute('error')
         for node in dom.getElementsByTagName('queryresult'):
             for pod in node.getElementsByTagName('pod'):
-               xmlTag = dom.getElementsByTagName('plaintext')[count_wolfram].toxml()
-               xmlTag2 = dom.getElementsByTagName('subpod')[count_wolfram]
-               xmlData=xmlTag.replace('<plaintext>','').replace('</plaintext>','')
-               if count_wolfram == 0:
-                  if xmlData == "<plaintext/>":
-                      image_list = dom.getElementsByTagName('img')[count_wolfram]
-                      image_type = image_list.getAttribute('src')
-                      wolfram0 = image_type
-                      wolfram0_img = 1
-                  else:
-                      wolfram0 = xmlData
-                  wolfram_pod0 = pod.getAttribute('title')
-               elif count_wolfram == 1:
-                  if xmlData == "<plaintext/>":
-                      image_list = dom.getElementsByTagName('img')[count_wolfram]
-                      image_type = image_list.getAttribute('src')
-                      wolfram1 = image_type
-                      wolfram1_img = 1
-                  else:
-                      wolfram1 = xmlData
-                  wolfram_pod1 = pod.getAttribute('title')
-               elif count_wolfram == 2:
-                  if xmlData == "<plaintext/>":
-                     image_list = dom.getElementsByTagName('img')[count_wolfram]
-                     image_type = image_list.getAttribute('src')
-                     wolfram2 = image_type
-                     wolfram2_img = 1
-                  else:
-                     wolfram2 = xmlData
-                  wolfram_pod2 = pod.getAttribute('title')
-               elif count_wolfram == 3:
-                  if xmlData == "<plaintext/>":
-                     image_list = dom.getElementsByTagName('img')[count_wolfram]
-                     image_type = image_list.getAttribute('src')
-                     wolfram3 = image_type
-                     wolfram3_img = 1
-                  else:
-                     wolfram3 = xmlData
-                  wolfram_pod3 = pod.getAttribute('title')
-               elif count_wolfram == 4:
-                  if xmlData == "<plaintext/>":
-                     image_list = dom.getElementsByTagName('img')[count_wolfram]
-                     image_type = image_list.getAttribute('src')
-                     wolfram4 = image_type
-                     wolfram4_img = 1
-                  else:
-                     wolfram4 = xmlData
-                  wolfram_pod4 = pod.getAttribute('title')
-               elif count_wolfram == 5:
-                  wolfram5 = xmlData
-                  wolfram_pod5 = pod.getAttribute('title')
-               elif count_wolfram == 6:
-                  wolfram6 = xmlData
-                  wolfram_pod6 = pod.getAttribute('title')
-               elif count_wolfram == 7:
-                  wolfram7 = xmlData
-                  wolfram_pod7 = pod.getAttribute('title')
-               elif count_wolfram == 8:
-                  wolfram8 = xmlData
-                  wolfram_pod8 = pod.getAttribute('title')
-               count_wolfram += 1
+                xmlTag = dom.getElementsByTagName('plaintext')[count_wolfram].toxml()
+                xmlTag2 = dom.getElementsByTagName('subpod')[count_wolfram]
+                xmlData=xmlTag.replace('<plaintext>','').replace('</plaintext>','')
+                if count_wolfram == 0:
+                    if xmlData == "<plaintext/>":
+                        image_list = dom.getElementsByTagName('img')[count_wolfram]
+                        image_type = image_list.getAttribute('src')
+                        wolfram0 = image_type
+                        wolfram0_img = 1
+                    else:
+                        wolfram0 = xmlData
+                    wolfram_pod0 = pod.getAttribute('title')
+                elif count_wolfram == 1:
+                    if xmlData == "<plaintext/>":
+                        image_list = dom.getElementsByTagName('img')[count_wolfram]
+                        image_type = image_list.getAttribute('src')
+                        wolfram1 = image_type
+                        wolfram1_img = 1
+                    else:
+                        wolfram1 = xmlData
+                    wolfram_pod1 = pod.getAttribute('title')
+                elif count_wolfram == 2:
+                    if xmlData == "<plaintext/>":
+                        image_list = dom.getElementsByTagName('img')[count_wolfram]
+                        image_type = image_list.getAttribute('src')
+                        wolfram2 = image_type
+                        wolfram2_img = 1
+                    else:
+                        wolfram2 = xmlData
+                    wolfram_pod2 = pod.getAttribute('title')
+                elif count_wolfram == 3:
+                    if xmlData == "<plaintext/>":
+                        image_list = dom.getElementsByTagName('img')[count_wolfram]
+                        image_type = image_list.getAttribute('src')
+                        wolfram3 = image_type
+                        wolfram3_img = 1
+                    else:
+                        wolfram3 = xmlData
+                    wolfram_pod3 = pod.getAttribute('title')
+                elif count_wolfram == 4:
+                    if xmlData == "<plaintext/>":
+                        image_list = dom.getElementsByTagName('img')[count_wolfram]
+                        image_type = image_list.getAttribute('src')
+                        wolfram4 = image_type
+                        wolfram4_img = 1
+                    else:
+                        wolfram4 = xmlData
+                    wolfram_pod4 = pod.getAttribute('title')
+                elif count_wolfram == 5:
+                    wolfram5 = xmlData
+                    wolfram_pod5 = pod.getAttribute('title')
+                elif count_wolfram == 6:
+                    wolfram6 = xmlData
+                    wolfram_pod6 = pod.getAttribute('title')
+                elif count_wolfram == 7:
+                    wolfram7 = xmlData
+                    wolfram_pod7 = pod.getAttribute('title')
+                elif count_wolfram == 8:
+                    wolfram8 = xmlData
+                    wolfram_pod8 = pod.getAttribute('title')
+                count_wolfram += 1
         if language == 'de-DE':
             self.say("Dies könnte Ihre Frage zu beantworten:")
         else:
@@ -167,44 +138,44 @@ class wolfram(Plugin):
         view = AddViews(self.refId, dialogPhase="Completion")
         if wolfram_pod0 != 12:
             if wolfram0_img == 1:
-                wolframAnswer = SiriAnswer(title=wolfram_pod0,lines=[SiriAnswerLine(image=wolfram0)])
+                wolframAnswer = AnswerObject(title=wolfram_pod0,lines=[AnswerObjectLine(image=wolfram0)])
             else:
-                wolframAnswer = SiriAnswer(title=wolfram_pod0,lines=[SiriAnswerLine(text=wolfram0)])
+                wolframAnswer = AnswerObject(title=wolfram_pod0,lines=[AnswerObjectLine(text=wolfram0)])
         else:
             print wolfram_pod0
         if wolfram_pod1 != 12:
             if wolfram1_img == 1:
-                wolframAnswer1 = SiriAnswer(title=wolfram_pod1,lines=[SiriAnswerLine(image=wolfram1)])
+                wolframAnswer1 = AnswerObject(title=wolfram_pod1,lines=[AnswerObjectLine(image=wolfram1)])
             else:
-                wolframAnswer1 = SiriAnswer(title=wolfram_pod1,lines=[SiriAnswerLine(text=wolfram1)])
+                wolframAnswer1 = AnswerObject(title=wolfram_pod1,lines=[AnswerObjectLine(text=wolfram1)])
         else:
             print wolfram_pod1
         if wolfram_pod2 != 12:
             if wolfram2_img == 1:
-                wolframAnswer2 = SiriAnswer(title=wolfram_pod2,lines=[SiriAnswerLine(image=wolfram2)])
+                wolframAnswer2 = AnswerObject(title=wolfram_pod2,lines=[AnswerObjectLine(image=wolfram2)])
             else:
-                wolframAnswer2 = SiriAnswer(title=wolfram_pod2,lines=[SiriAnswerLine(text=wolfram2)])
+                wolframAnswer2 = AnswerObject(title=wolfram_pod2,lines=[AnswerObjectLine(text=wolfram2)])
         else:
             print wolfram_pod2
         if wolfram_pod3 != 12:
             if wolfram3_img == 1:
-                wolframAnswer3 = SiriAnswer(title=wolfram_pod3,lines=[SiriAnswerLine(image=wolfram3)])
+                wolframAnswer3 = AnswerObject(title=wolfram_pod3,lines=[AnswerObjectLine(image=wolfram3)])
             else:
-                wolframAnswer3 = SiriAnswer(title=wolfram_pod3,lines=[SiriAnswerLine(text=wolfram3)])
+                wolframAnswer3 = AnswerObject(title=wolfram_pod3,lines=[AnswerObjectLine(text=wolfram3)])
         else:
             print wolfram_pod3
         if wolfram_pod4 != 12:
             if wolfram4_img == 1:
-                wolframAnswer4 = SiriAnswer(title=wolfram_pod4,lines=[SiriAnswerLine(image=wolfram4)])
+                wolframAnswer4 = AnswerObject(title=wolfram_pod4,lines=[AnswerObjectLine(image=wolfram4)])
             else:
-                wolframAnswer4 = SiriAnswer(title=wolfram_pod4,lines=[SiriAnswerLine(text=wolfram4)])
+                wolframAnswer4 = AnswerObject(title=wolfram_pod4,lines=[AnswerObjectLine(text=wolfram4)])
         else:
             print wolfram_pod4
         if wolfram_pod8 != 12:
             if wolfram8_img == 1:
-                wolframAnswer8 = SiriAnswer(title=wolfram_pod8,lines=[SiriAnswerLine(image=wolfram8)])
+                wolframAnswer8 = AnswerObject(title=wolfram_pod8,lines=[AnswerObjectLine(image=wolfram8)])
             else:
-                wolframAnswer8 = SiriAnswer(title=wolfram_pod8,lines=[SiriAnswerLine(text=wolfram8)])
+                wolframAnswer8 = AnswerObject(title=wolfram_pod8,lines=[AnswerObjectLine(text=wolfram8)])
         if wolfram_pod0 == 12:
             if APPID == "":
                 self.say("Sorry I can't process your request. Your APPID is not set! Please register free dev account at http://wolframalpha.com and edit line 21 with you APPID.")
@@ -212,21 +183,21 @@ class wolfram(Plugin):
                 if language == 'de-DE':
                     self.say("Nichts hat sich auf Ihre Anfrage!")
                 else:
-                    self.say("Nothing has found for your query!")
+                    self.say("Nothing was found for your query!")
             self.complete_request()
             view1 = 0
         elif wolfram_pod1 == 12:
-            view1 = SiriAnswerSnippet(answers=[wolframAnswer])
+            view1 = AnswerSnippet(answers=[wolframAnswer])
         elif wolfram_pod2 == 12:
-            view1 = SiriAnswerSnippet(answers=[wolframAnswer, wolframAnswer1])
+            view1 = AnswerSnippet(answers=[wolframAnswer, wolframAnswer1])
         elif wolfram_pod3 == 12:
-            view1 = SiriAnswerSnippet(answers=[wolframAnswer, wolframAnswer1, wolframAnswer2])
+            view1 = AnswerSnippet(answers=[wolframAnswer, wolframAnswer1, wolframAnswer2])
         elif wolfram_pod4 == 12:
-            view1 = SiriAnswerSnippet(answers=[wolframAnswer, wolframAnswer1, wolframAnswer2, wolframAnswer3])
+            view1 = AnswerSnippet(answers=[wolframAnswer, wolframAnswer1, wolframAnswer2, wolframAnswer3])
         elif wolfram_pod8 == 12:
-            view1 = SiriAnswerSnippet(answers=[wolframAnswer, wolframAnswer1, wolframAnswer2, wolframAnswer3, wolframAnswer4])
+            view1 = AnswerSnippet(answers=[wolframAnswer, wolframAnswer1, wolframAnswer2, wolframAnswer3, wolframAnswer4])
         else:
-            view1 = SiriAnswerSnippet(answers=[wolframAnswer, wolframAnswer1, wolframAnswer2, wolframAnswer3, wolframAnswer4, wolframAnswer8])
+            view1 = AnswerSnippet(answers=[wolframAnswer, wolframAnswer1, wolframAnswer2, wolframAnswer3, wolframAnswer4, wolframAnswer8])
         view.views = [view1]
         self.sendRequestWithoutAnswer(view)
         self.complete_request()

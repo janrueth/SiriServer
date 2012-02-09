@@ -17,7 +17,7 @@ from M2Crypto import BIO, RSA, X509
 from siriObjects import speechObjects, baseObjects, uiObjects, systemObjects
 from siriObjects.baseObjects import ObjectIsCommand
 from siriObjects.speechObjects import StartSpeech, StartSpeechRequest, StartSpeechDictation, SpeechPacket, SpeechFailure, FinishSpeech
-
+from siriObjects.systemObjects import CancelRequest, CancelSucceeded, GetSessionCertificate, GetSessionCertificateResponse, CreateSessionInfoRequest, CommandFailed
 from httpClient import AsyncOpenHttp
 
 from sslDispatcher import ssl_dispatcher
@@ -269,21 +269,30 @@ class HandleConnection(ssl_dispatcher):
                     self.httpClient.make_google_request(flacBin, finishSpeech.refId, dictation, language=self.assistant.language, allowCurses=True)
                         
                         
-                elif reqObject['class'] == 'CancelRequest':
+                elif ObjectIsCommand(reqObject, CancelRequest):
                         # this is probably called when we need to kill a plugin
                         # wait for thread to finish a send
-                        if reqObject['refId'] in self.speech:
-                            del self.speech[reqObject['refId']]
-                        self.send_plist({"class": "CancelSucceeded", "group": "com.apple.ace.system", "aceId": str(uuid.uuid4()), "refId": reqObject['aceId'], "properties":{"callbacks": []}})
-                elif reqObject['class'] == 'GetSessionCertificate':
-                    caDer = caCert.as_der()
-                    serverDer = serverCert.as_der()
-                    self.send_plist({"class": "GetSessionCertificateResponse", "group": "com.apple.ace.system", "aceId": str(uuid.uuid4()), "refId": reqObject['aceId'], "properties":{"certificate": biplist.Data("\x01\x02"+struct.pack(">I", len(caDer))+caDer + struct.pack(">I", len(serverDer))+serverDer)}})
+                        cancelRequest = CancelRequest(reqObject)
+                        if cancelRequest.refId in self.speech:
+                            del self.speech[cancelRequest.refId]
+                        
+                        self.send_object(CancelSucceeded(cancelRequest.aceId))
 
-                    #self.send_plist({"class":"CommandFailed", "properties": {"reason":"Not authenticated", "errorCode":0, "callbacks":[]}, "aceId": str(uuid.uuid4()), "refId": reqObject['aceId'], "group":"com.apple.ace.system"})
-                elif reqObject['class'] == 'CreateSessionInfoRequest':
-            # how does a positive answer look like?
-                    self.send_plist({"class":"CommandFailed", "properties": {"reason":"Not authenticated", "errorCode":0, "callbacks":[]}, "aceId": str(uuid.uuid4()), "refId": reqObject['aceId'], "group":"com.apple.ace.system"})
+                elif ObjectIsCommand(reqObject, GetSessionCertificate):
+                    getSessionCertificate = GetSessionCertificate(reqObject)
+                    response = GetSessionCertificateResponse(getSessionCertificate.aceId)
+                    response.caCert = caCert.as_der()
+                    response.sessionCert = serverCert.as_der()
+                    self.send_object(response)
+
+                elif ObjectIsCommand(reqObject, CreateSessionInfoRequest):
+                    # how does a positive answer look like?
+                    createSessionInfoRequest = CreateSessionInfoRequest(reqObject)
+                    fail = CommandFailed(createSessionInfoRequest.aceId)
+                    fail.reason = "Not authenticated"
+                    fail.errorCode = 0
+                    self.send_object(fail)
+
                     #self.send_plist({"class":"SessionValidationFailed", "properties":{"errorCode":"UnsupportedHardwareVersion"}, "aceId": str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
                     
                 elif reqObject['class'] == 'CreateAssistant':
@@ -455,6 +464,7 @@ x.addHandler(h)
 db.setup()
 
 #load Plugins
+PluginManager.load_api_keys()
 PluginManager.load_plugins()
 
 
@@ -464,6 +474,6 @@ server = SiriServer('', options.port)
 try:
     asyncore.loop()
 except (asyncore.ExitNow, KeyboardInterrupt, SystemExit):
-    x.info("Cought shutdown, closing server")
+    x.info("Caught shutdown, closing server")
     asyncore.dispatcher.close(server)
     exit()
