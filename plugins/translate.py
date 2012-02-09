@@ -31,9 +31,9 @@ class translator(Plugin):
 	if sirilang == "de-DE": self.say("Ich übersetze...")
 #the next line is necessary as we need to remove only the last instance of into (into could appear in the translation query)
 	if sirilang == "en-US": text1=(speech[::-1].replace("to"[::-1], "xxxxxx"[::-1], 1))[::-1] 
-	if sirilang == "en-US": text = text1.replace("Translate ","",1)
+	if sirilang == "en-US": text = text1.replace("Translate ","",1).replace("translate ","",1)
 	if sirilang == "de-DE": text1=(speech[::-1].replace("zu"[::-1], "xxxxxx"[::-1], 1))[::-1] 
-	if sirilang == "de-DE": text = text1.replace("Übersetze ","",1)
+	if sirilang == "de-DE": text = text1.replace("Übersetze ","",1).replace("übersetze ","",1)
 	phrase = text.split(" xxxxxx ")[0].replace(" ","%20")
 	language = text.split(" xxxxxx ")[1]
 #manage the communication with the API, parse and output this data
