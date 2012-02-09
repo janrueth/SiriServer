@@ -9,12 +9,13 @@ import logging
 import PluginManager
 import inspect
 
-from PluginManager import apikeys_file
+
 from siriObjects.baseObjects import ClientBoundCommand, RequestCompleted
 from siriObjects.uiObjects import AddViews, AssistantUtteranceView, OpenLink, Button
 from siriObjects.systemObjects import GetRequestOrigin, SetRequestOrigin
 
 __criteria_key__ = "criterias"
+
 
 __error_responses__ = {"de-DE": "Es ist ein Fehler in der Verarbeitung ihrer Anfrage aufgetreten!", "en-US": "There was an error during the processing of your request!", "en-GB": "There was an error during the processing of your request!", "en-AU": "There was an error during the processing of your request!", "fr-FR": "Il y avait une erreur lors du traitement de votre demande!"}
 
@@ -42,7 +43,7 @@ class StopPluginExecution(Exception):
         return repr(self.reason)
 
 class ApiKeyNotFoundException(Exception):
-    def __init__(self, reason)
+    def __init__(self, reason):
         self.reason = reason
     def __str__(self):
         return repr(self.reason)
@@ -50,7 +51,7 @@ class ApiKeyNotFoundException(Exception):
 def APIKeyForAPI(apiName):
     apiKey = PluginManager.getAPIKeyForAPI(apiName)
     if apiKey == None or apiKey == "":
-        raise ApiKeyNotFoundException("Could not find API key for: "+ apiName + ". Please check your " + apikeys_file)
+        raise ApiKeyNotFoundException("Could not find API key for: "+ apiName + ". Please check your " + PluginManager.__apikeys_file__)
     return apiKey
 
 class Plugin(threading.Thread):
