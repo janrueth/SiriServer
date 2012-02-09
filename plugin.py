@@ -48,6 +48,12 @@ class ApiKeyNotFoundException(Exception):
     def __str__(self):
         return repr(self.reason)
 
+class NecessaryModuleNotFound(Exception):
+    def __init__(self, reason):
+        self.reason = reason
+    def __str__(self):
+        return repr(self.reason)
+
 def APIKeyForAPI(apiName):
     apiKey = PluginManager.getAPIKeyForAPI(apiName)
     if apiKey == None or apiKey == "":
