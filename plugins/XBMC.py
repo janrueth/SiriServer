@@ -5,7 +5,7 @@
 # -*- coding: utf-8 -*-
 #
 #
-#
+# Note: This XBMC plugin is designed for XBMC RPC V3, this means that it works best with XBMC Eden and up.
 
 from plugin import *
 import urllib2, urllib, socket, struct, logging
@@ -13,7 +13,7 @@ import urllib2, urllib, socket, struct, logging
 try:
     import jsonrpclib
 except:
-    print 'WARNING: XBMC plugin will not work: JSONRPCLIB not installed. If you wish to test it out run \"easy_install jsonrpclib\"'
+    ImportError: raise Exception('WARNING: XBMC plugin will not work: JSONRPCLIB not installed. To install, run "easy_install jsonrpclib"')
     
 
 class XBMC_object():
