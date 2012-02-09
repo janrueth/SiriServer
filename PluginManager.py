@@ -28,7 +28,7 @@ def load_plugins():
             try:
                 __import__(pluginPath+"."+line,  globals(), locals(), [], -1)
             except NecessaryModuleNotFound as e:
-                logger.critical("Failed loading Plugin due to missing module: "+e)
+                logger.critical("Failed loading Plugin due to missing module: "+str(e))
             except:
                 logger.exception("Plugin loading failed")
             
