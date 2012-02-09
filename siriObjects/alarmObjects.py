@@ -99,14 +99,14 @@ class AlarmSnippet(Snippet):
         return super(AlarmSnippet, self).to_plist()
 
 class AlarmUpdate(ClientBoundCommand):
-    def __init__(self, refId):
+    def __init__(self, refId, alarmId=None, hour=None, minute=None):
         super(AlarmUpdate, self).__init__("Update", "com.apple.ace.alarm", None, refId)
         self.removedFrequency = None # array
-        self.minute = None # number
+        self.minute = minute # number
         self.label = None #string
-        self.hour = None # number
+        self.hour = hour # number
         self.enabled = None # number
-        self.alarmId = None # url
+        self.alarmId = alarmId # url
         self.addedFrequency = None # array
         self.targetAppId = None # url
 

@@ -6,7 +6,7 @@ import re
 from pprint import pprint as pp
 
 from fractions import Fraction
-from time import localtime, time
+from datetime import datetime, time, timedelta
 
 from plugin import *
 
@@ -39,6 +39,22 @@ def parse_alarm_length(t, language):
             # shouldn't ever get here, but just in case...
             return count * 60
 
+def parse_alarm_time(t, language):
+    if t == 'midnight':
+        return (0, 0)
+    elif t == 'noon':
+        return (12, 0)
+    m = re.match(alarmPlugin.res['alarmTime'][language], t, re.IGNORECASE)
+    if m:
+        hour = int(m.group('hour'))
+        if m.group('minute'):
+            minute = int(m.group('minute'))
+        else:
+            minute = 0
+        if m.group('qual') == 'pm' and hour < 12:
+            hour += 12
+        return (hour, minute)
+
 
 class alarmPlugin(Plugin):
     
@@ -50,11 +66,20 @@ class alarmPlugin(Plugin):
         'Alarm': {
             'alarmConflict': {
                 'en-US': 'You already have an alarm set at {}.'
+            }, 'alarmTimeWasChanged': {
+                'en-US': 'I changed your alarm to {}.'
             }, 'alarmWasSet': {
                 'en-US': u'I\u2019ve set an alarm for {}:'
+            }, 'changingAlarm': {
+                'en-US': u'Updating the alarm\u2026'
+            }, 'noAlarmAtThatTime': {
+                'en-US': u'There\u2019s no alarm at {}. You do have these, though:'
             }, 'settingAlarm': {
                 'en-US': u'Setting the alarm\u2026'
             }
+        },
+        'timeFormat': {
+            'en-US': '%-I:%M %p'
         }
     }
 
@@ -64,7 +89,7 @@ class alarmPlugin(Plugin):
         }, 'alarmLength': {
             'en-US': '.*([0-9/ ]|a|an|the)\s+(mins?|minutes?|hrs?|hours?)'
         }, 'alarmTime': {
-            'en-US': '.*(?P<hour>2[0-3]|1[0-9]|0?[0-9]):?\s*(?P<minute>[0-5][0-9])?\s*($|[^0-9])'
+            'en-US': '([^0-9]*(?P<hour>[0-9]{1,2}):?\s*(?P<minute>[0-9]{2})?\s*(?P<qual>am|pm)?|noon|midnight)(\s|$)'
         }, 'amClues': {
             'en-US': '.*(am|morning|midnight)'
         }, 'midnightClues': {
@@ -73,12 +98,12 @@ class alarmPlugin(Plugin):
             'en-US': '.*(noon)'
         }, 'pmClues': {
             'en-US': '.*(pm|evening|afternoon|[^m][^i][^d]night)'
+        }, 'changeAlarm': {
+            'en-US': '.*(change|move).*[^0-9]+(?P<time1>([0-9]{1,2}):?\s*([0-9]{2})?\s*(am|pm)?|noon|midnight)\s.*alarm.*[^0-9]+(?P<time2>([0-9]{1,2}):?\s*([0-9]{2})?\s*(am|pm)?|noon|midnight)(\s|$)'
         }, 'setAlarm': {
-            'en-US': '.*(wake|set.*alarm).*\s+((?P<relative>([0-9/ ]*|a|an|the)\s+(mins?|minutes?|hrs?|hours?))|(?P<absolute>(?P<hour>2[0-3]|1[0-9]|0?[0-9]):?\s*(?P<minute>[0-5][0-9])?\s*($|[^0-9])))'
+            'en-US': '.*(wake|set.*alarm).*[^0-9]+((?P<relative>([0-9/ ]*|a|an|the)\s+(mins?|minutes?|hrs?|hours?))|(?P<absolute>([0-9]{1,2}):?\s*([0-9]{2})?\s*(am|pm)?|noon|midnight))(\s|$)'
         }
     }
-
-    title = 'Alarm'
 
     @register("en-US", res['setAlarm']['en-US'])
     def setAlarm(self, speech, language):
@@ -90,35 +115,22 @@ class alarmPlugin(Plugin):
         if m.group('relative'):
             # person has specified an alarm in relative time ("in 8 hours")
             offset = parse_alarm_length(m.group('relative'), language)
-            target_time = localtime(time() + offset)
+            # target_time = localtime(time() + offset)
+            target_time = datetime.now() + timedelta(seconds=offset)
             # TODO: local time selection?
-            hour = target_time.tm_hour
-            minute = target_time.tm_min
+            hour = target_time.hour
+            minute = target_time.minute
         elif m.group('absolute'):
-            # relative time ("at 7 a.m.")
-            hour = int(m.group('hour'))
-            if m.group('minute'):
-                minute = int(m.group('minute'))
-            else:
-                minute = 0
-            if hour < 12 and re.match(self.res['pmClues'][language], speech, re.IGNORECASE):
-                hour += 12
-            elif hour == 12 and re.match(self.res['midnightClues'][language], speech, re.IGNORECASE):
-                hour = 0
-                print("{0:0=2}:{1:0=2}".format(hour, minute))
-        elif re.match(self.res['midnightClues'][language], speech, re.IGNORECASE):
-            hour = 0
-            minute = 0
-        elif re.match(self.res['noonClues'][language], speech, re.IGNORECASE):
-            hour = 12
-            minute = 0
+            # absolute time ("at 7 a.m.")
+            hour, minute = parse_alarm_time(m.group('absolute'), language)
         else:
             # ask what time?
             self.say('Set an alarm for what time?')
             self.complete_request()
             return
-
-        speakableTime = '{}:{:0<2}'.format(hour, minute)
+        
+        target_time = time(hour, minute)
+        speakableTime = target_time.strftime(self.localizations['timeFormat'][language])
         
         response = self.getResponseForRequest(AlarmSearch(refId=self.refId, hour=hour, minute=minute))
         assert(response['class'] == 'SearchCompleted')
@@ -149,7 +161,58 @@ class alarmPlugin(Plugin):
                 addlViews=AlarmSnippet(alarms=[alarm]))
 
         self.complete_request()
+    
 
+    @register("en-US", res['changeAlarm']['en-US'])
+    def changeAlarm(self, speech, language):
+        m = re.match(self.res['changeAlarm'][language], speech, re.IGNORECASE)
+        
+        time1 = time(*parse_alarm_time(m.group('time1'), language))
+        time2 = time(*parse_alarm_time(m.group('time2'), language))
+        speakableTime1 = time1.strftime(self.localizations['timeFormat'][language])
+        speakableTime2 = time2.strftime(self.localizations['timeFormat'][language])
+
+        response = self.getResponseForRequest(AlarmSearch(refId=self.refId, hour=time1.hour, minute=time1.minute))
+        assert(response['class'] == 'SearchCompleted')
+        
+        results = response['properties']['results']
+        self.AddViewsHelper('Alarm#changingAlarm', language, 'Reflection')
+
+        if len(results) == 0:
+            # didn't find a matching alarm
+            # find ALL the alarms
+            response = self.getResponseForRequest(AlarmSearch(refId=self.refId))
+            assert(response['class'] == 'SearchCompleted')
+
+            results = response['properties']['results']
+
+            alarms = []
+            for r in results:
+                alarm = AlarmObject()
+                alarm.initWithPList(r)
+                alarms += [alarm]
+
+            self.AddViewsHelper('Alarm#noAlarmAtThatTime', language, 'Summary',
+                    args=speakableTime1,
+                    addlViews=AlarmSnippet(alarms=alarms))
+
+            self.complete_request()
+            return
+
+        alarm = AlarmObject()
+        alarm.initWithPList(response['properties']['results'][0])
+
+        response = self.getResponseForRequest(AlarmUpdate(self.refId, alarmId=alarm.identifier, hour=time2.hour, minute=time2.minute))
+        assert(response['class'] == 'UpdateCompleted')
+        
+        self.AddViewsHelper('Alarm#alarmTimeWasChanged', language, 'Completion',
+                args=speakableTime2,
+                addlViews=AlarmSnippet(alarms=[alarm]))
+        
+        self.complete_request()
+        
+
+        
 
     def AddViewsHelper(self, dialogIdentifier=None, language='en-US',
                        dialogPhase='Completion', args=None, addlViews=None):
