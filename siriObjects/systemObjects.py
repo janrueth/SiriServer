@@ -167,4 +167,64 @@ class Person(DomainObject):
         self.add_property('compary')
         self.add_property('birthday')
         self.add_property('addresses')
-        super(Person, self).to_plist()
+        return super(Person, self).to_plist()
+
+class CancelRequest(ServerBoundCommand):
+    groupIdentifier = "com.apple.ace.system"
+    classIdentifier = "CancelRequest"
+
+    def __init__(self, plist):
+        super(CancelRequest, self).__init__(plist)
+
+class CancelSucceeded(ClientBoundCommand):
+    def __init__(self, refId):
+        super(CancelSucceeded, self).__init__("CancelSucceeded", "com.apple.ace.system", None, refId)
+
+class GetSessionCertificate(ServerBoundCommand):
+    groupIdentifier = "com.apple.ace.system"
+    classIdentifier = "GetSessionCertificate"
+
+    def __init__(self, plist):
+        super(GetSessionCertificate, self).__init__(plist)
+
+class GetSessionCertificateResponse(ClientBoundCommand):
+    def __init__(self, refId):
+        super(GetSessionCertificateResponse, self).__init__("GetSessionCertificateResponse", "com.apple.ace.system", None, refId)
+        self.caCert = None
+        self.sessionCert = None
+
+    def to_plist(self):
+        self.certificate = biplist.Data("\x01\x02"+struct.pack(">I", len(self.caCert))+self.caCert + struct.pack(">I", len(self.sessionCert))+self.sessionCert)
+        self.add_property('certificate')
+        return super(GetSessionCertificateResponse, self).to_plist()
+        
+class CreateSessionInfoRequest(ServerBoundCommand):
+    groupIdentifier = "com.apple.ace.system"
+    classIdentifier = "CreateSessionInfoRequest"
+
+    def __init__(self, plist):
+        self.sessionInfoRequest = None # binary
+        super(CreateSessionInfoRequest, self).__init__(plist)
+
+class CreateSessionInfoResponse(ClientBoundCommand):
+    def __init__(self, refId):
+        super(CreateSessionInfoResponse, self).__init__("CreateSessionInfoResponse", "com.apple.ace.system", None, refId)
+        self.validityDuration = None # number
+        self.sessionInfo = None # binary
+
+    def to_plist(self):
+        self.add_property('validityDuration')
+        self.add_property('sessionInfo')
+        return super(CreateSessionInfoResponse, self).to_plist()
+
+
+class CommandFailed(ClientBoundCommand):
+    def __init__(self, refId):
+        super(CommandFailed, self).__init__("CommandFailed", "com.apple.ace.system", None, refId, callbacks=[])
+        self.reason = None #string
+        self.errorCode = None  #int
+    
+    def to_plist(self):
+        self.add_property('reason')
+        self.add_property('errorCode')
+        return super(CommandFailed, self).to_plist()
