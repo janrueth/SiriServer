@@ -27,7 +27,7 @@ class define(Plugin):
     def defineword(self, speech, language, regex):
         Title = regex.group(regex.lastindex)
         Query = urllib.quote_plus(Title.encode("utf-8"))
-        SearchURL = u'https://ajax.googleapis.com/ajax/services/search/images?v=1.0&imgsz=xlarge&q=' + str(Query.encode("utf-8"))
+        SearchURL = u'https://ajax.googleapis.com/ajax/services/search/images?v=1.0&imgsz=xlarge&q=' + str(Query)
         try:
             jsonResponse = urllib2.urlopen(SearchURL).read()
             jsonDecoded = json.JSONDecoder().decode(jsonResponse)
