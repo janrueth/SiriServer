@@ -11,8 +11,10 @@ from plugin import *
 from plugin import __criteria_key__
 #you will need to install the Wordnik API to use this
 #this can be done from the commandline by typing: easy_install Wordnik
-
-from wordnik import Wordnik
+try:
+   from wordnik import Wordnik
+except ImportError:
+   raise Exception("Wordnik library not found. Please install wordnik library! e.g. sudo easy_install wordnik")
 
 #if below does not have a long alphanumeric string for the api key, you can get yours at http://developer.wordnik.com/ (first you sign up for a username in the upp$
 ########################################################
