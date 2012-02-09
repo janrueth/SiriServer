@@ -23,9 +23,9 @@ class AlarmObject(DomainObject):
         return super(AlarmObject, self).to_plist()
 
 class AlarmCreate(ClientBoundCommand):
-    def __init__(self, refId):
+    def __init__(self, refId, alarmToCreate=None):
         super(AlarmCreate, self).__init__("Create", "com.apple.ace.alarm", None, refId)      
-        self.alarmToCreate = None
+        self.alarmToCreate = alarmToCreate
         self.targetAppId = None
     
     def to_plist(self):
@@ -90,9 +90,9 @@ class AlarmSearchCompleted(ServerBoundCommand):
 
 
 class AlarmSnippet(Snippet):                
-    def __init__(self):
+    def __init__(self, alarms=None):
         super(AlarmSnippet, self).__init__("com.apple.ace.alarm")
-        self.alarms = None # array
+        self.alarms = alarms # array
     
     def to_plist(self):
         self.add_property('alarms')

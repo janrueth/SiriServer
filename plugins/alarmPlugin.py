@@ -41,11 +41,17 @@ def parse_alarm_length(t, language):
 
 
 class alarmPlugin(Plugin):
-
+    
+    # localizations are sorted by title, fragment, and language, based upon
+    # dialogIdentifiers.
+    # i.e., for dialogIdentifier 'Alarm#settingAlarm' in en-US, one would
+    # access localizations['Alarm']['settingAlarm']['en-US']
     localizations = {
         'Alarm': {
-            'settingAlarm': {
-               'en-US': u'Setting the alarm\u2026'
+            'alarmWasSet': {
+                'en-US': u'I\u2019ve set an alarm for {hour}:{minute:0>2}:'
+            }, 'settingAlarm': {
+                'en-US': u'Setting the alarm\u2026'
             }
         }
     }
@@ -103,7 +109,7 @@ class alarmPlugin(Plugin):
             self.complete_request()
             return
 
-        self.say('set an alarm for {}:{}'.format(hour, minute))
+        #self.say('set an alarm for {}:{}'.format(hour, minute))
         
         response = self.getResponseForRequest(AlarmSearch(refId=self.refId, hour=hour, minute=minute))
         pp(response)
@@ -115,20 +121,48 @@ class alarmPlugin(Plugin):
             # TODO: handle it
             return
         
-        self.reflect('settingAlarm', language)
+        self.AddViewsHelper('Alarm#settingAlarm', language, 'Reflection')
+        
+        alarm = AlarmObject(enabled=True, minute=minute, hour=hour, frequency=['Never'])
+        response = self.getResponseForRequest(AlarmCreate(self.refId, alarmToCreate=alarm))
+        pp(response)
+        assert(response['class'] == 'CreateCompleted')
+        alarm.identifier = response['properties']['alarmId']
+        
+        self.AddViewsHelper('Alarm#alarmWasSet', language, 'Completion', args={'hour':hour, 'minute':minute}, addlViews=AlarmSnippet(alarms=[alarm]))
 
         self.complete_request()
 
 
-    def reflect(self, fragment, language):
-        view = AddViews(self.refId, dialogPhase='Reflection')
-        view.views = [
-            AssistantUtteranceView(
-                speakableText=self.localizations[self.title][fragment][language],
-                dialogIdentifier='{}#{}'.format(self.title, fragment)
-            )
-        ]
+    def AddViewsHelper(self, dialogIdentifier=None, language='en-US', dialogPhase='Completion', args=None, addlViews=None):
+        view = AddViews(self.refId, dialogPhase=dialogPhase)
+        if dialogIdentifier:
+            title, fragment = dialogIdentifier.split('#')
+        
+            args = args or []
+
+            if type(args) is not list and type(args) is not dict:
+                args = [args]
+            
+            speakableText = self.localizations[title][fragment][language]
+
+            if type(args) is dict:
+                speakableText = speakableText.format(**args)
+            else:
+                speakableText = speakableText.format(*args)
+
+            view.views += [AssistantUtteranceView(
+                            speakableText=speakableText,
+                            dialogIdentifier=dialogIdentifier)]
+
+        if addlViews and type(addlViews) is list:
+            view.views += addlViews
+        elif addlViews:
+            view.views += [addlViews]
+        
         self.sendRequestWithoutAnswer(view)
+
+
 
 #        m = re.match(timerPlugin.res['setTimer'][language], speech, re.IGNORECASE)
 #        timer_length = ' '.join(m.group(1, 2))
