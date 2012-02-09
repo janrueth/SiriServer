@@ -6,4 +6,4 @@
 *.log
 *.cnf
 .DS_Store
-apiKeys.conf
+*.conf
