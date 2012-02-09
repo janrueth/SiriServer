@@ -8,12 +8,12 @@
 # Note: This XBMC plugin is designed for XBMC RPC V3, this means that it works best with XBMC Eden and up.
 
 from plugin import *
-import urllib2, urllib, socket, struct, logging
+import urllib2, urllib, socket, struct, logging, re
 
-try:
+try: 
     import jsonrpclib
-except:
-    ImportError: raise Exception('WARNING: XBMC plugin will not work: JSONRPCLIB not installed. To install, run "easy_install jsonrpclib"')
+except ImportError: 
+    raise Exception('WARNING: XBMC plugin will not work: JSONRPCLIB not installed. To install, run "easy_install jsonrpclib"')
     
 
 class XBMC_object():
@@ -65,8 +65,9 @@ class XBMC(Plugin):
                 print 'Searching for: '+title
                 result = json.VideoLibrary.GetMovies()
                 matches = []
+                stripped_title = ''.join(ch for ch in title if ch.isalnum()).lower()
                 for movie in result['movies']:
-                    if title in movie['label'].lower():
+                    if stripped_title in ''.join(ch for ch in movie['label'] if ch.isalnum()).lower():
                         movieid = movie['movieid']
                         matches.append(movie['label'])
                 if len(matches) > 0:
@@ -85,7 +86,7 @@ class XBMC(Plugin):
                     result = json.VideoLibrary.GetTVShows()
                     tvmatches = []
                     for tvshow in result['tvshows']:
-                        if title in tvshow['label'].lower():
+                        if stripped_title in ''.join(ch for ch in tvshow['label'] if ch.isalnum()).lower():
                             tvshowid = tvshow['tvshowid']
                             matches.append(tvshow['label'])
                     if len(matches) > 0:
