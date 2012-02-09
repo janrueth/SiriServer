@@ -4,18 +4,20 @@ from siriObjects.uiObjects import Snippet
 
 
 class AlarmObject(DomainObject):
-    def __init__(self, identifier=""):
+    def __init__(self, identifier="", hour=None, minute=None, enabled=None, frequency=None):
         super(AlarmObject, self).__init__("com.apple.ace.alarm", identifier)
         self.relativeOffsetMinutes = None
         self.label = None
-        self.hour = None
-        self.frequency = None
-        self.enabled = None
+        self.hour = hour
+        self.minute = minute
+        self.frequency = frequency
+        self.enabled = enabled
     
     def to_plist(self):
         self.add_property('relativeOffsetMinutes')
         self.add_property('label')
         self.add_property('hour')
+        self.add_property('minute')
         self.add_property('frequency')
         self.add_property('enabled')
         return super(AlarmObject, self).to_plist()
@@ -58,12 +60,12 @@ class AlarmDeleteCompleted(ServerBoundCommand):
 
 
 class AlarmSearch(ClientBoundCommand):
-    def __init__(self, refId):
+    def __init__(self, refId, hour = None, minute = None):
         super(AlarmSearch, self).__init__("Search", "com.apple.ace.alarm", None, refId)
-        self.minute = None # number
+        self.minute = minute # number
         self.label = None # string
         self.identifier = None #url
-        self.hour = None #number
+        self.hour = hour #number
         self.frequency = None #array
         self.enabled = None # number
         self.targetAppId = None # url
