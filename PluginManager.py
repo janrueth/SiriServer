@@ -1,9 +1,8 @@
-
 import os
 import re
 import logging
 
-from plugin import Plugin, __criteria_key__, NecessaryModuleNotFound
+from plugin import Plugin, __criteria_key__, NecessaryModuleNotFound, ApiKeyNotFoundException
 from types import FunctionType
 
 
@@ -28,7 +27,9 @@ def load_plugins():
             try:
                 __import__(pluginPath+"."+line,  globals(), locals(), [], -1)
             except NecessaryModuleNotFound as e:
-                logger.critical("Failed loading Plugin due to missing module: "+str(e))
+                logger.critical("Failed loading plugin due to missing module: "+str(e))
+            except ApiKeyNotFoundException as e:
+                logger.critical("Failed loading plugin due to missing API key: "+str(e))
             except:
                 logger.exception("Plugin loading failed")
             
@@ -62,10 +63,10 @@ def load_api_keys():
             try:
                 apiName = str.lower(kv[0]).strip()
                 kv[1] = kv[1].strip()
-                apiKey = kv[1][1:len(kv[1])-1] #stip the ""
+                apiKey = kv[1][1:-1] #stip the ""
                 apiKeys[apiName] = apiKey
             except:
-                logger.critial("There was an error parsing an API in the line: "+ line)
+                logger.critical("There was an error parsing an API in the line: "+ line)
 
 def getAPIKeyForAPI(APIname):
     apiName = str.lower(APIname) 

@@ -1,7 +1,24 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import socket, ssl, sys, zlib, binascii, time, select, struct, biplist, uuid, json, asyncore, re, threading, logging, pprint, sqlite3
+try:
+    import biplist
+except ImportError:
+    print "You need to install biplist package on your system! e.g. \"sudo easy_install biplist\""
+    exit(-1)
+
+try:
+    from M2Crypto import BIO, RSA, X509
+except ImportError:
+    print "You must install M2Crypto on your system! (this might require openssl and SWIG) e.g. \"sudo easy_install m2crypto\""
+    exit(-1)
+
+import sys
+if sys.version_info < (2, 6):
+    print "You must use python 2.6 or greater"
+    exit(-1)
+
+import socket, ssl, zlib, binascii, time, select, struct, uuid, json, asyncore, re, threading, logging, pprint, sqlite3
 from optparse import OptionParser
 from email.utils import formatdate
 
@@ -11,8 +28,6 @@ import db
 from db import Assistant
 
 import PluginManager
-
-from M2Crypto import BIO, RSA, X509
 
 from siriObjects import speechObjects, baseObjects, uiObjects, systemObjects
 from siriObjects.baseObjects import ObjectIsCommand
@@ -280,9 +295,7 @@ class HandleConnection(ssl_dispatcher):
 
                 elif ObjectIsCommand(reqObject, GetSessionCertificate):
                     getSessionCertificate = GetSessionCertificate(reqObject)
-                    response = GetSessionCertificateResponse(getSessionCertificate.aceId)
-                    response.caCert = caCert.as_der()
-                    response.sessionCert = serverCert.as_der()
+                    response = GetSessionCertificateResponse(getSessionCertificate.aceId, caCert.as_der(), serverCert.as_der())
                     self.send_object(response)
 
                 elif ObjectIsCommand(reqObject, CreateSessionInfoRequest):
@@ -474,6 +487,6 @@ server = SiriServer('', options.port)
 try:
     asyncore.loop()
 except (asyncore.ExitNow, KeyboardInterrupt, SystemExit):
-    x.info("Cought shutdown, closing server")
+    x.info("Caught shutdown, closing server")
     asyncore.dispatcher.close(server)
     exit()
