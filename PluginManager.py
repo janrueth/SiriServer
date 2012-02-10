@@ -3,7 +3,7 @@ import os
 import re
 import logging
 
-from plugin import Plugin, __criteria_key__, NecessaryModuleNotFound
+from plugin import Plugin, __criteria_key__, NecessaryModuleNotFound, ApiKeyNotFoundException
 from types import FunctionType
 
 
@@ -28,7 +28,9 @@ def load_plugins():
             try:
                 __import__(pluginPath+"."+line,  globals(), locals(), [], -1)
             except NecessaryModuleNotFound as e:
-                logger.critical("Failed loading Plugin due to missing module: "+str(e))
+                logger.critical("Failed loading plugin due to missing module: "+str(e))
+            except ApiKeyNotFoundException as e:
+                logger.critical("Failed loading plugin due to missing API key: "+str(e))
             except:
                 logger.exception("Plugin loading failed")
             
