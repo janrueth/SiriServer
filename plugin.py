@@ -77,8 +77,10 @@ class Plugin(threading.Thread):
                     self.__method(self, self.__speech, self.__lang)
                 elif len(arguments) == 4:
                     self.__method(self, self.__speech, self.__lang, self.__method.__dict__[__criteria_key__][self.__lang].match(self.__speech))
+            except ApiKeyNotFoundException as e:
+                self.logger.warning("Failed executing plugin due to missing API key: "+str(e))
             except StopPluginExecution, instance:
-                self.logger.info("Plugin stopped executing with reason: {0}".format(instance))
+                self.logger.warning("Plugin stopped executing with reason: {0}".format(instance))
             except:
                 self.logger.exception("Unexpected during plugin processing")
                 self.say(__error_responses__[self.__lang])

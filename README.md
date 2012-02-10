@@ -129,6 +129,29 @@ Please make sure to install the CA certificate on your iDevice (you can simply m
 It is the CA.pem file that was copied by gen_certs.sh to the servers root. 
 In your mail, just click on the certificate and install it.
 
+**Installing API Keys**
+
+
+Some of the plugins included require API/APPID keys to use. You'll need to register with the respective websites to obtain these keys.
+
+The general format is as follows:
+
+	apiName="PLUGIN-API-KEY"
+
+The apiName is usually printed in error messages when you miss a certain API Key.
+
+***Where to obtain API Keys***
+
+Register and sign up for an API with the following sites:
+
+- Wolfram Alpha : [http://products.wolframalpha.com/developers/](http://products.wolframalpha.com/developers/)
+- Wordnik : [http://developer.wordnik.com/](http://developer.wordnik.com/)
+- Weather Wunderground : [http://www.wunderground.com/weather/api/](http://www.wunderground.com/weather/api/)
+
+***Why don't you give me your key?***
+
+The API (Application Programming Interface) keys are necessary to allow some plugins to use different services on the internet. Those api keys are like a username password combination and grant access to several resources online, like wolframalpha, they make it very easy to use the resources in a computer program. As you must buy a API key if you want to use it for multiple users or commercially (That are usually the terms for APIs) we cannot distribute the keys here in github and must require users to create them on their own, they are usually free for noncommercial and personal use.
+
 **Running the server**
 
 Now you are ready to go, start the server with:
@@ -217,7 +240,6 @@ It should output something like this, note the Ace http request near the end:
 	 Host: DOMAIN REMOVED
 	 User-Agent: Assistant(iPhone/iPhone3,1; iPhone OS/5.0.1/9A405) Ace/1.0
 	 Content-Length: 2000000000
-
 
 
 Thanks

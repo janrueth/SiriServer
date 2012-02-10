@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #Author: WebScript
-#Todo: Nothing that I know
+#Todo: Translate with my GTranslate API
 #For: SiriServer
 #Commands: The same as in original Wolfram Alpha in Siri
 #If you find bug: email me - admin@game-host.eu
@@ -24,22 +24,28 @@ APPID = APIKeyForAPI("wolframalpha")
 
 
 
+
 class wolfram(Plugin):
     
     @register("de-DE", "(Was ist [a-zA-Z0-9]+)|(Wer ist [a-zA-Z0-9]+)|(Wie viel [a-zA-Z0-9]+)|(Was war [a-zA-Z0-9]+)|(Wer ist [a-zA-Z0-9]+)|(Wie lang [a-zA-Z0-9]+)|(Was ist [a-zA-Z0-9]+)|(Wie weit [a-zA-Z0-9]+)|(Wann ist [a-zA-Z0-9]+)|(Zeig mir [a-zA-Z0-9]+)|(Wie hoch [a-zA-Z0-9]+)|(Wie tief [a-zA-Z0-9]+)")     
     @register("en-US", "(What is [a-zA-Z0-9]+)|(Who is [a-zA-Z0-9]+)|(How many [a-zA-Z0-9]+)|(What was [a-zA-Z0-9]+)|(Who's [a-zA-Z0-9]+)|(How long [a-zA-Z0-9]+)|(What's [a-zA-Z0-9]+)|(How far [a-zA-Z0-9]+)|(When is [a-zA-Z0-9]+)|(Show me [a-zA-Z0-9]+)|(How high [a-zA-Z0-9]+)|(How deep [a-zA-Z0-9]+)")
     @register("fr-FR", u"(Wolfram [a-zA-Z0-9]+)|(Qu'est ce que [a-zA-Z0-9]+)|(Quesque [a-zA-Z0-9]+)|(Qui est [a-zA-Z0-9]+)|(Combien de [a-zA-Z0-9]+)|(Qu'étais [a-zA-Z0-9]+)|(Combien de temps [a-zA-Z0-9]+)|(Combien font [a-zA-Z0-9]+)|(A quelle distance [a-zA-Z0-9]+)|(Quand est [a-zA-Z0-9]+)|(Montre moi [a-zA-Z0-9]+)|(A quelle hauteur [a-zA-Z0-9]+)|(A quelle profondeur [a-zA-Z0-9]+)")
     def wolfram(self, speech, language):
-
         if language == 'fr-FR':
             wolframQuestion = re.match(u"(Wolfram |Qu'est ce que |Quesque |Qui est |Combien de |Qu'étais |Combien de temps |Combien font |A quelle distance |Quand est |Montre moi |A quelle hauteur|A quelle profondeur)(.*)", speech, re.IGNORECASE)
             if wolframQuestion != None:
-                wolframQuestion = wolframQuestion.group(2).strip()		
+                wolframQuestion = wolframQuestion.group(2).strip()
+            wolframTranslation = 'true'
+        elif language == "en-US":
+            wolframQuestion = speech.replace('who is ','').replace('what is ','').replace('what was ','').replace('Who is ','').replace('What is ','').replace('What was ','').replace(' ', '%20')
+            wolframTranslation = 'false'
+        elif language == "de-DE":
+            wolframQuestion = speech.replace('wer ist ','').replace('was ist ', '').replace('Wer ist ','').replace('Was ist ', '').replace('Wie viel ','How much ').replace('Wie lang ','How long ').replace('Wie weit ','How far ').replace('Wann ist ','When is ').replace('Zeig mir ','Show me ').replace('Wie hoch ','How high ').replace('Wie tief ','How deep ').replace('ist','is').replace('der','the').replace('die','the').replace('das','the').replace('wie viel ','how much ').replace('wie lang ','how long ').replace('wie weit ','how far ').replace('wann ist ','when is ').replace('zeig mir ','show me ').replace('wie hoch ','how high ').replace('wie tief ','how deep ').replace('ist','is').replace('der','the').replace('die','the').replace('das','the').replace(' ', '%20').replace(u'ä', 'a').replace(u'ö', 'o').replace(u'ü', 'u').replace(u'ß', 's')
+            wolframTranslation = 'true'
         else:
-            wolframQuestion = speech.replace('who is ','').replace('what is ','').replace('what was ','').replace('Who is ','').replace('What is ','').replace('What was ','').replace('wer ist ','').replace('was ist ', '').replace('Wer ist ','').replace('Was ist ', '').replace('Wie viel ','How much ').replace('Wie lang ','How long ').replace('Wie weit ','How far ').replace('Wann ist ','When is ').replace('Zeig mir ','Show me ').replace('Wie hoch ','How high ').replace('Wie tief ','How deep ').replace('ist','is').replace('der','the').replace('die','the').replace('das','the').replace('wie viel ','how much ').replace('wie lang ','how long ').replace('wie weit ','how far ').replace('wann ist ','when is ').replace('zeig mir ','show me ').replace('wie hoch ','how high ').replace('wie tief ','how deep ').replace('ist','is').replace('der','the').replace('die','the').replace('das','the').replace(' ', '%20').replace(u'ä', 'a').replace(u'ö', 'o').replace(u'ü', 'u').replace(u'ß', 's')
-
-        wolfram_alpha = 'http://api.wolframalpha.com/v1/query.jsp?input=%s&appid=%s' % (urllib.quote_plus(wolframQuestion.encode("utf-8")), APPID)
-        print wolfram_alpha
+            wolframQuestion = speech.replace('who is ','').replace('what is ','').replace('what was ','').replace('Who is ','').replace('What is ','').replace('What was ','').replace(' ', '%20')
+            wolframTranslation = 'false'
+        wolfram_alpha = 'http://api.wolframalpha.com/v1/query.jsp?input=%s&appid=%s&translation=%s' % (wolframQuestion, APPID, wolframTranslation)
         dom = minidom.parse(urlopen(wolfram_alpha))
         count_wolfram = 0
         wolfram0 = 12
@@ -78,67 +84,67 @@ class wolfram(Plugin):
         query_type = query_list.getAttribute('error')
         for node in dom.getElementsByTagName('queryresult'):
             for pod in node.getElementsByTagName('pod'):
-                xmlTag = dom.getElementsByTagName('plaintext')[count_wolfram].toxml()
-                xmlTag2 = dom.getElementsByTagName('subpod')[count_wolfram]
-                xmlData=xmlTag.replace('<plaintext>','').replace('</plaintext>','')
-                if count_wolfram == 0:
-                    if xmlData == "<plaintext/>":
-                        image_list = dom.getElementsByTagName('img')[count_wolfram]
-                        image_type = image_list.getAttribute('src')
-                        wolfram0 = image_type
-                        wolfram0_img = 1
-                    else:
-                        wolfram0 = xmlData
-                    wolfram_pod0 = pod.getAttribute('title')
-                elif count_wolfram == 1:
-                    if xmlData == "<plaintext/>":
-                        image_list = dom.getElementsByTagName('img')[count_wolfram]
-                        image_type = image_list.getAttribute('src')
-                        wolfram1 = image_type
-                        wolfram1_img = 1
-                    else:
-                        wolfram1 = xmlData
-                    wolfram_pod1 = pod.getAttribute('title')
-                elif count_wolfram == 2:
-                    if xmlData == "<plaintext/>":
-                        image_list = dom.getElementsByTagName('img')[count_wolfram]
-                        image_type = image_list.getAttribute('src')
-                        wolfram2 = image_type
-                        wolfram2_img = 1
-                    else:
-                        wolfram2 = xmlData
-                    wolfram_pod2 = pod.getAttribute('title')
-                elif count_wolfram == 3:
-                    if xmlData == "<plaintext/>":
-                        image_list = dom.getElementsByTagName('img')[count_wolfram]
-                        image_type = image_list.getAttribute('src')
-                        wolfram3 = image_type
-                        wolfram3_img = 1
-                    else:
-                        wolfram3 = xmlData
-                    wolfram_pod3 = pod.getAttribute('title')
-                elif count_wolfram == 4:
-                    if xmlData == "<plaintext/>":
-                        image_list = dom.getElementsByTagName('img')[count_wolfram]
-                        image_type = image_list.getAttribute('src')
-                        wolfram4 = image_type
-                        wolfram4_img = 1
-                    else:
-                        wolfram4 = xmlData
-                    wolfram_pod4 = pod.getAttribute('title')
-                elif count_wolfram == 5:
-                    wolfram5 = xmlData
-                    wolfram_pod5 = pod.getAttribute('title')
-                elif count_wolfram == 6:
-                    wolfram6 = xmlData
-                    wolfram_pod6 = pod.getAttribute('title')
-                elif count_wolfram == 7:
-                    wolfram7 = xmlData
-                    wolfram_pod7 = pod.getAttribute('title')
-                elif count_wolfram == 8:
-                    wolfram8 = xmlData
-                    wolfram_pod8 = pod.getAttribute('title')
-                count_wolfram += 1
+               xmlTag = dom.getElementsByTagName('plaintext')[count_wolfram].toxml()
+               xmlTag2 = dom.getElementsByTagName('subpod')[count_wolfram]
+               xmlData=xmlTag.replace('<plaintext>','').replace('</plaintext>','')
+               if count_wolfram == 0:
+                  if xmlData == "<plaintext/>":
+                      image_list = dom.getElementsByTagName('img')[count_wolfram]
+                      image_type = image_list.getAttribute('src')
+                      wolfram0 = image_type
+                      wolfram0_img = 1
+                  else:
+                      wolfram0 = xmlData
+                  wolfram_pod0 = pod.getAttribute('title')
+               elif count_wolfram == 1:
+                  if xmlData == "<plaintext/>":
+                      image_list = dom.getElementsByTagName('img')[count_wolfram]
+                      image_type = image_list.getAttribute('src')
+                      wolfram1 = image_type
+                      wolfram1_img = 1
+                  else:
+                      wolfram1 = xmlData
+                  wolfram_pod1 = pod.getAttribute('title')
+               elif count_wolfram == 2:
+                  if xmlData == "<plaintext/>":
+                     image_list = dom.getElementsByTagName('img')[count_wolfram]
+                     image_type = image_list.getAttribute('src')
+                     wolfram2 = image_type
+                     wolfram2_img = 1
+                  else:
+                     wolfram2 = xmlData
+                  wolfram_pod2 = pod.getAttribute('title')
+               elif count_wolfram == 3:
+                  if xmlData == "<plaintext/>":
+                     image_list = dom.getElementsByTagName('img')[count_wolfram]
+                     image_type = image_list.getAttribute('src')
+                     wolfram3 = image_type
+                     wolfram3_img = 1
+                  else:
+                     wolfram3 = xmlData
+                  wolfram_pod3 = pod.getAttribute('title')
+               elif count_wolfram == 4:
+                  if xmlData == "<plaintext/>":
+                     image_list = dom.getElementsByTagName('img')[count_wolfram]
+                     image_type = image_list.getAttribute('src')
+                     wolfram4 = image_type
+                     wolfram4_img = 1
+                  else:
+                     wolfram4 = xmlData
+                  wolfram_pod4 = pod.getAttribute('title')
+               elif count_wolfram == 5:
+                  wolfram5 = xmlData
+                  wolfram_pod5 = pod.getAttribute('title')
+               elif count_wolfram == 6:
+                  wolfram6 = xmlData
+                  wolfram_pod6 = pod.getAttribute('title')
+               elif count_wolfram == 7:
+                  wolfram7 = xmlData
+                  wolfram_pod7 = pod.getAttribute('title')
+               elif count_wolfram == 8:
+                  wolfram8 = xmlData
+                  wolfram_pod8 = pod.getAttribute('title')
+               count_wolfram += 1
         if language == 'de-DE':
             self.say("Dies könnte Ihre Frage zu beantworten:")
         elif language == 'fr-FR':
@@ -191,11 +197,11 @@ class wolfram(Plugin):
                 self.say("Sorry I can't process your request. Your APPID is not set! Please register free dev account at http://wolframalpha.com and edit line 21 with you APPID.")
             else:
                 if language == 'de-DE':
-                    self.say("Nichts hat sich auf Ihre Anfrage!")
+                    self.say("Es tut mir leid. Ich konnte keine Antwort auf Ihre Frage finden.")
                 elif language == 'fr-FR':
                     self.say(u"Je n'ai rien trouvé !");
                 else:
-                    self.say("Nothing was found for your query!")
+                    self.say("Nothing has found for your query!")
             self.complete_request()
             view1 = 0
         elif wolfram_pod1 == 12:
