@@ -37,8 +37,8 @@ class wwwSearch(Plugin):
             if speech == "":
                 speech = self.ask("Nach was soll ich suchen?")
 
-        search = WebSearch(refId="", aceId="", query=speech)
-        self.send_object(search)
+        search = WebSearch(refId=self.refId, query=speech)
+        self.sendRequestWithoutAnswer(search)
         self.complete_request()
 
 
