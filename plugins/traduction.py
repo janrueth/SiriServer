@@ -98,6 +98,7 @@ class Translation(Plugin):
         else:
             self.say(res["not_found"][language]);
             self.complete_request()
+            return False
 
         traduction = None
         try:
