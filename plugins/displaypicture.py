@@ -21,13 +21,13 @@ from siriObjects.answerObjects import AnswerSnippet, AnswerObject, AnswerObjectL
 
 class define(Plugin):
     
-    @register("de-DE", "(zeig mir|zeige|zeig).*(bild|zeichnung) (vo. ein..|vo. ein..|aus)* ([\w ]+)")
+    @register("de-DE", "(zeig mir|zeige|zeig).*(bild|zeichnung) (vo. ein..|vo.|aus)* ([\w ]+)")
     @register("en-US", "(display|show me|show).*(picture|image|drawing|illustration) (of|an|a)* ([\w ]+)")
     @register("fr-FR", "(montre|affiche moi|affiche).*(photo|image|dessin|illustration) (de|du|d'un)* ([\w ]+)")
     def defineword(self, speech, language, regex):
         Title = regex.group(regex.lastindex)
         Query = urllib.quote_plus(Title.encode("utf-8"))
-        SearchURL = u'https://ajax.googleapis.com/ajax/services/search/images?v=1.0&imgsz=xlarge&q=' + str(Query)
+        SearchURL = u'https://ajax.googleapis.com/ajax/services/search/images?v=1.0&imgsz=small|medium|large|xlarge&q=' + str(Query)
         try:
     	    self.say("Je recherche une image de "+Query+"...")
             jsonResponse = urllib2.urlopen(SearchURL).read()
