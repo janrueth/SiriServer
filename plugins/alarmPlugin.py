@@ -26,36 +26,43 @@ class alarmPlugin(Plugin):
     localizations = {
         'Alarm': {
             "settingAlarm": {
-                "en-US": u"Setting the Alarm\u2026"
+                "en-US": u"Setting the Alarm\u2026",
+                "fr-FR": u"Réglage de l'alarme\u2026"
             }, "alarmWasSet": {
-                "en-US": "Your alarm is set for {0}:{1} {2}."
+                "en-US": "Your alarm is set for {0}:{1} {2}.",
+                "fr-FR": u"Votre alarme est programmée pour {0}:{1} {2}"
             }, "alarmSetWithLabel": {
-                "en-US": "Your alarm {0} {1} is set for {2}:{3} {4}."
+                "en-US": "Your alarm {0} {1} is set for {2}:{3} {4}.",
+                "fr-FR": u"Votre alarme {0} {1} est programmée pour {2}:{3} {4}"
             }
         }
     }
 
     res = {
         'setAlarm': {
-            'en-US': '.*set.* alarm for.* (0?[1-9]|1[012])([0-5]\d)?\s?([APap][mM])\s?(\bcalled|named|labeled\b)?\s?(([a-z0-9]{1,7}\s)?([a-z0-9]{1,7})\s?([a-z0-9]{1,7}))?'
+            'en-US': '.*set.* alarm for.* (0?[1-9]|1[012])([0-5]\d)?\s?([APap][mM])\s?(\bcalled|named|labeled\b)?\s?(([a-z0-9]{1,7}\s)?([a-z0-9]{1,7})\s?([a-z0-9]{1,7}))?',
+            'fr-FR': u'.*(programme|regle|règle).*(alarme|reveil|réveil).*(0?[1-9]|1[0-9]|2[0-3]) ([0-5]\d)?\s?(\appelée|appel|nommée|nommee|labellé|labelle\b)?\s?(([a-z0-9]{1,7}\s)?([a-z0-9]{1,7})\s?([a-z0-9]{1,7}))?'
         }
     }
 
     @register("en-US", res['setAlarm']['en-US'])
+    @register("fr-FR", res['setAlarm']['fr-FR'])
     def setAlarm(self, speech, language):
         alarmString = re.match(alarmPlugin.res['setAlarm'][language], speech, re.IGNORECASE)
-        
-        alarmHour = int(alarmString.group(1))
+		
+		
+		#need to add back english compatibility
+        alarmHour = int(alarmString.group(3))
         alarm24Hour = alarmHour
-        alarmMinutes = alarmString.group(2)
-        alarmAMPM = alarmString.group(3)
-        alarmLabelExists = alarmString.group(4)
+        alarmMinutes = alarmString.group(4)
+        alarmAMPM = ""
+        alarmLabelExists = alarmString.group(6)
         
         #check if we are naming the alarm
         if alarmLabelExists == None:
             alarmLabel = None
         else:
-            alarmLabel = alarmString.group(5)
+            alarmLabel = alarmString.group(6)
         
         #the siri alarm object requires 24 hour clock
         if (alarmAMPM == "pm" and alarmHour != 12):
