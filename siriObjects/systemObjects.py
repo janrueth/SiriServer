@@ -228,3 +228,35 @@ class CommandFailed(ClientBoundCommand):
         self.add_property('reason')
         self.add_property('errorCode')
         return super(CommandFailed, self).to_plist()
+
+
+
+class Location(DomainObject):
+    AccuracyBestValue = "Best"
+    AccuracyNearestTenMetersValue = "NearestTenMeters"
+    AccuracyHundredMetersValue = "HundredMeters"
+    AccuracyKilometerValue = "Kilometer"
+    AccuracyThreeKilometersValue = "ThreeKilometers"
+    def __init__(self, label="", street="", city="", stateCode="", countryCode="", postalCode="", latitude=0, longitude=0, accuracy=0):
+        super(Location, self).__init__("com.apple.ace.system", clazz="Location")
+        self.label = label
+        self.street = street
+        self.city = city
+        self.stateCode = stateCode
+        self.countryCode = countryCode
+        self.postalCode = postalCode
+        self.latitude = latitude
+        self.longitude = longitude
+        self.accuracy = accuracy
+
+    def to_plist(self):
+        self.add_property('label')
+        self.add_property('street')
+        self.add_property('city')
+        self.add_property('stateCode')
+        self.add_property('countryCode')
+        self.add_property('postalCode')
+        self.add_property('latitude')
+        self.add_property('longitude')
+        self.add_property('accuracy')
+        return super(Location, self).to_plist()
