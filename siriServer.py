@@ -166,9 +166,8 @@ class HandleConnection(ssl_dispatcher):
                 
                 if not dictation:
                     if self.current_running_plugin == None:
-                        (clazz, method) = PluginManager.getPlugin(best_match, self.assistant.language)
-                        if clazz != None and method != None:
-                            plugin = clazz(method, best_match, self.assistant.language, self.send_object, self.send_plist, self.assistant, self.current_location)
+                        plugin = PluginManager.getPluginForImmediateExecution(self.assistant.assistantId, best_match, self.assistant.language, (self.send_object, self.send_plist, self.assistant, self.current_location))
+                        if plugin != None:
                             plugin.refId = requestId
                             plugin.connection = self
                             self.current_running_plugin = plugin
