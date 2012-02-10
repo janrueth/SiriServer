@@ -29,6 +29,7 @@ class define(Plugin):
         Query = urllib.quote_plus(Title.encode("utf-8"))
         SearchURL = u'https://ajax.googleapis.com/ajax/services/search/images?v=1.0&imgsz=xlarge&q=' + str(Query)
         try:
+    	    self.say("Je recherche une image de "+Query+"...")
             jsonResponse = urllib2.urlopen(SearchURL).read()
             jsonDecoded = json.JSONDecoder().decode(jsonResponse)
             ImageURL = jsonDecoded['responseData']['results'][0]['unescapedUrl']
