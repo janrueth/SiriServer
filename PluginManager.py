@@ -15,6 +15,7 @@ __apikeys_file__ = "apiKeys.conf"
 
 
 plugins = dict()
+prioritizedPlugins = dict()
 apiKeys = dict()
 
 def load_plugins():
@@ -80,7 +81,45 @@ def getPlugin(speech, language):
             if regex.match(speech) != None:
                 return (clazz, method)
     return (None, None)
-                
+
+def clearPriorityFor(assistantId):
+    if assistantId in prioritizedPlugins:
+        del prioritizedPlugins[assistantId]
+
+def prioritizePluginObject(pluginObj, assistantId):
+    prioritizedPlugins[assistantId] = dict()
+    for lang in plugins.keys():
+        for (regex, clazz, method) in plugins[lang]:
+            if pluginObj.__class__ == clazz:
+                if not lang in prioritizedPlugins[assistantId]:
+                    prioritizedPlugins[assistantId][lang] = []
+                prioritizedPlugins[assistantId][lang].append((regex, pluginObj, method))
+
+def searchPrioritizedPlugin(assistantId, speech, language):
+    if assistantId in prioritizedPlugins:
+        if language in prioritizedPlugins[assistantId]:
+            for (regex, pluginObj, method) in prioritizedPlugins[assistantId][language]:
+                if regex.match(speech) != None:
+                    return (pluginObj, method)
+    return (None, None)
+
+def getPluginForImmediateExecution(assistantId, speech, language, otherPluginParams):
+    (sendObj, sendPlist, assistant, location) = otherPluginParams
+
+    (pluginObj, method) = searchPrioritizedPlugin(assistantId, speech, language)
+    if pluginObj == None and method == None:
+        (clazz, method) = getPlugin(speech, language)
+        if clazz != None and method != None:
+            pluginObj = clazz()
+            pluginObj.initialize(method, speech, language, sendObj, sendPlist, assistant, location)
+            #prioritizePluginObject(pluginObj, assistantId)
+    else:
+        #reinitialize it
+        logger.info("Found a matching prioritized plugin")
+        pluginObj.initialize(method, speech, language, sendObj, sendPlist, assistant, location)
+    
+    return pluginObj
+        
 
 
 

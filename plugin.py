@@ -54,21 +54,32 @@ def APIKeyForAPI(apiName):
     return apiKey
 
 class Plugin(threading.Thread):
-    def __init__(self, method, speech, language, send_object, send_plist, assistant, location):
+    def __init__(self):
         super(Plugin, self).__init__()
-        self.__method = method
-        self.__lang = language
-        self.__speech = speech
+        self.__method = None
+        self.__lang = None
+        self.__speech = None
         self.waitForResponse = None
         self.response = None
         self.refId = None
         self.connection = None
+        self.__send_plist = None
+        self.__send_object = None
+        self.assistant = None
+        self.location = None
+        self.logger = logging.getLogger("logger")
+        self.__priority = False
+    
+    def initialize(self, method, speech, language, send_object, send_plist, assistant, location):
+        super(Plugin, self).__init__()
+        self.__method = method
+        self.__lang = language
+        self.__speech = speech
         self.__send_plist = send_plist
         self.__send_object = send_object
         self.assistant = assistant
         self.location = location
-        self.logger = logging.getLogger("logger")
-    
+
     def run(self):
         try:
             try:
@@ -77,6 +88,10 @@ class Plugin(threading.Thread):
                     self.__method(self, self.__speech, self.__lang)
                 elif len(arguments) == 4:
                     self.__method(self, self.__speech, self.__lang, self.__method.__dict__[__criteria_key__][self.__lang].match(self.__speech))
+                if self.__priority:
+                    PluginManager.prioritizePluginObject(self, self.assistant.assistantId)
+                else:
+                    PluginManager.clearPriorityFor(self.assistant.assistantId)
             except ApiKeyNotFoundException as e:
                 self.logger.warning("Failed executing plugin due to missing API key: "+str(e))
             except StopPluginExecution, instance:
@@ -88,6 +103,9 @@ class Plugin(threading.Thread):
         except:
             pass
         self.connection.current_running_plugin = None
+
+    def requestPriorityOnNextRequest(self):
+        self.__priority = True
 
     def getCurrentLocation(self, force_reload=False, accuracy=GetRequestOrigin.desiredAccuracyBest):
         if self.location != None and force_reload == False:
