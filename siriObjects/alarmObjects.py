@@ -4,16 +4,18 @@ from siriObjects.uiObjects import Snippet
 
 
 class AlarmObject(DomainObject):
-    def __init__(self, identifier=""):
-        super(AlarmObject, self).__init__("com.apple.ace.alarm", identifier)
+    def __init__(self, label = None, minute = None, hour = None, frequency = None, enabled = None):
+        super(AlarmObject, self).__init__("com.apple.ace.alarm")
         self.relativeOffsetMinutes = None
-        self.label = None
-        self.hour = None
-        self.frequency = None
-        self.enabled = None
+        self.label = label
+        self.minute = minute
+        self.hour = hour
+        self.frequency = frequency
+        self.enabled = 1
     
     def to_plist(self):
         self.add_property('relativeOffsetMinutes')
+        self.add_property('minute')
         self.add_property('label')
         self.add_property('hour')
         self.add_property('frequency')
@@ -21,14 +23,12 @@ class AlarmObject(DomainObject):
         return super(AlarmObject, self).to_plist()
 
 class AlarmCreate(ClientBoundCommand):
-    def __init__(self, refId):
+    def __init__(self, refId, alarm = None):
         super(AlarmCreate, self).__init__("Create", "com.apple.ace.alarm", None, refId)      
-        self.alarmToCreate = None
-        self.targetAppId = None
+        self.alarmToCreate = alarm
     
     def to_plist(self):
         self.add_property('alarmToCreate')
-        self.add_property('targetAppId')
         return super(AlarmCreate, self).to_plist()
 
 class AlarmCreateCompleted(ServerBoundCommand):
@@ -88,14 +88,14 @@ class AlarmSearchCompleted(ServerBoundCommand):
 
 
 class AlarmSnippet(Snippet):                
-    def __init__(self):
+    def __init__(self, alarms = None):
         super(AlarmSnippet, self).__init__("com.apple.ace.alarm")
-        self.alarms = None # array
+        self.alarms = alarms if alarms != None else []
     
     def to_plist(self):
         self.add_property('alarms')
         return super(AlarmSnippet, self).to_plist()
-
+        
 class AlarmUpdate(ClientBoundCommand):
     def __init__(self, refId):
         super(AlarmUpdate, self).__init__("Update", "com.apple.ace.alarm", None, refId)

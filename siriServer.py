@@ -474,6 +474,6 @@ server = SiriServer('', options.port)
 try:
     asyncore.loop()
 except (asyncore.ExitNow, KeyboardInterrupt, SystemExit):
-    x.info("Cought shutdown, closing server")
+    x.info("Caught shutdown, closing server")
     asyncore.dispatcher.close(server)
     exit()
