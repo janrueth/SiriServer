@@ -64,7 +64,7 @@ class frenchtalk(Plugin):
         self.say(u"Mais ça ne marchera pas, tu as configuré Siri en français.");
         self.complete_request()
 		
-    @register("fr-FR", u"(.*connard.*)|(.*idiot.*)|(.*crétin.*)|(.*pétasse.*)|(.*connasse.*)|(.*salope.*)|(.*putain.*)|(.*merde.*)|(.*débile.*)|(.*con.*)")
+    @register("fr-FR", u"(.*connard.*)|(.*idiot.*)|(.*crétin.*)|(.*pétasse.*)|(.*connasse.*)|(.*salope.*)|(.*putain.*)|(.*merde.*)|(.*débile.*)|(.* con.*)")
     def st_insultes(self, speech, language):
         self.say(u"Oh Oh, tu parles un langage bien châtié, il me semble.");
         self.say(u"Repose-moi ta question poliment.");
