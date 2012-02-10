@@ -295,9 +295,7 @@ class HandleConnection(ssl_dispatcher):
 
                 elif ObjectIsCommand(reqObject, GetSessionCertificate):
                     getSessionCertificate = GetSessionCertificate(reqObject)
-                    response = GetSessionCertificateResponse(getSessionCertificate.aceId)
-                    response.caCert = caCert.as_der()
-                    response.sessionCert = serverCert.as_der()
+                    response = GetSessionCertificateResponse(getSessionCertificate.aceId, caCert.as_der(), serverCert.as_der())
                     self.send_object(response)
 
                 elif ObjectIsCommand(reqObject, CreateSessionInfoRequest):

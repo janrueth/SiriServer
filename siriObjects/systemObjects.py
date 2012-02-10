@@ -1,5 +1,7 @@
 from siriObjects.baseObjects import ClientBoundCommand, AceObject, ServerBoundCommand
 
+import biplist, struct
+
 class GetRequestOrigin(ClientBoundCommand):
     desiredAccuracyThreeKilometers = "ThreeKilometers"
     desiredAccuracyKilometer = "Kilometer"
@@ -188,10 +190,10 @@ class GetSessionCertificate(ServerBoundCommand):
         super(GetSessionCertificate, self).__init__(plist)
 
 class GetSessionCertificateResponse(ClientBoundCommand):
-    def __init__(self, refId):
+    def __init__(self, refId, caCert, sessionCert):
         super(GetSessionCertificateResponse, self).__init__("GetSessionCertificateResponse", "com.apple.ace.system", None, refId)
-        self.caCert = None
-        self.sessionCert = None
+        self.caCert = caCert
+        self.sessionCert = sessionCert
 
     def to_plist(self):
         self.certificate = biplist.Data("\x01\x02"+struct.pack(">I", len(self.caCert))+self.caCert + struct.pack(">I", len(self.sessionCert))+self.sessionCert)
