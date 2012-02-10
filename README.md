@@ -3,9 +3,10 @@ Siri Server
 
 IMPORTANT
 ---------
-There are currently only 3 plugins here, you can chat a little bit with siri.
+There are currently only 8 plugins here, you can chat a little bit with siri.
 You can ask it for the current time and the current time at a certain point in the world.
 And you can ask it for the meaning of life.
+Also you can ask it for the weather. Create timers, ask for definitions of words, control your XBMC, work with notes and ask several question to wolfram alpha
 
 You can contribute by making more plugins!
 
@@ -42,6 +43,11 @@ The file SiriProtocol documents everything I (and others) found out about the pr
 
 Setup, Notes and Instructions
 -----------------------------
+
+**Installer**
+
+There is an experimental installer by [johanberglind](https://github.com/johanberglind) which does the steps described below, you may try it instead of the manual method.
+You can get it here: [Installer on Github](https://github.com/johanberglind/InstallSiriServer)
 
 **Install audio libraries**
 

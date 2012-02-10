@@ -15,7 +15,9 @@ import PluginManager
 from M2Crypto import BIO, RSA, X509
 
 from siriObjects import speechObjects, baseObjects, uiObjects, systemObjects
-
+from siriObjects.baseObjects import ObjectIsCommand
+from siriObjects.speechObjects import StartSpeech, StartSpeechRequest, StartSpeechDictation, SpeechPacket, SpeechFailure, FinishSpeech
+from siriObjects.systemObjects import CancelRequest, CancelSucceeded, GetSessionCertificate, GetSessionCertificateResponse, CreateSessionInfoRequest, CommandFailed
 from httpClient import AsyncOpenHttp
 
 from sslDispatcher import ssl_dispatcher
@@ -199,52 +201,98 @@ class HandleConnection(ssl_dispatcher):
                         if self.current_running_plugin.waitForResponse != None:
                             # just forward the object to the 
                             # don't change it's refId, further requests must reference last FinishSpeech
+                            self.logger.info("Forwarding object to plugin")
                             self.plugin_lastAceId = None
                             self.current_running_plugin.response = reqObject
                             self.current_running_plugin.waitForResponse.set()
                 
-                if reqObject['class'] == 'StartSpeechRequest' or reqObject['class'] == 'StartSpeechDictation':
-                        decoder = speex.Decoder()
+                if ObjectIsCommand(reqObject, StartSpeechRequest) or ObjectIsCommand(reqObject, StartSpeechDictation):
+                    self.logger.info("New start of speech received")
+                    startSpeech = None
+                    if ObjectIsCommand(reqObject, StartSpeechDictation):
+                        dictation = True
+                        startSpeech = StartSpeechDictation(reqObject)
+                    else:
+                        dictation = False
+                        startSpeech = StartSpeechRequest(reqObject)
+            
+                    decoder = speex.Decoder()
+                    encoder = flac.Encoder()
+                    speexUsed = False
+                    if startSpeech.codec == StartSpeech.CodecSpeex_WB_Quality8Value:
                         decoder.initialize(mode=speex.SPEEX_MODEID_WB)
-                        encoder = flac.Encoder()
-                        encoder.initialize(16000, 1, 16) #16kHz sample rate, 1 channel, 16 bits per sample
-                        dictation=(reqObject['class'] == 'StartSpeechDictation')
-                        self.speech[reqObject['aceId']] = (decoder, encoder, dictation)
+                        encoder.initialize(16000, 1, 16)
+                        speexUsed = True
+                    elif startSpeech.codec == StartSpeech.CodecSpeex_NB_Quality7Value:
+                        decoder.initialize(mode=speex.SPEEX_MODEID_NB)
+                        encoder.initialize(16000, 1, 16)
+                        speexUsed = True
+                    elif startSpeech.codec == StartSpeech.CodecPCM_Mono_16Bit_8000HzValue:
+                        encoder.initialize(8000, 1, 16)
+                    elif startSpeech.codec == StartSpeech.CodecPCM_Mono_16Bit_11025HzValue:
+                        encoder.initialize(11025, 1, 16)
+                    elif startSpeech.coded == StartSpeech.CodecPCM_Mono_16Bit_16000HzValue:
+                        encoder.initialize(16000, 1, 16)
+                    elif startSpeech.coded == StartSpeech.CodecPCM_Mono_16Bit_22050HzValue:
+                        encoder.initialize(22050, 1, 16)
+                    elif startSpeech.coded == StartSpeech.CodecPCM_Mono_16Bit_32000HzValue:
+                        encoder.initialize(32000, 1, 16)
+                    # we probably need resampling for sample rates other than 16kHz...
+                    
+                    self.speech[startSpeech.aceId] = (decoder if speexUsed else None, encoder, dictation)
                 
-                elif reqObject['class'] == 'SpeechPacket':
-                    (decoder, encoder, dictation) = self.speech[reqObject['refId']]
-                    pcm = decoder.decode(reqObject['properties']['packets'])
+                elif ObjectIsCommand(reqObject, SpeechPacket):
+                    self.logger.info("Decoding speech packet")
+                    speechPacket = SpeechPacket(reqObject)
+                    (decoder, encoder, dictation) = self.speech[speechPacket.refId]
+                    if decoder:
+                        pcm = decoder.decode(speechPacket.packets)
+                    else:
+                        pcm = SpeechPacket.data # <- probably data... if pcm
                     encoder.encode(pcm)
                         
                 elif reqObject['class'] == 'StartCorrectedSpeechRequest':
                     self.process_recognized_speech({u'hypotheses': [{'confidence': 1.0, 'utterance': str.lower(reqObject['properties']['utterance'])}]}, reqObject['aceId'], False)
             
-                elif reqObject['class'] == 'FinishSpeech':
-                    (decoder, encoder, dictation) = self.speech[reqObject['refId']]
-                    decoder.destroy()
+                elif ObjectIsCommand(reqObject, FinishSpeech):
+                    self.logger.info("End of speech received")
+                    finishSpeech = FinishSpeech(reqObject)
+                    (decoder, encoder, dictation) = self.speech[finishSpeech.refId]
+                    if decoder:
+                        decoder.destroy()
                     encoder.finish()
                     flacBin = encoder.getBinary()
                     encoder.destroy()
-                    del self.speech[reqObject['refId']]
+                    del self.speech[finishSpeech.refId]
                     
-                    self.httpClient.make_google_request(flacBin, reqObject['refId'], dictation, language=self.assistant.language, allowCurses=True)
+                    self.logger.info("Sending flac to google for recognition")
+                    self.httpClient.make_google_request(flacBin, finishSpeech.refId, dictation, language=self.assistant.language, allowCurses=True)
                         
                         
-                elif reqObject['class'] == 'CancelRequest':
+                elif ObjectIsCommand(reqObject, CancelRequest):
                         # this is probably called when we need to kill a plugin
                         # wait for thread to finish a send
-                        if reqObject['refId'] in self.speech:
-                            del self.speech[reqObject['refId']]
-                        self.send_plist({"class": "CancelSucceeded", "group": "com.apple.ace.system", "aceId": str(uuid.uuid4()), "refId": reqObject['aceId'], "properties":{"callbacks": []}})
-                elif reqObject['class'] == 'GetSessionCertificate':
-                    caDer = caCert.as_der()
-                    serverDer = serverCert.as_der()
-                    self.send_plist({"class": "GetSessionCertificateResponse", "group": "com.apple.ace.system", "aceId": str(uuid.uuid4()), "refId": reqObject['aceId'], "properties":{"certificate": biplist.Data("\x01\x02"+struct.pack(">I", len(caDer))+caDer + struct.pack(">I", len(serverDer))+serverDer)}})
+                        cancelRequest = CancelRequest(reqObject)
+                        if cancelRequest.refId in self.speech:
+                            del self.speech[cancelRequest.refId]
+                        
+                        self.send_object(CancelSucceeded(cancelRequest.aceId))
 
-                    #self.send_plist({"class":"CommandFailed", "properties": {"reason":"Not authenticated", "errorCode":0, "callbacks":[]}, "aceId": str(uuid.uuid4()), "refId": reqObject['aceId'], "group":"com.apple.ace.system"})
-                elif reqObject['class'] == 'CreateSessionInfoRequest':
-            # how does a positive answer look like?
-                    self.send_plist({"class":"CommandFailed", "properties": {"reason":"Not authenticated", "errorCode":0, "callbacks":[]}, "aceId": str(uuid.uuid4()), "refId": reqObject['aceId'], "group":"com.apple.ace.system"})
+                elif ObjectIsCommand(reqObject, GetSessionCertificate):
+                    getSessionCertificate = GetSessionCertificate(reqObject)
+                    response = GetSessionCertificateResponse(getSessionCertificate.aceId)
+                    response.caCert = caCert.as_der()
+                    response.sessionCert = serverCert.as_der()
+                    self.send_object(response)
+
+                elif ObjectIsCommand(reqObject, CreateSessionInfoRequest):
+                    # how does a positive answer look like?
+                    createSessionInfoRequest = CreateSessionInfoRequest(reqObject)
+                    fail = CommandFailed(createSessionInfoRequest.aceId)
+                    fail.reason = "Not authenticated"
+                    fail.errorCode = 0
+                    self.send_object(fail)
+
                     #self.send_plist({"class":"SessionValidationFailed", "properties":{"errorCode":"UnsupportedHardwareVersion"}, "aceId": str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
                     
                 elif reqObject['class'] == 'CreateAssistant':
@@ -382,11 +430,7 @@ certFile = open('OrigAppleServerCert.der')
 serverCert = X509.load_cert_bio(BIO.MemoryBuffer(certFile.read()), format=0)
 certFile.close()
 
-#setup database
-db.setup()
 
-#load Plugins
-PluginManager.load_plugins()
 
 #setup logging
 
@@ -400,15 +444,28 @@ log_levels = {'debug':logging.DEBUG,
 parser = OptionParser()
 parser.add_option('-l', '--loglevel', default='info', dest='logLevel', help='This sets the logging level you have these options: debug, info, warning, error, critical \t\tThe standard value is info')
 parser.add_option('-p', '--port', default=443, type='int', dest='port', help='This options lets you use a custom port instead of 443 (use a port > 1024 to run as non root user)')
+parser.add_option('--logfile', default=None, dest='logfile', help='Log to a file instead of stdout.')
 (options, args) = parser.parse_args()
 
 x = logging.getLogger("logger")
 x.setLevel(log_levels[options.logLevel])
-h = logging.StreamHandler()
+
+if options.logfile != None:
+    h = logging.FileHandler(options.logfile)
+else:
+    h = logging.StreamHandler()
+
 f = logging.Formatter(u"%(levelname)s %(funcName)s %(message)s")
 h.setFormatter(f)
 x.addHandler(h)
 
+
+#setup database
+db.setup()
+
+#load Plugins
+PluginManager.load_api_keys()
+PluginManager.load_plugins()
 
 
 #start server
@@ -417,6 +474,6 @@ server = SiriServer('', options.port)
 try:
     asyncore.loop()
 except (asyncore.ExitNow, KeyboardInterrupt, SystemExit):
-    x.info("Cought shutdown, closing server")
+    x.info("Caught shutdown, closing server")
     asyncore.dispatcher.close(server)
     exit()

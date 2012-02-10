@@ -3,19 +3,23 @@ import os
 import re
 import logging
 
-from plugin import Plugin, __criteria_key__
+from plugin import Plugin, __criteria_key__, NecessaryModuleNotFound
 from types import FunctionType
 
 
 logger = logging.getLogger("logger")
 pluginPath = "plugins"
 
-config_file = "plugins.conf"
+__config_file__ = "plugins.conf"
+__apikeys_file__ = "apiKeys.conf"
+
+
 
 plugins = dict()
+apiKeys = dict()
 
 def load_plugins():
-    with open(config_file, "r") as fh:
+    with open(__config_file__, "r") as fh:
         for line in fh:
             line = line.strip()
             if line.startswith("#") or line == "":
@@ -23,6 +27,8 @@ def load_plugins():
             # just load the whole shit...
             try:
                 __import__(pluginPath+"."+line,  globals(), locals(), [], -1)
+            except NecessaryModuleNotFound as e:
+                logger.critical("Failed loading Plugin due to missing module: "+str(e))
             except:
                 logger.exception("Plugin loading failed")
             
@@ -41,6 +47,31 @@ def load_plugins():
                     # yeah... save the regex, the clazz and the method, shit just got loaded...
                     plugins[lang].append((regex, clazz, method))
 
+
+def reload_api_keys():
+    apiKeys = dict()
+    load_api_keys()
+
+def load_api_keys():
+    with open(__apikeys_file__, "r") as fh:
+        for line in fh:
+            line = line.strip()
+            if line.startswith("#") or line == "":
+                continue
+            kv = line.split("=", 1)
+            try:
+                apiName = str.lower(kv[0]).strip()
+                kv[1] = kv[1].strip()
+                apiKey = kv[1][1:len(kv[1])-1] #stip the ""
+                apiKeys[apiName] = apiKey
+            except:
+                logger.critial("There was an error parsing an API in the line: "+ line)
+
+def getAPIKeyForAPI(APIname):
+    apiName = str.lower(APIname) 
+    if apiName in apiKeys:
+        return apiKeys[apiName]
+    return None
 
 def getPlugin(speech, language):
     if language in plugins:

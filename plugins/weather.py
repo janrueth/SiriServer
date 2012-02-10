@@ -14,7 +14,7 @@ from siriObjects.uiObjects import AddViews, AssistantUtteranceView
 from siriObjects.forecastObjects import *
 
 #Obtain API Key from wundergrounds.com
-weatherApiKey =""
+weatherApiKey = APIKeyForAPI('wundergrounds')
 
 class SiriWeatherFunctions():
     def __init__(self):
@@ -72,8 +72,9 @@ class weatherPlugin(Plugin):
     def weatherForecastLookUp(self, speech, language):
         if weatherApiKey =="":
             self.say("Please obtain an API key from http://api.wunderground.com/weather/api/ and enter it in line 17!")
-            self.complete_Request()
-            pass
+            self.complete_request()
+            return False
+	speech = speech.replace(u".","")
         viewType ="DAILY"
         if (speech.count("today") > 0 or speech.count("current") > 0 or speech.count(" for today") > 0) and language=="en-US":
             viewType = "HOURLY"
