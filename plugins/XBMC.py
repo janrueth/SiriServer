@@ -42,7 +42,6 @@ class XBMC_object():
         json.Playlist.Add(playlistid=1, item=item)
         json.Player.Open({ 'playlistid': 1 })
 
-
 class XBMC(Plugin):	    
 
     def addPictureView(self,title,image_url):
@@ -59,7 +58,7 @@ class XBMC(Plugin):
     def test2(self, speech, language):
         global xbmc
         if speech.lower() == 'xbmc':
-            self.say("XBMC currently supports the following commands: play [movie or tv show], pause, stop, shut down, start and info.")
+            self.say("XBMC currently supports the following commands: play [movie or tv show], play latest episode of [tv show], play trailer for [movie] pause, stop, shut down, start and info.")
         else:
             firstword, command=speech.split(' ',1)
             json = jsonrpclib.Server('%s/jsonrpc' % (xbmc.get_url()))
@@ -73,7 +72,25 @@ class XBMC(Plugin):
                     json.Player.PlayPause(playerid=1)
                 except:
                     self.say('Nothing to play/pause')
-            elif 'play' in command or 'plate' in command or 'place' in command or 'played' in command or 'start' in command: #this elif needs to be located below command == 'play' part
+            elif 'play trailer of' in command or 'play trailer for' in command or 'play trailer 4' in command:
+                if 'play trailer of' in command:
+                    title = command.replace('play trailer of ','')
+                elif 'play trailer for' in command:
+                    title = command.replace('play trailer for ', '')
+                elif 'play trailer 4' in command:
+                    title = command.replace('play trailer 4 ', '')
+                result = json.VideoLibrary.GetMovies()
+                stripped_title = ''.join(ch for ch in title if ch.isalnum()).lower()
+                for movie in result['movies']:
+                    if stripped_title in ''.join(ch for ch in movie['label'] if ch.isalnum()).lower():
+                        movieid = movie['movieid']
+                        trailer = json.VideoLibrary.GetMovieDetails(movieid=movieid, properties= ['trailer'])['moviedetails']['trailer']
+                        break
+                if trailer:
+                    xbmc.play(json,{'file':trailer})
+                else:
+                    self.say("It seems that there is no trailer available for this movie.")
+            elif 'play' in command or 'plate' in command or 'place' in command or 'played' in command or 'start' in command:
                 command, title=command.split(' ',1)
                 if 'first occurrence' in title:
                     first_match = True
