@@ -4,16 +4,10 @@
 # The plugin must be in the plugins folder
 # Do not add the .py ending here
 
-wwwsearch
 weather
-alarmPlugin
 timerPlugin
 timePlugin
-wordnikDefinitions
 smalltalk
 examplePlugin
-displaypicture
 XBMC
 startRequestHandler
-wolfram
-notes
