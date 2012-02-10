@@ -10,7 +10,7 @@ except ImportError:
 try:
     from M2Crypto import BIO, RSA, X509
 except ImportError:
-    print "You must install openssl and M2Crypto on your system! e.g. \"sudo easy_install m2crypto\""
+    print "You must install M2Crypto on your system! (this might require openssl and SWIG) e.g. \"sudo easy_install m2crypto\""
     exit(-1)
 
 import sys
