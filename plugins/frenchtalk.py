@@ -21,7 +21,7 @@ class frenchtalk(Plugin):
         self.say(u"Je suis Siri.");
         self.complete_request()
 
-    @register("fr-FR", "(Coucou.*)")
+    @register("fr-FR", "Coucou.*")
     def st_aimer(self, speech, language):
         self.say(u"Bonjour.");
         self.complete_request()
@@ -31,7 +31,7 @@ class frenchtalk(Plugin):
         self.say(u"A bientôt.");
         self.complete_request()
 	
-    @register("fr-FR", "(.*Je.*travail.*)")
+    @register("fr-FR", ".*Je.*travail.*")
     def st_travaille(self, speech, language):
         self.say(u"D'accord, je vous laisse travailler.");
         self.complete_request()
@@ -41,13 +41,13 @@ class frenchtalk(Plugin):
         self.say(u"Merci, mais j'ai déjà tout ce dont j'ai besoin dans le nuage.");
         self.complete_request()
 		
-    @register("fr-FR", "(Je.*aime)")
+    @register("fr-FR", "Je.*aime")
     def st_aime(self, speech, language):
         self.say(u"Désolé, un assistant virtuel ne peut pas éprouver de sentiment.");
         self.say(u"Voilà, c'est dit.");
         self.complete_request()
 		
-    @register("fr-FR", u"(J'aime.*)")
+    @register("fr-FR", u"J'aime.*")
     def st_aimer(self, speech, language):
         self.say(u"Moi aussi.");
         self.complete_request()
@@ -58,7 +58,7 @@ class frenchtalk(Plugin):
         self.say(u"Heureusement, nous n'avons pas forcément les-mêmes.");
         self.complete_request()
 		
-    @register("fr-FR", "(Hello)")
+    @register("fr-FR", "Hello")
     def st_frenglish(self, speech, language):
         self.say(u"Oh Oh, tu essayes de parler anglais, c'est bien.");
         self.say(u"Mais ça ne marchera pas, tu as configuré Siri en français.");
@@ -70,8 +70,14 @@ class frenchtalk(Plugin):
         self.say(u"Repose-moi ta question poliment.");
         self.complete_request()
 		
-    @register("fr-FR", u"(j.*envie.*)")
+    @register("fr-FR", u"j.*envie.*")
     def st_envies(self, speech, language):
         self.say(u"Moi pas.");
         self.say(u"Heureusement, nous n'avons pas les mêmes envies.");
+        self.complete_request()		
+
+    @register("fr-FR", u"tu.*(est|es).*(genie|genial|génie|génial)")
+    def st_genie(self, speech, language):
+        self.say(u"Cela nous fait un point commun.");
+        self.say(u"Nous savons tout les 2 que je suis génial.");
         self.complete_request()
