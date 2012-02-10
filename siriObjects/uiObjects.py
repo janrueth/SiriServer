@@ -125,8 +125,8 @@ class AceView(AceObject):
         return super(AceView, self).to_plist()
 
 class Snippet(AceView):
-    def __init__(self, group):
-        super(Snippet, self).__init__("Snippet", group)
+    def __init__(self, group, clazz="Snippet"):
+        super(Snippet, self).__init__(clazz, group)
         self.otherOptions = None # array
         self.confirmationOptions = None # ConfirmationOptions obj
     
