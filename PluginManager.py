@@ -67,7 +67,7 @@ def load_api_keys():
                 apiKey = kv[1][1:len(kv[1])-1] #stip the ""
                 apiKeys[apiName] = apiKey
             except:
-                logger.critial("There was an error parsing an API in the line: "+ line)
+                logger.critical("There was an error parsing an API in the line: "+ line)
 
 def getAPIKeyForAPI(APIname):
     apiName = str.lower(APIname) 
