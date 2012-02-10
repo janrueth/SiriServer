@@ -51,7 +51,7 @@ class timerPlugin(Plugin):
                 "fr-FR": u"Démarrage du minuteur\u2026"
             }, 'showTheTimer': {
                 'en-US': u'Here\u2019s the timer:',
-                'fr-FR': u'Voici votre alarme :'
+                'fr-FR': u'Voici votre minuteur :'
             }, 'timerIsAlreadyPaused': {
                 'en-US': u'It\u2019s already paused.',
                 'fr-FR': u'Il est déjà en pause.'
@@ -86,10 +86,10 @@ class timerPlugin(Plugin):
             'fr-FR': u'un|une|le',
         }, 'pauseTimer': {
             'en-US': '.*(pause|freeze|hold).*timer',
-            'fr-FR': u'.*(pause|suspend|interromp).*minuteur'
+            'fr-FR': u'.*(pause|pose|suspend|interromp).*minuteur'
         }, 'resetTimer': {
             'en-US': '.*(cancel|reset|stop).*timer',
-            'fr-FR': u'.*(annule|reset|arret|arrêt|zero|zéro).*minuteur'
+            'fr-FR': u'.*(annule|reset|arret|arrêt|zero|zéro|stop).*minuteur'
         }, 'resumeTimer': {
             'en-US': '.*(resume|thaw|continue).*timer',
             'fr-FR': u'.*(reprend|continue|relance).*minuteur'
@@ -98,7 +98,7 @@ class timerPlugin(Plugin):
             'fr-FR': '.*minuteur.*\s+([0-9/ ]*|un|une|le|la)\s+(secs?|secondes?|mins?|minutes?|hrs?|heures?)'
         }, 'showTimer': {
             'en-US': '.*(show|display|see).*timer',
-            'fr-FR': '.*(montre|affiche|voir).*timer'
+            'fr-FR': '.*(montre|affiche|voir).*minuteur'
         }, 'timerLength': {
             'en-US': '([0-9/ ]*|a|an|the)\s+(secs?|seconds?|mins?|minutes?|hrs?|hours?)',
             'fr-FR': '([0-9/ ]*|un|une|le|la)\s+(secs?|secondes?|mins?|minutes?|hrs?|heures?)'
@@ -171,6 +171,7 @@ class timerPlugin(Plugin):
         self.complete_request()
 
     @register("en-US", res['resetTimer']['en-US'])
+    @register("fr-FR", res['resetTimer']['fr-FR'])
     def resetTimer(self, speech, language):
         response = self.getResponseForRequest(TimerGet(self.refId))
         timer_properties = response['properties']['timer']['properties']
@@ -193,6 +194,7 @@ class timerPlugin(Plugin):
             self.complete_request()
 
     @register("en-US", res['resumeTimer']['en-US'])
+    @register("fr-FR", res['resumeTimer']['fr-FR'])
     def resumeTimer(self, speech, language):
         response = self.getResponseForRequest(TimerGet(self.refId))
         timer_properties = response['properties']['timer']['properties']
@@ -217,6 +219,7 @@ class timerPlugin(Plugin):
             self.complete_request()
 
     @register("en-US", res['pauseTimer']['en-US'])
+    @register("fr-FR", res['pauseTimer']['fr-FR'])
     def pauseTimer(self, speech, language):
         response = self.getResponseForRequest(TimerGet(self.refId))
         timer_properties = response['properties']['timer']['properties']
@@ -247,6 +250,7 @@ class timerPlugin(Plugin):
             self.complete_request()
 
     @register("en-US", res['showTimer']['en-US'])
+    @register("fr-FR", res['showTimer']['fr-FR'])
     def showTimer(self, speech, language):
         response = self.getResponseForRequest(TimerGet(self.refId))
         timer_properties = response['properties']['timer']['properties']
