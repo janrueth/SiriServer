@@ -17,7 +17,7 @@ except ImportError:
     
 
 class XBMC_object():
-    def __init__(self, host='appletv.local', port='8080', username=None, password=None, mac_address=None):
+    def __init__(self, host=APIKeyForAPI("xbmc_host"), port=APIKeyForAPI("xbmc_port"), username=APIKeyForAPI("xbmc_username"), password=APIKeyForAPI("xbmc_password"), mac_address=APIKeyForAPI("xbmc_mac_address")):
         self.username = username
         self.password = password
         self.port = port
@@ -28,7 +28,7 @@ class XBMC_object():
         return 'http://%s%s:%s' %(self.get_user_pass(), self.host, self.port)
         
     def get_user_pass(self):
-        if self.username != None and self.password != None:
+        if self.username != '' and self.password != '':
             return '%s:%s@' % (self.username, self.password)
         
         return ''
