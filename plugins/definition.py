@@ -4,15 +4,17 @@
 import re
 import urllib2, urllib
 import json
+import unicodedata
 from plugin import *
 
 class definition(Plugin):
-    
-    @register("fr-FR", u"(defini|definit|défini|définit|definis|définis|définition|definition|définition de|definition de) (.*)")
+ 
+    @register("fr-FR", u"(defini|definit|défini|définit|definis|définis|définition|definition) (.*)")
     def define(self, speech, language, regMatched):
-        query = regMatched.group(2)
-        print query
-        url = u"http://www.google.com/dictionary/json?callback=dict_api.callbacks.id100&q=" +urllib.quote_plus(query.encode("utf-8"))+ "&sl="+language+"&tl="+language+"&restrict=pr%2Cde&client=te"
+        query = regMatched.group(regMatched.lastindex).strip()
+        self.say(u"Je recherche la définition de "+query+"...")
+        query_clean = self.cleanString(query)
+        url = u"http://www.google.com/dictionary/json?callback=dict_api.callbacks.id100&q=" +urllib.quote_plus(query_clean.encode("utf-8"))+ "&sl="+language+"&tl="+language+"&restrict=pr%2Cde&client=te"
         print url
         definition = None
         try:
@@ -28,4 +30,13 @@ class definition(Plugin):
             self.say(definition);
         else:
             self.say(u"Je n'ai pas trouvé de définition pour " + query)
+        
+        
+        
         self.complete_request()
+        
+    def cleanString(self, s):
+        if isinstance(s,str):
+            s = unicode(s,"utf8","replace")
+        s=unicodedata.normalize('NFD',s)
+        return s.encode('ascii','ignore')
