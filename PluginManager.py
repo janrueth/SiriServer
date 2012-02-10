@@ -1,4 +1,3 @@
-
 import os
 import re
 import logging
@@ -64,7 +63,7 @@ def load_api_keys():
             try:
                 apiName = str.lower(kv[0]).strip()
                 kv[1] = kv[1].strip()
-                apiKey = kv[1][1:len(kv[1])-1] #stip the ""
+                apiKey = kv[1][1:-1] #stip the ""
                 apiKeys[apiName] = apiKey
             except:
                 logger.critical("There was an error parsing an API in the line: "+ line)
