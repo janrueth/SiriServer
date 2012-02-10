@@ -24,11 +24,14 @@ class Translation(Plugin):
             'fr-FR': u"Je ne connais pas cette langue.",
         },
         'error': {
-            'en-US': u"I can't translate {0}",
-            'fr-FR': u"Je n'arrive pas à traduire {0}",
+            'en-US': u"I can't translate {0} in {1}",
+            'fr-FR': u"Je n'arrive pas à traduire {0} en {1}",
         }
     }
     
+    #see
+    # langcode => http://api.microsofttranslator.com/V2/Ajax.svc/GetLanguagesForTranslate?appId={APIKEY}
+    # and http://api.microsofttranslator.com/V2/Ajax.svc/GetLanguageNames?locale={languages}&languageCodes={langcode}&appId={APIKEY}
     languages = {
         'fr-FR' : {
             'arabe' : 'ar',
@@ -76,15 +79,19 @@ class Translation(Plugin):
             u'suédois' : 'sv',
             'suedois' : 'sv',
             'thai' : 'th',
-            'thaï' : 'th',
+            u'thaï' : 'th',
             'turc' : 'tr',
             'ukrainien' : 'uk',
             'vietnamien' : 'vi',
             'flamand' : 'nl',
+        },
+        'en-US': {
+            "arabic": "ar", "czech": "cs","check": "cs","czech language": "cs","danish": "da","german": "de","english": "en","estonian": "et","finnish": "fi","french": "fr","dutch": "nl","greek": "el","hebrew": "he","haitian creole": "ht","hungarian": "hu","indonesian": "id","italian": "it","japanese": "ja","korean": "ko","lithuanian": "lt","latvian": "lv","norwegian": "no","polish": "pl","portuguese": "pt","romanian": "ro","spanish": "es","russian": "ru","slovak": "sk","slovene": "sl","swedish": "sv","thai": "th","turkish": "tr","ukranian": "uk","vietnamese": "vi","simplified chinese": "zh-CHS","traditional chinese": "zh-CHT","chinese": "zh-CHT"
         }
     }
 
     @register("fr-FR", res["translate"]["fr-FR"])
+    @register("en-US", res["translate"]["en-US"])
     def translation(self, speech, language, regex):
 
         term = regex.group(2).strip()		
@@ -112,6 +119,6 @@ class Translation(Plugin):
         if traduction != None:
             self.say(traduction)
         else:
-            error = res['error'][languages];
-            self.say(error.format(term))
+            error = res["error"][language];
+            self.say(error.format(term,lang))
         self.complete_request()
