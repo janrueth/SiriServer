@@ -133,8 +133,8 @@ class SendCommands(AceObject):
         return super(SendCommands, self).to_plist()
 
 class Person(DomainObject):
-    def __init__(self):
-        super(Person, self).__init__("com.apple.ace.system", clazz="Person")
+    def __init__(self, group="com.apple.ace.system"):
+        super(Person, self).__init__(group, clazz="Person")
         self.suffix = None # string
         self.relatedNames = None # array
         self.prefix = None # string
@@ -171,6 +171,47 @@ class Person(DomainObject):
         self.add_property('addresses')
         return super(Person, self).to_plist()
 
+class PersonAttribute(AceObject):
+    def __init__(self, object=None, displayText="", data=""):
+        super(PersonAttribute, self).__init__("PersonAttribute", "com.apple.ace.system")
+        self.object = object if object != None else Person()
+        self.displayText = ""
+        self.data = ""
+    
+    def to_plist(self):
+        self.add_property('object')
+        self.add_property('displayText')
+        self.add_property('data')
+        return super(PersonAttribute, self).to_plist()
+
+class Phone(AceObject):
+    def __init__(self, number="", label="", favoriteVoice=0, favoriteFacetime=0, group="com.apple.ace.system"):
+        super(Phone, self).__init__("Phone", group)
+        self.number = number
+        self.label = label
+        self.favoriteVoice = favoriteVoice
+        self.favoriteFacetime = favoriteFacetime
+    
+    def to_plist(self):
+        self.add_property('number')
+        self.add_property('label')
+        self.add_property('favoriteVoice')
+        self.add_property('favoriteFacetime')
+        return super(Phone, self).to_plist()
+
+
+class RelatedName(AceObject):
+    def __init__(self, name="", label="", group="com.apple.ace.system"):
+        super(RelatedName, self).__init__("RelatedName", group)
+        self.name = name
+        self.label = label
+
+    def to_plist(self):
+        self.add_property('name')
+        self.add_property('label')
+        return super(RelatedName, self).to_plist()
+
+
 class CancelRequest(ServerBoundCommand):
     groupIdentifier = "com.apple.ace.system"
     classIdentifier = "CancelRequest"
@@ -192,6 +233,7 @@ class GetSessionCertificate(ServerBoundCommand):
 class GetSessionCertificateResponse(ClientBoundCommand):
     def __init__(self, refId, caCert, sessionCert):
         super(GetSessionCertificateResponse, self).__init__("GetSessionCertificateResponse", "com.apple.ace.system", None, refId)
+        self.certificate = None
         self.caCert = caCert
         self.sessionCert = sessionCert
 
@@ -239,8 +281,8 @@ class Location(DomainObject):
     AccuracyHundredMetersValue = "HundredMeters"
     AccuracyKilometerValue = "Kilometer"
     AccuracyThreeKilometersValue = "ThreeKilometers"
-    def __init__(self, label="", street="", city="", stateCode="", countryCode="", postalCode="", latitude=0, longitude=0, accuracy=0):
-        super(Location, self).__init__("com.apple.ace.system", clazz="Location")
+    def __init__(self, label="", street="", city="", stateCode="", countryCode="", postalCode="", latitude=0, longitude=0, accuracy=0, group="com.apple.ace.system", clazz="Location"):
+        super(Location, self).__init__(group, clazz)
         self.label = label
         self.street = street
         self.city = city
