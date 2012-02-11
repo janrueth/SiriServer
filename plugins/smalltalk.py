@@ -442,7 +442,7 @@ class smalltalk(Plugin):
     @register("en-US",".*sing.*song.*")
     def st_sing_song(self, speech, language):
         opt = { 'de-DE': ['Das überlasse ich lieber Anderen.'], 
-                'en-US': ['Daisy, Daisy, give me your answer do...',,'10101010101, you didn\'t understand that? It\'s in binary. I don\'t have any songs in English.']]}
+                'en-US': ['Daisy, Daisy, give me your answer do...','10101010101, you didn\'t understand that? It\'s in binary. I don\'t have any songs in English.']]}
         satz = aussage()
         self.say(satz.test(opt[language]))
         self.complete_request()
