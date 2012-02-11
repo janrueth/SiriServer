@@ -4,8 +4,8 @@ from siriObjects.systemObjects import DomainObject
 
 
 class Email(AceObject):
-    def __init__(self):
-        super(Email, self).__init__("Email", "com.apple.ace.email")
+    def __init__(self, group="com.apple.ace.email"):
+        super(Email, self).__init__("Email", group)
         self.label = None # string
         self.favoriteFacetime = None # number
         self.emailAddress = None # string
