@@ -19,8 +19,10 @@ responses = {
 
 class phonecallPlugin(Plugin):
     
-    def searchUserByName(personToLookup):
-        search = PersonSearch(self.refId, name=personToLookup)
+    def searchUserByName(self, personToLookup):
+        search = PersonSearch(self.refId)
+        search.scope = PersonSearch.ScopeLocalValue
+        search.name = personToLookup
         answerObj = self.getResponseForRequest(search)
         if ObjectIsCommand(answerObj, PersonSearchCompleted):
             answer = PersonSearchCompleted(answerObj)
@@ -30,7 +32,7 @@ class phonecallPlugin(Plugin):
         return []
                                       
     
-    def call(person):
+    def call(self, person):
         pass
     
     @register("de-DE", "ruf. ([\w ]+) an")
@@ -41,9 +43,11 @@ class phonecallPlugin(Plugin):
         return 
         personToCall = regex.group(regex.lastindex)
         
-        options = searchUserByName(persontoCall)
-        if len(options) > 0:
-            pass
+        persons = self.searchUserByName(personToCall)
+        if len(persons) > 0:
+            favoritePersons = filter(lambda x: len(filter(lambda y: y.favoriteVoice if hasattr(y, "favoriteVoice") else False, x.phones)) > 0, persons)
+        # try to find a single favorit
+        #favorites = filter(lambda x: True if filter(x.phones persons
         # what is siri doing here We should probably list the possible users
         # and continue asking for one specific until we found the correct one
         # 

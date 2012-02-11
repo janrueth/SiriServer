@@ -1,8 +1,7 @@
 from siriObjects.baseObjects import ClientBoundCommand, AceObject, ServerBoundCommand
-from siriObjects.systemObjects import DomainObject, Location, Person as SuperPerson, RelatedName as SuperRelatedName
+from siriObjects.systemObjects import DomainObject, Location, Person as SuperPerson, RelatedName as SuperRelatedName, Phone as SuperPhone
 from siriObjects.uiObjects import Snippet
 from siriObjects.emailObjects import Email as SuperEmail
-from siriObjects.phoneObjects import Phone as SuperPhone
 
 class Address(Location):
     def __init__(self, label="", street="", city="", stateCode="", countryCode="", postalCode="", latitude=0, longitude=0, accuracy=0):
@@ -41,19 +40,19 @@ class PersonSearch(ClientBoundCommand):
     ScopeLocalValue = "Local"
     ScopeRemoteValue = "Remote"
 
-    def __init__(self, refId, scope="Local", relationship="", phone=None, name="", me=0, email=None, company="", birthday="", address=None, accountIdentifier="", targetAppId=""):
+    def __init__(self, refId):
         super(PersonSearch, self).__init__("PersonSearch", "com.apple.ace.contact", None, refId)
-        self.scope = scope
-        self.relationship = relationship
-        self.phone = phone
-        self.name = name
-        self.me = me
-        self.email = email
-        self.company = company
-        self.birthday = birthday
-        self.address = address
-        self.accountIdentifier = accountIdentifier
-        self.targetAppId = targetAppId
+        self.scope = None
+        self.relationship = None
+        self.phone = None
+        self.name = None
+        self.me = None
+        self.email = None
+        self.company = None
+        self.birthday = None
+        self.address = None
+        self.accountIdentifier = None
+        self.targetAppId = None
 
     def to_plist(self):
         self.add_property('scope')
