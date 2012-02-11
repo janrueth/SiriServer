@@ -184,15 +184,9 @@ class weatherPlugin(Plugin):
                                 weatherTempNightTime = False
                                 
                             conditionSwapper = SiriWeatherFunctions()
-                            
-                            dayOfWeek=dict()
-                            dayOfWeek[0]=2
-                            dayOfWeek[1]=3
-                            dayOfWeek[2]=4
-                            dayOfWeek[3]=5
-                            dayOfWeek[4]=6
-                            dayOfWeek[5]=7
-                            dayOfWeek[6]=1
+                            dayOfWeek=[] #
+                            for i in range(1,8):
+                                dayOfWeek.append(i % 7 + 1)
                             
                             tempNight=weatherTempNightTime
                             weatherTemp["currentTemperature"] =str(response["current_observation"]["temp_c"])
