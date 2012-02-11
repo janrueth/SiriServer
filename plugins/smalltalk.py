@@ -130,7 +130,7 @@ class smalltalk(Plugin):
     @register("en-US", ".*Android.*")
     def st_android(self, speech, language):
         opt = { 'de-DE': ['Ich denke da anders.'], 
-                'en-US': ['I think differently','I don\'t like talking about clones.','10101010101, you didn\'t understand that? It\'s in binary. I don\'t have any songs in English.']}
+                'en-US': ['I think differently','I don\'t like talking about clones.'}
         satz = aussage()
         self.say(satz.test(opt[language]))
         self.complete_request()
@@ -442,7 +442,7 @@ class smalltalk(Plugin):
     @register("en-US",".*sing.*song.*")
     def st_sing_song(self, speech, language):
         opt = { 'de-DE': ['Das überlasse ich lieber Anderen.'], 
-                'en-US': ['Daisy, Daisy, give me your answer do...']}
+                'en-US': ['Daisy, Daisy, give me your answer do...',,'10101010101, you didn\'t understand that? It\'s in binary. I don\'t have any songs in English.']]}
         satz = aussage()
         self.say(satz.test(opt[language]))
         self.complete_request()
