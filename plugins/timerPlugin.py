@@ -24,19 +24,22 @@ def parse_number(s, language):
 
 
 def parse_timer_length(t, language):
-    m = re.search(timerPlugin.res['timerLength'][language], t, re.IGNORECASE)
-    if m:
+    seconds = None
+    for m in re.finditer(timerPlugin.res['timerLength'][language], t, re.IGNORECASE):
+        print(m.groups())
+        seconds = seconds or 0
         unit = m.group(2)[0]
         count = parse_number(m.group(1), language)
         if unit == 'h':
-            return count * 60 * 60
+            seconds += count * 3600
         elif unit == 'm':
-            return count * 60
+            seconds += count * 60
         elif unit == 's':
-            return count
+            seconds += count
         else:
-            # shouldn't ever get here, but just in case...
-            return count * 60
+            seconds += count * 60
+
+    return seconds
 
 
 class timerPlugin(Plugin):
@@ -94,14 +97,16 @@ class timerPlugin(Plugin):
             'en-US': '.*(resume|thaw|continue).*timer',
             'fr-FR': u'.*(reprend|continue|relance).*minuteur'
         }, 'setTimer': {
-            'en-US': '.*timer.*\s+([0-9/ ]*|a|an|the)\s+(secs?|seconds?|mins?|minutes?|hrs?|hours?)',
-            'fr-FR': u'.*minuteur.*\s+([0-9/ ]*|un|une|le|la|pour|sur)\s+(secs?|secondes?|mins?|minutes?|hrs?|heures?)'
+            #'fr-FR': u'.*minuteur.*\s+([0-9/ ]*|un|une|le|la|pour|sur)\s+(secs?|secondes?|mins?|minutes?|hrs?|heures?)'
+            # 'en-US': '.*timer[^0-9]*(((([0-9/ ]*|a|an|the)\s+(seconds?|secs?|minutes?|mins?|hours?|hrs?))\s*(and)?)+)'
+            'en-US': '.*timer[^0-9]*(?P<length>([0-9/ ]|seconds?|secs?|minutes?|mins?|hours?|hrs?|and|the|an|a){2,})',
+            'fr-FR': '.*timer[^0-9]*(?P<length>([0-9/ ]|seconds?|secs?|minutes?|mins?|hours?|hrs?|and|the|an|a){2,})'
         }, 'showTimer': {
             'en-US': '.*(show|display|see).*timer',
             'fr-FR': u'.*(montre|affiche|voir).*minuteur'
         }, 'timerLength': {
-            'en-US': '([0-9/ ]*|a|an|the)\s+(secs?|seconds?|mins?|minutes?|hrs?|hours?)',
-            'fr-FR': u'([0-9/ ]*|un|une|le|la|pour|sur)\s+(secs?|secondes?|mins?|minutes?|hrs?|heures?)'
+            'en-US': '([0-9][0-9 /]*|an|a|the)\s+(seconds?|secs?|minutes?|mins?|hours?|hrs?)',
+            'fr-FR': '([0-9][0-9 /]*|un|une|le|la|pour|sur)\s+(secs?|secondes?|mins?|minutes?|hrs?|heures?)',
         }
     }
 
@@ -109,7 +114,7 @@ class timerPlugin(Plugin):
     @register("fr-FR", res['setTimer']['fr-FR'])
     def setTimer(self, speech, language):
         m = re.match(timerPlugin.res['setTimer'][language], speech, re.IGNORECASE)
-        timer_length = ' '.join(m.group(1, 2))
+        timer_length = m.group('length')
         duration = parse_timer_length(timer_length, language)
 
         view = AddViews(self.refId, dialogPhase="Reflection")
