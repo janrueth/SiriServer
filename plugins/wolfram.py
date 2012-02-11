@@ -45,7 +45,7 @@ class wolfram(Plugin):
         else:
             wolframQuestion = speech.replace('who is ','').replace('what is ','').replace('what was ','').replace('Who is ','').replace('What is ','').replace('What was ','').replace(' ', '%20')
             wolframTranslation = 'false'
-        wolfram_alpha = 'http://api.wolframalpha.com/v1/query.jsp?input=%s&appid=%s&translation=%s' % (wolframQuestion, APPID, wolframTranslation)
+        wolfram_alpha = u'http://api.wolframalpha.com/v1/query.jsp?input=%s&appid=%s&translation=%s' % (urllib.quote_plus(wolframQuestion.encode("utf-8")), APPID, wolframTranslation)
         dom = minidom.parse(urlopen(wolfram_alpha))
         count_wolfram = 0
         wolfram0 = 12
