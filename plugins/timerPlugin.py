@@ -95,13 +95,13 @@ class timerPlugin(Plugin):
             'fr-FR': u'.*(reprend|continue|relance).*minuteur'
         }, 'setTimer': {
             'en-US': '.*timer.*\s+([0-9/ ]*|a|an|the)\s+(secs?|seconds?|mins?|minutes?|hrs?|hours?)',
-            'fr-FR': '.*minuteur.*\s+([0-9/ ]*|un|une|le|la)\s+(secs?|secondes?|mins?|minutes?|hrs?|heures?)'
+            'fr-FR': u'.*minuteur.*\s+([0-9/ ]*|un|une|le|la|pour|sur)\s+(secs?|secondes?|mins?|minutes?|hrs?|heures?)'
         }, 'showTimer': {
             'en-US': '.*(show|display|see).*timer',
-            'fr-FR': '.*(montre|affiche|voir).*minuteur'
+            'fr-FR': u'.*(montre|affiche|voir).*minuteur'
         }, 'timerLength': {
             'en-US': '([0-9/ ]*|a|an|the)\s+(secs?|seconds?|mins?|minutes?|hrs?|hours?)',
-            'fr-FR': '([0-9/ ]*|un|une|le|la)\s+(secs?|secondes?|mins?|minutes?|hrs?|heures?)'
+            'fr-FR': u'([0-9/ ]*|un|une|le|la|pour|sur)\s+(secs?|secondes?|mins?|minutes?|hrs?|heures?)'
         }
     }
 
