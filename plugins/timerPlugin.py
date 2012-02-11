@@ -100,7 +100,7 @@ class timerPlugin(Plugin):
             #'fr-FR': u'.*minuteur.*\s+([0-9/ ]*|un|une|le|la|pour|sur)\s+(secs?|secondes?|mins?|minutes?|hrs?|heures?)'
             # 'en-US': '.*timer[^0-9]*(((([0-9/ ]*|a|an|the)\s+(seconds?|secs?|minutes?|mins?|hours?|hrs?))\s*(and)?)+)'
             'en-US': '.*timer[^0-9]*(?P<length>([0-9/ ]|seconds?|secs?|minutes?|mins?|hours?|hrs?|and|the|an|a){2,})',
-            'fr-FR': '.*timer[^0-9]*(?P<length>([0-9/ ]|seconds?|secs?|minutes?|mins?|hours?|hrs?|and|the|an|a){2,})'
+            'fr-FR': '.*minuteur[^0-9]*(?P<length>([0-9/ ]|secondes?|secs?|minutes?|mins?|hours?|hrs?|and|the|an|a){2,})'
         }, 'showTimer': {
             'en-US': '.*(show|display|see).*timer',
             'fr-FR': u'.*(montre|affiche|voir).*minuteur'
@@ -144,7 +144,7 @@ class timerPlugin(Plugin):
             view = AddViews(self.refId, dialogPhase="Reflection")
             view.views = [AssistantUtteranceView(speakableText=timerPlugin.localizations['Timer']['settingTimer'][language], dialogIdentifier="Timer#settingTimer")]
             self.sendRequestWithoutAnswer(view)
-
+            
             if re.match('\^timerConfirmation\^=\^no\^', utterance):
                 # user canceled
                 view = AddViews(self.refId, dialogPhase="Completion")
