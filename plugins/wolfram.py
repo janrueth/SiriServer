@@ -140,7 +140,7 @@ class wolfram(Plugin):
                   wolfram_pod8 = pod.getAttribute('title')
                count_wolfram += 1
         if language == 'de-DE':
-            self.say("Dies könnte Ihre Frage zu beantworten:")
+            self.say("Das k\xf6nnte ihre Frage beantworten:")
         else:
             self.say("This might answer your question:")
         view = AddViews(self.refId, dialogPhase="Completion")
