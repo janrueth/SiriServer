@@ -184,6 +184,22 @@ class PersonAttribute(AceObject):
         self.add_property('data')
         return super(PersonAttribute, self).to_plist()
 
+class Phone(AceObject):
+    def __init__(self, number="", label="", favoriteVoice=0, favoriteFacetime=0, group="com.apple.ace.system"):
+        super(Phone, self).__init__("Phone", group)
+        self.number = number
+        self.label = label
+        self.favoriteVoice = favoriteVoice
+        self.favoriteFacetime = favoriteFacetime
+    
+    def to_plist(self):
+        self.add_property('number')
+        self.add_property('label')
+        self.add_property('favoriteVoice')
+        self.add_property('favoriteFacetime')
+        return super(Phone, self).to_plist()
+
+
 class RelatedName(AceObject):
     def __init__(self, name="", label="", group="com.apple.ace.system"):
         super(RelatedName, self).__init__("RelatedName", group)

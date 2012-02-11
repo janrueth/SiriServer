@@ -3,23 +3,6 @@ from siriObjects.systemObjects import DomainObject, PersonAttribute
 from siriObjects.uiObjects import Snippet
 
 
-class Phone(AceObject):
-    def __init__(self, number="", label="", favoriteVoice=0, favoriteFacetime=0, group="com.apple.ace.phone"):
-        super(Phone, self).__init__("Phone", group)
-        self.number = number
-        self.label = label
-        self.favoriteVoice = favoriteVoice
-        self.favoriteFacetime = favoriteFacetime
-
-    def to_plist(self):
-        self.add_property('number')
-        self.add_property('label')
-        self.add_property('favoriteVoice')
-        self.add_property('favoriteFacetime')
-        return super(Phone, self).to_plist()
-
-
-
 class PhoneCall(ClientBoundCommand):
     def __init__(self, refId, recipient="", faceTime=False, callRecipient=None, targetAppId=""):
         super(PhoneCall, self).__init__("Call", "com.apple.ace.phone", None, refId)
