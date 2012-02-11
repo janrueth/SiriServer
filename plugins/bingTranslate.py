@@ -13,7 +13,7 @@ from xml.etree import ElementTree as ET
 from plugin import *
 
 #appid to connect to bing API http://www.microsoft.com/web/post/using-the-free-bing-translation-apis
-appid = APIKeyForAPI("translate")
+appid = APIKeyForAPI("bingTranslate")
 
 #dictionary for language name --> code conversion
 
