@@ -9,7 +9,7 @@ class smalltalk(Plugin):
     
     @register("de-DE", "(.*Hallo.*)|(.*Hi.*Siri.*)")
     @register("en-US", "(.*Hello.*)|(.*Hi.*Siri.*)")
-    @register("fr-FR", "(.*Bonjour.*)|(.*Bonjour.*Siri.*)")
+    @register("fr-FR", ".*Bonjour|Bonjour Siri|Coucou.*")
     def st_hello(self, speech, language):
         if language == 'de-DE':
             self.say("Hallo.")
@@ -33,7 +33,7 @@ class smalltalk(Plugin):
 
     @register("de-DE", "Wie geht es dir?")
     @register("en-US", "How are you?")
-    @register("fr-FR", u".*((ça|ca) va|va bien|comment va).*")
+    @register("fr-FR", u".*((ça|ca) va|va bien|comment va|gaze).*")
     def st_howareyou(self, speech, language):
         if language == 'de-DE':
             self.say("Gut danke der Nachfrage.")
@@ -157,6 +157,7 @@ class smalltalk(Plugin):
 
     @register("de-DE", ".*Android.*")
     @register("en-US", ".*Android.*")
+    @register("fr-FR", ".*Android.*")
     def st_android(self, speech, language):
         if language == 'de-DE':
             self.say("Ich denke da anders.")
@@ -222,7 +223,7 @@ class smalltalk(Plugin):
 
     @register("de-DE", ".*Sag mir.*Schmutzige.*")
     @register("en-US", ".*talk.*dirty*")
-    @register("fr-FR", ".*(Dis|Dit) moi.*sou*")
+    @register("fr-FR", ".*di(s|t).*mots?.*sales?.*")
     def st_dirty(self, speech, language):
         if language == 'de-DE':
             self.say("Hummus. Kompost. Bims. Schlamm. Kies.")
@@ -269,7 +270,8 @@ class smalltalk(Plugin):
         if language == 'en-US':
             self.say("Listen to me, put down the iphone right now and take a nap. I will be here when you get back.")
         elif language == 'fr-FR':
-            self.say(u"Ecoutez-moi, déposez le téléphone immédiatement et faites une sieste. Je serai là à votre retour.")
+            rep = [u"Ecoutez-moi, déposez l'iPhone immédiatement et faites une sieste. Je serai là à votre retour.", u"Ecoutez-moi. Posez tout de suite cet iPhone et faites une sieste. Je vous attends ici."]
+            self.say(random.choice(rep))
         self.complete_request()
     
     @register("en-US", ".*like.helping.*")
@@ -426,7 +428,7 @@ class smalltalk(Plugin):
         self.complete_request()
     
     @register("en-US",".*I'm.*drunk.driving.*")
-    @register("fr-FR",u".*je.*(conduit|conduis).(bourré|saoul|soul|soûl|sous|bourrer).*")
+    @register("fr-FR",u".*je.*(conduit|conduis|conduire).(bourré|saoul|soul|soûl|sous|bourrer).*|(j'ai|je).vol(é|er|e).*")
     def st_dui(self, speech, language):
         if language == 'en=US':
             self.say("I couldn't find any DUI lawyers nearby.")
@@ -460,12 +462,13 @@ class smalltalk(Plugin):
         self.complete_request()
     
     @register("en-US",".*you're.*funny.*")
-    @register("fr-FR",u".*tu (es|est).*(drole|drôle).*")
+    @register("fr-FR",u".*(tu (es|est).*(drole|drôle)|MDR|LOL).*")
     def st_funny(self, speech, language):
         if language == 'en-US':
             self.say("LOL")
         elif language == 'fr-FR':
-            self.say("MDR")
+            rep = ["LOL","MDR"]
+            self.say(random.choice(rep))
         self.complete_request()
     
     @register("en-US",".*guess.what.*")
