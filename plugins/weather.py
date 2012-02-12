@@ -69,7 +69,7 @@ class weatherPlugin(Plugin):
     
     @register("de-DE", "(.*Wetter.*)|(.*Vorhersage.*)")     
     @register("en-US", "(.*Weather.*)|(.*forecast.*)")
-    @register("fr-FR", u"(.*Météo.*)|(.*prévision.*)|(Quel.*temps.*)")
+    @register("fr-FR", u".*(Météo|prévision|Quel.*temps|(fais|fait|faire).*(chaud|froid)).*")
     def weatherForecastLookUp(self, speech, language):
         speech = speech.replace(u".","")
         viewType ="DAILY"
@@ -81,7 +81,7 @@ class weatherPlugin(Plugin):
             speech = speech.replace("current","")
             speech = speech.replace(" for today"," in ")
             speech = speech.replace(" for "," in ")
-        if (speech.count("aujourd'hui") > 0 or speech.count("actuel") > 0 or speech.count("maintenant") > 0 or speech.count(" pour aujourd'hui") > 0 and language == "fr-FR"):
+        if (speech.count("aujourd'hui") > 0 or speech.count("actuel") > 0 or speech.count("maintenant") > 0 or speech.count(" pour aujourd'hui") > 0 or speech.count("fait") > 0 and language == "fr-FR"):
             viewType = "HOURLY"
             speech = speech.replace(" pour aujourd'hui","")
             speech = speech.replace("aujourd'hui","")
@@ -114,7 +114,6 @@ class weatherPlugin(Plugin):
                 
         error = False
         view = AddViews(refId=self.refId, dialogPhase="Reflection")
-        print weatherPlugin.localizations
         randomNumber = random.randint(0,3)
         view.views = [AssistantUtteranceView(weatherPlugin.localizations['weatherForecast']['search'][randomNumber][language], weatherPlugin.localizations['weatherForecast']['search'][randomNumber][language])]
         self.connection.send_object(view)
@@ -124,17 +123,18 @@ class weatherPlugin(Plugin):
         
                 
         
-        countryOrCity = re.match(u"(?u).* (a|à|de|pour|in) ([\w ]+)", speech, re.IGNORECASE)
+        countryOrCity = re.match(u"(?u).* (a|à|de|pour|en|in) ([\w ]+)", speech, re.IGNORECASE)
         if countryOrCity != None:
             countryOrCity = countryOrCity.group(countryOrCity.lastindex).strip()
             print "found forecast"
             # lets see what we got, a country or a city... 
             # lets use google geocoding API for that
             url = "http://maps.googleapis.com/maps/api/geocode/json?address={0}&sensor=false&language={1}".format(urllib.quote_plus(countryOrCity.encode("utf-8")), language)
+            print url
         elif countryOrCity == None:
             currentLocation=self.getCurrentLocation()
             url = "http://maps.googleapis.com/maps/api/geocode/json?latlng={0},{1}&sensor=false&language={2}".format(str(currentLocation.latitude),str(currentLocation.longitude), language)
-           
+            print url
             # lets wait max 3 seconds
         jsonString = None
         try:
@@ -151,7 +151,8 @@ class weatherPlugin(Plugin):
                     # OK we have a country as input, that sucks, we need the capital, lets try again and ask for capital also
                     components = filter(lambda x: True if "country" in x['types'] else False, components)
                     url = "http://maps.googleapis.com/maps/api/geocode/json?address=capital%20{0}&sensor=false&language={1}".format(urllib.quote_plus(components[0]['long_name']), language)
-                        # lets wait max 3 seconds
+                    print url
+                    # lets wait max 3 seconds
                     jsonString = None
                     try:
                         jsonString = urllib2.urlopen(url, timeout=3).read()
@@ -166,13 +167,24 @@ class weatherPlugin(Plugin):
                 # get latitude and longitude
                 location = response['results'][0]['geometry']['location']
                 
-                
-                city = filter(lambda x: True if "locality" in x['types'] or "administrative_area_level_1" in x['types'] else False, components)[0]['long_name']
-                country = filter(lambda x: True if "country" in x['types'] else False, components)[0]['long_name']
-                state = filter(lambda x: True if "administrative_area_level_1" in x['types'] or "country" in x['types'] else False, components)[0]['short_name']
-                stateLong = filter(lambda x: True if "administrative_area_level_1" in x['types'] or "country" in x['types'] else False, components)[0]['long_name']
-                countryCode = filter(lambda x: True if "country" in x['types'] else False, components)[0]['short_name']
+                city = ""
+                country = ""
+                state = ""
+                stateLong = ""
+                countryCode = ""
+                shortName = ""
+                longName = ""
+                try:
+                    city = filter(lambda x: True if "locality" in x['types'] or "administrative_area_level_1" in x['types'] else False, components)[0]['long_name']
+                    country = filter(lambda x: True if "country" in x['types'] else False, components)[0]['long_name']
+                    state = filter(lambda x: True if "administrative_area_level_1" in x['types'] or "country" in x['types'] else False, components)[0]['short_name']
+                    stateLong = filter(lambda x: True if "administrative_area_level_1" in x['types'] or "country" in x['types'] else False, components)[0]['long_name']
+                    countryCode = filter(lambda x: True if "country" in x['types'] else False, components)[0]['short_name']
+                except:
+                    pass
+
                 url = "http://api.wunderground.com/api/{0}/geolookup/conditions/forecast7day//hourly7day/astronomy/q/{1},{2}.json".format(weatherApiKey, location['lat'], location['lng'])
+                print url
                  # lets wait max 3 seconds
                 jsonString = None
                 try:
@@ -242,6 +254,11 @@ class weatherPlugin(Plugin):
                             speakCountry = stateLong if country == "United States" else country
                             if language=="de-DE":
                                 speakCountry = stateLong + " (" + country + ")" if country == "USA" else country
+                            
+                            if city == "":
+                                city = components[0]['short_name']
+                            if country == "":
+                                speakCountry = components[0]['long_name']
                                 
                             randomNumber = random.randint(0,2)
                             view.views = [AssistantUtteranceView(text=weatherPlugin.localizations['weatherForecast']['forecast'][viewType][randomNumber][language].format(city, speakCountry),speakableText=weatherPlugin.localizations['weatherForecast']['forecast'][viewType][randomNumber][language].format(city,speakCountry), dialogIdentifier="Weather#forecastCommentary"), weather]
