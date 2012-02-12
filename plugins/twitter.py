@@ -5,7 +5,6 @@
 from plugin import *
 from oauth import oauth
 from oauthtwitter import OAuthApi
-import pprint
 import ConfigParser
 
 def getTwitterSession():
