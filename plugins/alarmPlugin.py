@@ -36,7 +36,7 @@ class alarmPlugin(Plugin):
     res = {
         'setAlarm': {
             'en-US': '.*set.* alarm for.* (0?[1-9]|1[012])([0-5]\d)?\s?([APap][mM])\s?(\bcalled|named|labeled\b)?\s?(([a-z0-9]{1,7}\s)?([a-z0-9]{1,7})\s?([a-z0-9]{1,7}))?',
-            'fr-FR': u'.*(programme|regle|règle).*(alarme|reveil|réveil).*(0?[1-9]|1[0-9]|2[0-3]) ([0-5]\d)?\s?(\appelée|appel|nommée|nommee|labellé|labelle\b)?\s?(([a-z0-9]{1,7}\s)?([a-z0-9]{1,7})\s?([a-z0-9]{1,7}))?'
+            'fr-FR': u'.*(programme|regle|règle)?.*(alarme|reveil|réveil)([^0-9]+)([0-2]?[0-9])([^0-9]+)?([0-5]?[0-9])?\s?(\appelée|appel|nommée|nommee|labellé|labelle\b)?\s?(([a-z0-9]{1,7}\s)?([a-z0-9]{1,7})\s?([a-z0-9]{1,7}))?'
         }
     }
 
@@ -46,10 +46,10 @@ class alarmPlugin(Plugin):
         alarmString = re.match(alarmPlugin.res['setAlarm'][language], speech, re.IGNORECASE)
 				
         if language == 'fr-FR':
-            labelGroupId = 6
-            alarmHour = int(alarmString.group(3))
+            labelGroupId = 8
+            alarmHour = int(alarmString.group(4))
             alarm24Hour = alarmHour
-            alarmMinutes = alarmString.group(4)
+            alarmMinutes = alarmString.group(6)
             alarmAMPM = ""
             alarmLabelExists = alarmString.group(labelGroupId)
         else:
