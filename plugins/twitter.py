@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-#from plugin import *
+from plugin import *
 from oauth import oauth
 from oauthtwitter import OAuthApi
 import pprint
