@@ -24,7 +24,7 @@ class whereAmI(Plugin):
         mapGetLocation = self.getCurrentLocation()
         latitude = mapGetLocation.latitude
         longitude = mapGetLocation.longitude
-        url = "http://maps.googleapis.com/maps/api/geocode/json?latlng={0},{1}&sensor=false&language={2}".format(str(latitude),str(longitude), language)
+        url = u"http://maps.googleapis.com/maps/api/geocode/json?latlng={0},{1}&sensor=false&language={2}".format(str(latitude),str(longitude), language)
         try:
             jsonString = urllib2.urlopen(url, timeout=3).read()
         except:
