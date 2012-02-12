@@ -62,7 +62,7 @@ class timePlugin(Plugin):
             countryOrCity = countryOrCity.group(1).strip()
             # lets see what we got, a country or a city... 
             # lets use google geocoding API for that
-            url = "http://maps.googleapis.com/maps/api/geocode/json?address={0}&sensor=false&language={1}".format(urllib.quote_plus(countryOrCity), language)
+            url = u"http://maps.googleapis.com/maps/api/geocode/json?address={0}&sensor=false&language={1}".format(urllib.quote_plus(countryOrCity), language)
             # lets wait max 3 seconds
             jsonString = None
             try:
@@ -78,7 +78,7 @@ class timePlugin(Plugin):
                     if "country" in types:
                         # OK we have a country as input, that sucks, we need the capital, lets try again and ask for capital also
                         components = filter(lambda x: True if "country" in x['types'] else False, components)
-                        url = "http://maps.googleapis.com/maps/api/geocode/json?address=capital%20{0}&sensor=false&language={1}".format(urllib.quote_plus(components[0]['long_name']), language)
+                        url = u"http://maps.googleapis.com/maps/api/geocode/json?address=capital%20{0}&sensor=false&language={1}".format(urllib.quote_plus(components[0]['long_name']), language)
                             # lets wait max 3 seconds
                         jsonString = None
                         try:
@@ -93,7 +93,7 @@ class timePlugin(Plugin):
                 if response['status'] == 'OK':
                     # get latitude and longitude
                     location = response['results'][0]['geometry']['location']
-                    url = "http://api.geonames.org/timezoneJSON?lat={0}&lng={1}&username={2}".format(location['lat'], location['lng'], geonames_user)
+                    url = u"http://api.geonames.org/timezoneJSON?lat={0}&lng={1}&username={2}".format(location['lat'], location['lng'], geonames_user)
                     jsonString = None
                     try:
                         jsonString = urllib2.urlopen(url, timeout=3).read()
