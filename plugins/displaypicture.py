@@ -25,13 +25,13 @@ class define(Plugin):
     
     @register("de-DE", "(zeig mir|zeige|zeig).*(bild|zeichnung) (vo. ein..|vo.|aus)* ([\w ]+)")
     @register("en-US", "(display|show me|show).*(picture|image|drawing|illustration) (of|an|a)* ([\w ]+)")
-    @register("fr-FR", u"(montre|affiche moi|affiche|recherche|cherche).*(photos?|images?|dessins?|illustrations?) (de|du|d'un|d')* ?([\w ]+)")
+    @register("fr-FR", u"(montre|affiche moi|affiche|recherche|cherche).*(photos?|images?|dessins?|illustrations?) (pour|de la|de l'|des|du|de|d'une?|d'|l')* ?([\w ]+)")
     def defineword(self, speech, language, regex):
         Title = regex.group(regex.lastindex).strip()
         Query = urllib.quote_plus(Title.encode("utf-8"))
         SearchURL = u'https://ajax.googleapis.com/ajax/services/search/images?v=1.0&imgsz=small|medium|large|xlarge&q=' + str(Query)
         try:
-    	    self.say("Je recherche une image de "+Title+"...")
+    	    self.say("Je recherche une image pour "+Title+"...")
             jsonResponse = urllib2.urlopen(SearchURL).read()
             jsonDecoded = json.JSONDecoder().decode(jsonResponse)
             ImageURL = jsonDecoded['responseData']['results'][0]['unescapedUrl']
