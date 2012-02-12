@@ -14,6 +14,20 @@ class AddViews(ClientBoundCommand):
         self.add_property('dialogPhase')
         self.add_property('views')
         return super(AddViews, self).to_plist()
+    
+class AceView(AceObject):
+    def __init__(self, clazz, group):
+        super(AceView, self).__init__(clazz, group)
+        self.viewId = None # string
+        self.speakableText = None # string
+        self.listenAfterSpeaking = None # number
+
+    def to_plist(self):
+        self.add_property('viewId')
+        self.add_property('speakableText')
+        self.add_property('listenAfterSpeaking')
+        return super(AceView, self).to_plist()
+
 
 # Assistant-related objects
 class AssistantUtteranceView(AceObject):
@@ -29,6 +43,23 @@ class AssistantUtteranceView(AceObject):
         self.add_property('dialogIdentifier')
         self.add_property('listenAfterSpeaking')
         return super(AssistantUtteranceView, self).to_plist()
+
+class DisambiguationList(AceView):
+    def __init__(self, items=None, speakableSelectionResponse="OK!", listenAfterSpeaking=True, speakableText="", speakableFinalDemitter="", speakableDemitter="", selectionResponse="OK!"):
+        super(DisambiguationList, self).__init__("DisambiguationList", "com.apple.ace.assistant")
+        self.items = items if items != None else []
+        self.speakableSelectionResponse = speakableSelectionResponse
+        self.listenAfterSpeaking = listenAfterSpeaking
+        self.speakableFinalDemitter = speakableFinalDemitter
+        self.selectionResponse = selectionResponse
+        self.speakableText = speakableText
+
+    def to_plist(self):
+        self.add_property('items')
+        self.add_property('speakableSelectionResponse')
+        self.add_property('speakableFinalDemitter')
+        self.add_property('selectionResponse')
+        return super(DisambiguationList, self).to_plist()
 
 class Button(AceObject):
     def __init__(self, text="", commands=None):
@@ -77,6 +108,21 @@ class MenuItem(AceObject):
         self.add_property('commands')
         return super(MenuItem, self).to_plist()
 
+class ListItem(AceView):
+    def __init__(self, title="", selectionText="", commands=None, speakableText="", obj=None):
+        super(ListItem, self).__init__("ListItem", "com.apple.ace.assistant")
+        self.title= title
+        self.selectionText = selectionText
+        self.commands = commands if commands != None else []
+        self.speakableText = speakableText
+        self.object = obj
+
+    def to_plist(self):
+        self.add_property('title')
+        self.add_property('selectionText')
+        self.add_property('commands')
+        self.add_property('object')
+        return super(ListItem, self).to_plist()
 
 class ConfirmationOptions(AceObject):
     def __init__(self, denyCommands=None, submitCommands=None, confirmText="Confirm", denyText="Cancel", cancelCommands=None, cancelLabel="Cancel", submitLabel="Confirm", confirmCommands=None, cancelTrigger="Deny"):
@@ -110,19 +156,6 @@ class CancelSnippet(AceObject):
 class ConfirmSnippet(AceObject):
     def __init__(self):
         super(ConfirmSnippet, self).__init__("ConfirmSnippet", "com.apple.ace.assistant")
-
-class AceView(AceObject):
-    def __init__(self, clazz, group):
-        super(AceView, self).__init__(clazz, group)
-        self.viewId = None # string
-        self.speakableText = None # string
-        self.listenAfterSpeaking = None # number
-
-    def to_plist(self):
-        self.add_property('viewId')
-        self.add_property('speakableText')
-        self.add_property('listenAfterSpeaking')
-        return super(AceView, self).to_plist()
 
 class Snippet(AceView):
     def __init__(self, group, clazz="Snippet"):
