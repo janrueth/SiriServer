@@ -160,6 +160,19 @@ Now you are ready to go, start the server with:
 Note: You need to run it as root, as we use https port 443
 (non root can only use ports > 1024) for incomming connections.
 
+**Running the server as a service**
+For Ubuntu/Debian/...
+
+1. Copy the script from startupScripts/siriserver to /etc/init.d "sudo cp startupScripts/siriserver /etc/init.d/siriserver"
+2. Edit the script, fill in the path to your SiriServer folder "sudo nano /etc/init.d/siriserver"
+3. Make executable "sudo chmod a+x /etc/init.d/siriserver"
+4. Add it to the startup items: "sudo update-rc.d siriserver defaults"
+5. Start with "sudo service siriserver start" You can now start, restart and stop SiriServer just as you started it in step 5.
+
+For Mac
+
+1. "sudo cp startupScripts/net.siriserver.plist /Library/LaunchDaemons"
+2. "sudo launchctl load /Library/LaunchDaemons/net.siriserver.plist"
 
 Common Errors
 -------------
@@ -241,6 +254,9 @@ It should output something like this, note the Ace http request near the end:
 	 User-Agent: Assistant(iPhone/iPhone3,1; iPhone OS/5.0.1/9A405) Ace/1.0
 	 Content-Length: 2000000000
 
+HELP
+------
+If you followed every step of the installation and you still need help to get SiriServer up and running, join #SiriServer channel on Freenode (IRC).
 
 Thanks
 ------
