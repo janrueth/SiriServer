@@ -275,6 +275,8 @@ class smalltalk(Plugin):
     def st_likehlep(self, speech, language):
         if language == 'en-US':
             self.say("I really have no opinion.")
+        elif language == 'fr-FR':
+            self.say(u"Je n'ai pas d'opinion à ce sujet.")
         self.complete_request()
     
     @register("en-US",".*you.like.peanut.butter.*")
@@ -329,9 +331,12 @@ class smalltalk(Plugin):
         self.complete_request()
     
     @register("en-US",".*know.*happened.*HAL.*9000.*")
+    @register("fr-FR",".*.*HAL.*9000.*")
     def st_hall_9000(self, speech, language):
         if language == 'en-US':
             self.say("Everyone knows what happened to HAL. I'd rather not talk about it.")
+        elif language == 'fr-FR':
+            self.say(u"Tout le monde sait ce qui est arrivé à HAL. Je préfère ne pas en parler.")
         self.complete_request()
     
     @register("en-US",".*don't.*understand.*love.*")
@@ -352,7 +357,7 @@ class smalltalk(Plugin):
         if language == 'en-US':
             self.say("We are talking about you, not me.")
         elif language == 'fr-FR':
-            self.say(u"Je ne pense pas que cela me regarde.");
+            self.say(u"Nous sommes en train de parler de toi, pas de moi.");
         self.complete_request()
     
     @register("en-US",".*you.*part.*matrix.*")
@@ -375,12 +380,12 @@ class smalltalk(Plugin):
         self.complete_request()
     
     @register("en-US",".*I.can't.*")
-    @register("fr-FR",".*je.(ne peux pas|ne sais pas).*")
+    @register("fr-FR","(je|tu).(ne peu(x|t) pas|ne sai(s|t) pas).*")
     def st_i_cant(self, speech, language):
         if language == 'en-US':
             self.say("I thought not.");
             self.say("OK, you can't then.")
-        if language == 'fr-FR':
+        elif language == 'fr-FR':
             self.say(u"Rien n'est impossible, l'important c'est d'avoir la foi.");
             self.say(u"OK, peut-être que ça l'est.")
         self.complete_request()
@@ -390,7 +395,7 @@ class smalltalk(Plugin):
     def st_i_just(self, speech, language):
         if language == 'en-US':
             self.say("Really!?")
-        if language == 'fr-FR':
+        elif language == 'fr-FR':
             self.say("Vraiment !?")
         self.complete_request()
     
@@ -399,7 +404,7 @@ class smalltalk(Plugin):
     def st_where_you(self, speech, language):
         if language == 'en-US':
             self.say("Wherever you are.")
-        if language == 'en-US':
+        elif language == 'fr-FR':
             self.say(u"Je suis partout où tu es.")
         self.complete_request()
     
@@ -408,7 +413,7 @@ class smalltalk(Plugin):
     def st_why_you(self, speech, language):
         if language == 'en-US':
             self.say("I just am.")
-        if language == 'fr-FR':
+        elif language == 'fr-FR':
             self.say("Je suis ce que je suis parce que je suis ce que je suis.")
         self.complete_request()
     
@@ -423,6 +428,9 @@ class smalltalk(Plugin):
     def st_dui(self, speech, language):
         if language == 'en=US':
             self.say("I couldn't find any DUI lawyers nearby.")
+        elif language == 'fr-FR':
+            self.say("Je recherche la patrouille de police la plus proche...")
+            self.say(u"Je n'ai trouvé aucune voiture de police dans le secteur.")
         self.complete_request()
     
     @register("en-US",".*shit.*myself.*")
