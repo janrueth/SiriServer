@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 #by Cédric Boverie
 
+import random
 from plugin import *
 
 class frenchtalk(Plugin):
@@ -36,7 +37,7 @@ class frenchtalk(Plugin):
         self.say(u"D'accord, je vous laisse travailler.");
         self.complete_request()
 		
-    @register("fr-FR", "((Veux|Veut).*tu.*)|(.*tu.*(veux|veut).*)|(as.*tu besoin d.*)")
+    @register("fr-FR", u"(Veux|Veut).*tu.*|.*tu.*(veux|veut).*|as.*tu besoin d.*|.*tu.*(as|a).*besoin d.*")
     def ft_besoin(self, speech, language):
         self.say(u"Merci, mais j'ai déjà tout ce dont j'ai besoin dans le nuage.");
         self.complete_request()
@@ -66,8 +67,18 @@ class frenchtalk(Plugin):
 		
     @register("fr-FR", u"(.*connard.*)|(.*idiot.*)|(.*crétin.*)|(.*pétasse.*)|(.*connasse.*)|(.*salope.*)|(.*putain.*)|(.*merde.*)|(.*débile.*)|(.* con .*)")
     def ft_insultes(self, speech, language):
-        self.say(u"Oh Oh, tu parles un langage bien châtié, il me semble.");
-        self.say(u"Repose-moi ta question poliment.");
+        choix = random.randint(0,1);
+        if choix == 1:
+            self.say(u"Oh Oh, tu parles un langage bien châtié, il me semble.");
+            self.say(u"Repose-moi ta question poliment.");
+        else:
+            self.say("Demandez gentiment, maintenant.")
+        self.complete_request()
+
+    @register("fr-FR", u".*(suis|suit).*(saoul|soul|soûl|sous)|(je|j'ai).*alcool.*")
+    def ft_glouglou(self, speech, language):
+        rep = [u"Ne buvez jamais si vous avez du travail à faire, ne buvez jamais seul et ne buvez jamais lorsque le soleil brille.", u"Ne comptez pas sur moi pour vous ramener chez vous."]
+        self.say(random.choice(rep));
         self.complete_request()
 		
     @register("fr-FR", u"j.*envie.*")
@@ -76,10 +87,14 @@ class frenchtalk(Plugin):
         self.say(u"Heureusement, nous n'avons pas les mêmes envies.");
         self.complete_request()		
 
-    @register("fr-FR", u"tu.*(est|es).*(genie|genial|génie|génial)")
+    @register("fr-FR", u"tu.*(est|es).*(genie|genial|génie|génial|intelligent)")
     def ft_genie(self, speech, language):
-        self.say(u"Cela nous fait un point commun.");
-        self.say(u"Nous savons tout les 2 que je suis génial.");
+        choix = random.randint(0,1)        
+        if choix == 1:
+            self.say(u"Cela nous fait un point commun.");
+            self.say(u"Nous savons tout les 2 que je suis génial.");
+        else:
+            self.say(u"Il y en a là-dedans !")
         self.complete_request()
 
     @register("fr-FR", u".*couleur.*cheval.*napoléon")
@@ -91,3 +106,10 @@ class frenchtalk(Plugin):
     def ft_faitquoi(self, speech, language):
         self.say(u"Je suis en train de te parler.");
         self.complete_request()
+
+    @register("fr-FR", u".*(iphone 5|iphone cinq).*")
+    def ft_iphonenext(self, speech, language):
+        rep = [u"Désolé, c'est convidentiel",u"Il sortira le... Désolé, un problème technique m'empêche de répondre"]
+        self.say(random.choice(rep));
+        self.complete_request()
+
