@@ -123,7 +123,7 @@ class weatherPlugin(Plugin):
         
                 
         
-        countryOrCity = re.match(u"(?u).* (a|à|de|pour|en|in) ([\w ]+)", speech, re.IGNORECASE)
+        countryOrCity = re.match(u"(?u).* (a|à|de|pour|dans|en|in) ([\w ]+)", speech, re.IGNORECASE)
         if countryOrCity != None:
             countryOrCity = countryOrCity.group(countryOrCity.lastindex).strip()
             print "found forecast"
