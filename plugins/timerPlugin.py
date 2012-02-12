@@ -100,7 +100,7 @@ class timerPlugin(Plugin):
             #'fr-FR': u'.*minuteur.*\s+([0-9/ ]*|un|une|le|la|pour|sur)\s+(secs?|secondes?|mins?|minutes?|hrs?|heures?)'
             # 'en-US': '.*timer[^0-9]*(((([0-9/ ]*|a|an|the)\s+(seconds?|secs?|minutes?|mins?|hours?|hrs?))\s*(and)?)+)'
             'en-US': '.*timer[^0-9]*(?P<length>([0-9/ ]|seconds?|secs?|minutes?|mins?|hours?|hrs?|and|the|an|a){2,})',
-            'fr-FR': '.*minuteur[^0-9]*(?P<length>([0-9/ ]|secondes?|secs?|minutes?|mins?|hours?|hrs?|and|the|an|a){2,})'
+            'fr-FR': '.*minuteur[^0-9]*(?P<length>([0-9/ ]|secondes?|secs?|minutes?|mins?|heures?|hrs?|et){2,})'
         }, 'showTimer': {
             'en-US': '.*(show|display|see).*timer',
             'fr-FR': u'.*(montre|affiche|voir).*minuteur'
