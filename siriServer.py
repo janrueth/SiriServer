@@ -40,7 +40,7 @@ from sslDispatcher import ssl_dispatcher
 import signal, os
 
 class HandleConnection(ssl_dispatcher):
-    __not_recognized = {"de-DE": u"Entschuldigung, ich verstehe \"{0}\" nicht.", "en-US": u"Sorry I don't understand {0}","fr-FR": u"Désolé, je ne comprends pas {0}."}
+    __not_recognized = {"de-DE": u"Entschuldigung, ich verstehe \"{0}\" nicht.", "en-US": u"Sorry I don't understand {0}","fr-FR": u"Désolé, je ne comprends pas ce que '{0}' veut dire."}
     __websearch = {"de-DE": u"Websuche", "en-US": u"Websearch", "fr-FR": "Rechercher sur le web"}
     def __init__(self, conn):
         asyncore.dispatcher_with_send.__init__(self, conn)
