@@ -256,7 +256,6 @@ It should output something like this, note the Ace http request near the end:
 
 HELP
 ------
-Please do not use the issues to post your normal installation issues. This page is intended for issues regarding SiriServer itself.
 If you followed every step of the installation and you still need help to get SiriServer up and running, join #SiriServer channel on Freenode (IRC).
 
 Thanks
