@@ -24,5 +24,5 @@ class twitterPlugin(Plugin):
     def tweet(self, speech, language):
         response = self.ask("Do you want me to tweet: %s?" % speech)
         if response == yes:
-            session.UpdateStatus(speech)
+            self.session.UpdateStatus(speech)
         self.complete_request()
