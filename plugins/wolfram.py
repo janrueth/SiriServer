@@ -29,12 +29,11 @@ class wolfram(Plugin):
     
     @register("de-DE", "(Was ist [a-zA-Z0-9]+)|(Wer ist [a-zA-Z0-9]+)|(Wie viel [a-zA-Z0-9]+)|(Was war [a-zA-Z0-9]+)|(Wer ist [a-zA-Z0-9]+)|(Wie lang [a-zA-Z0-9]+)|(Was ist [a-zA-Z0-9]+)|(Wie weit [a-zA-Z0-9]+)|(Wann ist [a-zA-Z0-9]+)|(Zeig mir [a-zA-Z0-9]+)|(Wie hoch [a-zA-Z0-9]+)|(Wie tief [a-zA-Z0-9]+)")     
     @register("en-US", "(What is [a-zA-Z0-9]+)|(Who is [a-zA-Z0-9]+)|(How many [a-zA-Z0-9]+)|(What was [a-zA-Z0-9]+)|(Who's [a-zA-Z0-9]+)|(How long [a-zA-Z0-9]+)|(What's [a-zA-Z0-9]+)|(How far [a-zA-Z0-9]+)|(When is [a-zA-Z0-9]+)|(Show me [a-zA-Z0-9]+)|(How high [a-zA-Z0-9]+)|(How deep [a-zA-Z0-9]+)")
-    @register("fr-FR", u"(Wolfram [a-zA-Z0-9]+)|(Qu'est ce que [a-zA-Z0-9]+)|(Quesque [a-zA-Z0-9]+)|(Qui est [a-zA-Z0-9]+)|(Combien de [a-zA-Z0-9]+)|(Qu'étais [a-zA-Z0-9]+)|(Combien de temps [a-zA-Z0-9]+)|(Combien font [a-zA-Z0-9]+)|(A quelle distance [a-zA-Z0-9]+)|(Quand est [a-zA-Z0-9]+)|(Montre moi [a-zA-Z0-9]+)|(A quelle hauteur [a-zA-Z0-9]+)|(A quelle profondeur [a-zA-Z0-9]+)")
-    def wolfram(self, speech, language):
+    @register("fr-FR", u"(Wolfram |Qu'est ce que |Quesque |Qui est |Combien de |Qu'étais |Combien de temps |Combien font |A quelle distance |Quand est |Montre moi |(A|à) (quelle|quel) hauteur |(A|à) (quelle|quel) profondeur )(.*)")
+    def wolfram(self, speech, language, regex):
         if language == 'fr-FR':
-            wolframQuestion = re.match(u"(Wolfram |Qu'est ce que |Quesque |Qui est |Combien de |Qu'étais |Combien de temps |Combien font |A quelle distance |Quand est |Montre moi |A quelle hauteur|A quelle profondeur)(.*)", speech, re.IGNORECASE)
-            if wolframQuestion != None:
-                wolframQuestion = wolframQuestion.group(2).strip()
+            wolframQuestion = regex.group(regex.lastindex).strip()
+            wolframQuestion = wolframQuestion.replace("le","").replace("la","").replace("les","").replace("un","").replace("une","").replace("de","").replace("du","").replace("des","")
             wolframTranslation = 'true'
         elif language == "en-US":
             wolframQuestion = speech.replace('who is ','').replace('what is ','').replace('what was ','').replace('Who is ','').replace('What is ','').replace('What was ','').replace(' ', '%20')
