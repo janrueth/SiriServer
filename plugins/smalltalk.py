@@ -9,7 +9,7 @@ class smalltalk(Plugin):
     
     @register("de-DE", "(.*Hallo.*)|(.*Hi.*Siri.*)")
     @register("en-US", "(.*Hello.*)|(.*Hi.*Siri.*)")
-    @register("fr-FR", ".*Bonjour|Bonjour Siri|Coucou.*")
+    @register("fr-FR", ".*(Bonjour|Coucou|Salut)( Siri)?.*")
     def st_hello(self, speech, language):
         if language == 'de-DE':
             self.say("Hallo.")
@@ -501,3 +501,4 @@ class smalltalk(Plugin):
             self.say(u"J'aurais voulu être un artiste...")
             self.say(u"Désolé, je devrais payer des royalties si j'en dis plus.")
         self.complete_request()
+

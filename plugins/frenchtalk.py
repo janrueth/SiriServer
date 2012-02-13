@@ -4,6 +4,7 @@
 
 import random
 from plugin import *
+from siriObjects.websearchObjects import WebSearch
 
 class frenchtalk(Plugin):
 
@@ -32,7 +33,7 @@ class frenchtalk(Plugin):
         self.say(u"D'accord, je vous laisse travailler.");
         self.complete_request()
 		
-    @register("fr-FR", u"(Veux|Veut).*tu.*|.*tu.*(veux|veut).*|as.*tu besoin d.*|.*tu.*(as|a).*besoin d.*")
+    @register("fr-FR", u"(Veux|Veut).*tu.*|.*tu.*(veux|veut).*|as.*tu besoin d.*|.*tu.*(as|a).*besoin d.*|.*qu.*(puis|peux|peut).*toi.*|.*que.*veux.*tu")
     def ft_veuxtu(self, speech, language):
         self.say(u"Merci, mais j'ai déjà tout ce dont j'ai besoin dans le nuage.");
         self.complete_request()
@@ -283,6 +284,31 @@ class frenchtalk(Plugin):
     @register("fr-FR", u".*pas de probl(e|è)me.*")
     def ft_pasdeprobleme(self, speech, language):
         rep = [u"Parfait !", u"Bien.", u"C'est agréable à entendre.", u"Ravi de l'entendre."]
+        self.say(random.choice(rep))
+        self.complete_request()
+
+    @register("fr-FR", u".*qu.*sai(s|t).*faire.*")
+    def ft_qqtusaisfaire(self, speech, language):
+        rep = [u"Tout et n'importe quoi. Ou peut-être rien...", u"Je peux tout faire, si tu me le demandes gentillement.", u"La liste des commandes disponibles n'est pas encore disponible."]
+        self.say(random.choice(rep))
+        self.complete_request()
+
+    @register("fr-FR", u".*je.*suis.*malade.*")
+    def ft_malade(self, speech, language):
+        choix = random.randint(0,2)
+        if choix == 1:
+            answer = self.ask(u"Quels sont les symptômes ?")
+            self.say(u"Malheureusement, je pense que votre maladie est incurable.")
+        elif choix == 2:
+            self.say("Soignez-vous bien.");
+        else:
+            self.say(u"S'il vous plait, éloignez-vous du téléphone. Je ne voudrais pas être contaminé.")
+            
+        self.complete_request()
+
+    @register("fr-FR", u".*je.*(suis|sens|sent).*seul.*")
+    def ft_seul(self, speech, language):
+        rep = [u"Si vous me le demander, je peux vous chercher de la compagnie.", u"Vous êtes seul ? Et moi ! Je compte pour du beurre ?", u"Voyons, je suis là.", u"Je crois que vous oubliez que je suis là."]
         self.say(random.choice(rep))
         self.complete_request()
 

@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import sys
 from PluginManager import *
 
@@ -9,7 +12,7 @@ load_plugins()
 lang = 'fr-FR'
 
 while 1:
-    speech = sys.stdin.readline()
+    speech = sys.stdin.readline().decode("utf-8")
     (clazz, method) = getPlugin(speech, lang)
     print clazz
     print method

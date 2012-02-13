@@ -83,7 +83,7 @@ errorNumberNotPresent= {
 InterruptCall= {
     'en-US': u".*(stop|cancel|none).*",
     'de-DE': u".*(stop|cancel|none).*",
-    'fr-FR': u".*(veu(t|x) plus|veu(x|t) plus|arr(ê|e)te|stop|annule|aucun).*"
+    'fr-FR': u".*(veu(t|x) plus|veu(x|t) plus|arr(ê|e)te|stop|annule|aucun|abandon).*"
 }
 
 InterruptCallResponse= {
