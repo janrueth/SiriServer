@@ -217,8 +217,9 @@ class HandleConnection(ssl_dispatcher):
                             # don't change it's refId, further requests must reference last FinishSpeech
                             self.logger.info("Forwarding object to plugin")
                             self.plugin_lastAceId = None
-                            self.current_running_plugin.response = reqObject
+                            self.current_running_plugin.response = reqObject if reqObject['class'] != "StartRequest" else reqObject['properties']['utterance']
                             self.current_running_plugin.waitForResponse.set()
+                            continue
                 
                 if ObjectIsCommand(reqObject, StartSpeechRequest) or ObjectIsCommand(reqObject, StartSpeechDictation):
                     self.logger.info("New start of speech received")
