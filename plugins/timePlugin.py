@@ -95,7 +95,7 @@ class timePlugin(Plugin):
                 if response['status'] == 'OK':
                     # get latitude and longitude
                     location = response['results'][0]['geometry']['location']
-                    url = "http://api.geonames.org/timezoneJSON?lat={0}&lng={1}&username={2}".format(location['lat'], location['lng'], geonames_user)
+                    url = u"http://api.geonames.org/timezoneJSON?lat={0}&lng={1}&username={2}".format(location['lat'], location['lng'], geonames_user)
                     jsonString = None
                     try:
                         jsonString = urllib2.urlopen(url, timeout=3).read()
