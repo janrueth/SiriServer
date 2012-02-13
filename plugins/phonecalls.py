@@ -8,64 +8,86 @@ from siriObjects.uiObjects import AddViews, DisambiguationList, ListItem, Assist
 from siriObjects.systemObjects import SendCommands, StartRequest, ResultCallback, Person, PersonAttribute
 from siriObjects.phoneObjects import PhoneCall
 import re
+import random
 
 responses = {
 'notFound': 
     {'de-DE': u"Entschuldigung, ich konnte niemanden in deinem Telefonbuch finden der so heißt",
-     'en-US': u"Sorry, I did not find a match in your phone book"
+     'en-US': u"Sorry, I did not find a match in your phone book",
+     'fr-FR': u"Désolé, je n'ai trouvé aucune correspondance dans votre carnet d'adresse."
     },
 'devel':
     {'de-DE': u"Entschuldigung, aber diese Funktion befindet sich noch in der Entwicklungsphase",
-     'en-US': u"Sorry this feature is still under development"
+     'en-US': u"Sorry this feature is still under development",
+     'fr-FR': u"Désolé, cette fonctionnalité est encore en cours de développement."
     },
  'select':
     {'de-DE': u"Wen genau?", 
-     'en-US': u"Which one?"
+     'en-US': u"Which one?",
+     'fr-FR': u"Lequel ?"
     },
 'selectNumber':
     {'de-DE': u"Welche Telefonnummer für {0}",
-     'en-US': u"Which phone one for {0}"
+     'en-US': u"Which phone one for {0}",
+     'fr-FR': u"Quel numéro pour {0}"
     },
 'callPersonSpeak':
     {'de-DE': u"Rufe {0}, {1} an.",
-     'en-US': u"Calling {0}, {1}."
+     'en-US': u"Calling {0}, {1}.",
+     'fr-FR': u"Appel de {0}, {1}."
     },
 'callPerson': 
     {'de-DE': u"Rufe {0}, {1} an: {2}",
-     'en-US': u"Calling {0}, {1}: {2}"
+     'en-US': u"Calling {0}, {1}: {2}",
+     'fr-FR': u"Appel de {0}, {1}: {2}"
     }
 }
 
 numberTypesLocalized= {
-'_$!<Mobile>!$_': {'en-US': u"mobile", 'de-DE': u"Handynummer"},
-'iPhone': {'en-US': u"iPhone", 'de-DE': u"iPhone-Nummer"},
-'_$!<Home>!$_': {'en-US': u"home", 'de-DE': u"Privatnummer"},
-'_$!<Work>!$_': {'en-US': u"work", 'de-DE': u"Geschäftsnummer"},
-'_$!<Main>!$_': {'en-US': u"main", 'de-DE': u"Hauptnummer"},
-'_$!<HomeFAX>!$_': {'en-US': u"home fax", 'de-DE': u'private Faxnummer'},
-'_$!<WorkFAX>!$_': {'en-US': u"work fax", 'de-DE': u"geschäftliche Faxnummer"},
-'_$!<OtherFAX>!$_': {'en-US': u"_$!<OtherFAX>!$_", 'de-DE': u"_$!<OtherFAX>!$_"},
-'_$!<Pager>!$_': {'en-US': u"pager", 'de-DE': u"Pagernummer"},
-'_$!<Other>!$_':{'en-US': u"other phone", 'de-DE': u"anderes Telefon"}
+'_$!<Mobile>!$_': {'en-US': u"mobile", 'de-DE': u"Handynummer", 'fr-FR': u"mobile"},
+'iPhone': {'en-US': u"iPhone", 'de-DE': u"iPhone-Nummer", 'fr-FR': u"iPhone"},
+'_$!<Home>!$_': {'en-US': u"home", 'de-DE': u"Privatnummer", 'fr-FR': u"domicile"},
+'_$!<Work>!$_': {'en-US': u"work", 'de-DE': u"Geschäftsnummer", 'fr-FR': u"bureau"},
+'_$!<Main>!$_': {'en-US': u"main", 'de-DE': u"Hauptnummer",'fr-FR': u"principal"},
+'_$!<HomeFAX>!$_': {'en-US': u"home fax", 'de-DE': u'private Faxnummer', 'fr-FR': u'fax domicile'},
+'_$!<WorkFAX>!$_': {'en-US': u"work fax", 'de-DE': u"geschäftliche Faxnummer", 'fr-FR': u"fax bureau"},
+'_$!<OtherFAX>!$_': {'en-US': u"_$!<OtherFAX>!$_", 'de-DE': u"_$!<OtherFAX>!$_", 'fr-FR': u"_$!<OtherFAX>!$_"},
+'_$!<Pager>!$_': {'en-US': u"pager", 'de-DE': u"Pagernummer", 'fr-FR': u"biper"},
+'_$!<Other>!$_':{'en-US': u"other phone", 'de-DE': u"anderes Telefon", 'fr-FR': u"autre"}
 }
 
 namesToNumberTypes = {
 'de-DE': {'mobile': "_$!<Mobile>!$_", 'handy': "_$!<Mobile>!$_", 'zuhause': "_$!<Home>!$_", 'privat': "_$!<Home>!$_", 'arbeit': "_$!<Work>!$_"},
+'fr-FR': {'mobile': "_$!<Mobile>!$_", 'gsm': "_$!<Mobile>!$_", 'portable': "_$!<Mobile>!$_", 'domicile': "_$!<Home>!$_", 'maison': "_$!<Home>!$_", 'travail': "_$!<Work>!$_", 'boulot': "_$!<Work>!$_"},
 'en-US': {'work': "_$!<Work>!$_",'home': "_$!<Home>!$_", 'mobile': "_$!<Mobile>!$_"}
 }
 
 speakableDemitter={
 'en-US': u", or ",
-'de-DE': u', oder '}
+'de-DE': u', oder ',
+'fr-FR': u', ou ',
+}
 
 errorNumberTypes= {
 'de-DE': u"Ich habe dich nicht verstanden, versuch es bitte noch einmal.",
-'en-US': u"Sorry, I did not understand, please try again."
+'en-US': u"Sorry, I did not understand, please try again.",
+'fr-FR': u"Désolé, je n'ai pas compris, veuillez réessayer."
 }
 
 errorNumberNotPresent= {
 'de-DE': u"Ich habe diese {0} von {1} nicht, aber eine andere.",
-'en-US': u"Sorry, I don't have a {0} number from {1}, but another."
+'en-US': u"Sorry, I don't have a {0} number from {1}, but another.",
+'fr-FR': u"Désolé, je n'ai pas un numéro de {0} pour {1}, mais un autre."
+}
+
+InterruptCall= {
+    'en-US': u".*(stop|cancel|none).*",
+    'de-DE': u".*(stop|cancel|none).*",
+    'fr-FR': u".*(veu(t|x) plus|veu(x|t) plus|arr(ê|e)te|stop|annule|aucun).*"
+}
+
+InterruptCallResponse= {
+    'fr-FR' : [u"D'accord.",u"Ok.",u"Pas de problème.",u"Aucun soucis"]
 }
 
 errorOnCallResponse={'en-US':
@@ -82,7 +104,8 @@ errorOnCallResponse={'en-US':
                        'text': u"Oh oh, I can't make your phone call.",
                        'code': -1}],
                      'de-DE':
-                     [{'dialogIdentifier':u"PhoneCall#airplaneMode",
+                     [
+                     {'dialogIdentifier':u"PhoneCall#airplaneMode",
                        'text': u"Dein Telefon ist im Flugmodus.",
                        'code': 1201},
                       {'dialogIdentifier': u"PhoneCall#networkUnavailable",
@@ -93,7 +116,23 @@ errorOnCallResponse={'en-US':
                        'code': 1203},
                       {'dialogIdentifier': u"PhoneCall#fatalResponse",
                        'text': u"Tut mir leid, Ich, ich kann momentan keine Anrufe tätigen.",
-                       'code': -1}]
+                       'code': -1}
+                       ],
+                     'fr-FR':
+                     [
+                     {'dialogIdentifier':u"PhoneCall#airplaneMode",
+                       'text': u"Votre téléphone est en mode avion.",
+                       'code': 1201},
+                      {'dialogIdentifier': u"PhoneCall#networkUnavailable",
+                       'text': u"Je ne trouve pas de réseau. Veuillez-réessayer votre appel plus tard.",
+                       'code': 1202},
+                      {'dialogIdentifier': u"PhoneCall#invalidNumber",
+                       'text': u"Désolé, je ne peux pas appeler ce numéro.",
+                       'code': 1203},
+                      {'dialogIdentifier': u"PhoneCall#fatalResponse",
+                       'text': u"Désolé, je ne peux pas passer cet appel.",
+                       'code': -1}
+                       ]
 }
 
 class phonecallPlugin(Plugin):
@@ -156,8 +195,12 @@ class phonecallPlugin(Plugin):
                         item.commands.append(SendCommands(commands=[StartRequest(handsFree=False, utterance=numberTypesLocalized[numberType][language])]))
                         lst.items.append(item)
                     answer = self.getResponseForRequest(rootView)
+                    if re.match(InterruptCall[language], answer, re.IGNORECASE):
+                        self.say(random.choice(InterruptCallResponse[language]))
+                        return None;
                     numberType = self.getNumberTypeForName(answer, language)
                     if numberType != None:
+                        print numberType
                         matches = filter(lambda x: x.label == numberType, person.phones)
                         if len(matches) == 1:
                             phoneToCall = matches[0]
@@ -169,6 +212,12 @@ class phonecallPlugin(Plugin):
              
     
     def call(self, phone, person, language):
+        
+        if phone == None:
+            print "abandon"
+            self.complete_request()
+            return
+        
         root = ResultCallback(commands=[])
         rootView = AddViews("", temporary=False, dialogPhase="Completion", views=[])
         root.commands.append(rootView)
@@ -204,11 +253,18 @@ class phonecallPlugin(Plugin):
     
     @register("de-DE", "ruf. (?P<name>[\w ]+).*(?P<type>arbeit|zuhause|privat|mobil|handy.*|iPhone.*|pager)? an")
     @register("en-US", "(make a )?call (to )?(?P<name>[\w ]+).*(?P<type>work|home|mobile|main|iPhone|pager)?")
+    @register("fr-FR", u"(fai(s|t) un )?(appel|appelle|appeler?) (à )?(?P<name>[\w ]+).*(?P<type>travail|maison|mobile|gsm|iPhone|principal|biper)?")
     def makeCall(self, speech, language, regex):
         personToCall = regex.group('name')
+        print "PersonToCall : "+personToCall
         numberType = str.lower(regex.group('type')) if type in regex.groupdict() else None
         numberType = self.getNumberTypeForName(numberType, language)
+        print u"numberType : " +str(numberType)
         persons = self.searchUserByName(personToCall)
+        print "Persons : "
+        for person in persons:
+            print person
+        
         personToCall = None
         if len(persons) > 0:
             if len(persons) == 1:
