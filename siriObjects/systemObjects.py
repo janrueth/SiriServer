@@ -172,9 +172,9 @@ class Person(DomainObject):
         return super(Person, self).to_plist()
 
 class PersonAttribute(AceObject):
-    def __init__(self, object=None, displayText="", data=""):
+    def __init__(self, obj=None, displayText="", data=""):
         super(PersonAttribute, self).__init__("PersonAttribute", "com.apple.ace.system")
-        self.object = object if object != None else Person()
+        self.object = obj if obj != None else Person()
         self.displayText = ""
         self.data = ""
     

@@ -151,7 +151,7 @@ class Plugin(threading.Thread):
         self.__send_object(obj)
     
     def send_plist(self, plist):
-        self.connection.plugin_lastAceId = obj['aceId']
+        self.connection.plugin_lastAceId = plist['aceId']
         self.__send_plist(plist)
 
     def complete_request(self, callbacks=None):
