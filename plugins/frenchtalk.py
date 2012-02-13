@@ -163,6 +163,11 @@ class frenchtalk(Plugin):
         self.say(u"Noël, c'est le 25 décembre. J'espère être en congé ce jour-là.");
         self.complete_request()
 
+    @register("fr-FR", u".*Quan(t|d).*est?.saint.valentin.*")
+    def ft_quandstvalentin(self, speech, language):
+        self.say(u"La Saint-Valentin, c'est le 14 février.");
+        self.complete_request()
+
     @register("fr-FR", u".*(c.est (ça|sa|ca)).*")
     def ft_cestca(self, speech, language):
         self.say(u"Parfois je m'épate moi-même.")
