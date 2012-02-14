@@ -7,7 +7,7 @@ class AsyncOpenHttp(threading.Thread):
         self.errorCallback = errorCallback
         self.finished = True
     
-    def make_google_request(self, flac, requestId, dictation, language="de-DE", allowCurses=True):
+    def make_google_request(self, flac, requestId, dictation, language="fr-FR", allowCurses=True):
         if self.finished:
             self.currentFlac = flac
             self.requestId = requestId
