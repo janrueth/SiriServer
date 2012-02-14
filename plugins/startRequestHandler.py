@@ -23,7 +23,7 @@ class startRequestHandler(Plugin):
     @register("fr-FR", u"\^webSearchQuery\^=\^([a-z, ]+)\^\^webSearchConfirmation\^=\^([a-z]+)\^")
     def webSearchConfirmation(self, speech, language):
         # lets use a little hack to get that regex
-        matcher = self.webSearchConfirmation.__dict__[__criteria_key__]['de-DE']
+        matcher = self.webSearchConfirmation.__dict__[__criteria_key__]['fr-FR']
         regMatched = matcher.match(speech)
         webSearchQuery = regMatched.group(1)
         webSearchConfirmation = regMatched.group(2)

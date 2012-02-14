@@ -32,7 +32,11 @@ class smalltalk(Plugin):
 
     @register("de-DE", "Wie geht es dir?")
     @register("en-US", "How are you?")
+<<<<<<< HEAD
     @register("fr-FR", u"(.*Comment vas-tu.*)|(.*Comment Áa va.*)")
+=======
+    @register("fr-FR", u"(.*Comment vas-tu.*)|(.*Comment √ßa va.*)")
+>>>>>>> 5194b777e300be9728d1d71016f49e7e55b5252e
     def st_howareyou(self, speech, language):
         if language == 'de-DE':
             self.say("Gut danke der Nachfrage.")
@@ -56,49 +60,74 @@ class smalltalk(Plugin):
             self.say("This is my job.")
         self.complete_request()     
     
-    @register("de-DE", "(.*mˆchtest.*heiraten.*)|(.*willst.*heiraten.*)")
+    @register("de-DE", "(.*m√∂chtest.*heiraten.*)|(.*willst.*heiraten.*)")
     @register("en-US", ".*Want.*marry*")
+<<<<<<< HEAD
     @register("fr-FR", u"(.*m'Èpouser.*)|(.*marier.*moi.*)")
+=======
+    @register("fr-FR", u"(.*m'√©pouser.*)|(.*marier.*moi.*)")
+>>>>>>> 5194b777e300be9728d1d71016f49e7e55b5252e
     def st_marry_me(self, speech, language):
         if language == 'de-DE':
             self.say("Nein Danke, ich stehe auf das schwarze iPhone von Deinem Kollegen.")   
         elif language == 'fr-FR':
+<<<<<<< HEAD
             self.say(u"Non merci. Je suis amoureux d'un autre tÈlÈphone.")                  
+=======
+            self.say(u"Non merci. Je suis amoureux d'un autre t√©l√©phone.")         
+>>>>>>> 5194b777e300be9728d1d71016f49e7e55b5252e
         else:
             self.say("No thank you, I'm in love with the black iPhone from you friend.")
         self.complete_request()
 
-    @register("de-DE", ".*erz‰hl.*Witz.*")
+    @register("de-DE", ".*erz√§hl.*Witz.*")
     @register("en-US", ".*tell.*joke*")
     @register("fr-FR", ".*raconte.*blague.*")
     def st_tell_joke(self, speech, language):
         if language == 'de-DE':
+<<<<<<< HEAD
             self.say("Zwei iPhones stehen an der Bar ... den Rest habe ich vergessen.")   
         elif language == 'fr-FR':
             self.say(u"Deux iPhones entrent dans un bar ... j'ai oubliÈ la suite.")         
+=======
+            self.say("Zwei iPhones stehen an der Bar ... den Rest habe ich vergessen.")
+        elif language == 'fr-FR':
+            self.say(u"Deux iPhones entrent dans un bar ... j'ai oubli√© la suite.")
+>>>>>>> 5194b777e300be9728d1d71016f49e7e55b5252e
         else:
             self.say("Two iPhones walk into a bar ... I forget the rest.")
         self.complete_request()
 
-    @register("de-DE", ".*erz‰hl.*Geschichte.*")
+    @register("de-DE", ".*erz√§hl.*Geschichte.*")
     @register("en-US", ".*tell.*story*")
     @register("fr-FR", ".*raconte.*histoire.*")
     def st_tell_story(self, speech, language):
         if language == 'de-DE':
+<<<<<<< HEAD
             self.say("Es war einmal ... nein, es ist zu albern")            
         elif language == 'fr-FR':
             self.say(u"Il Ètait une fois ... non c'est trop stupide")
+=======
+            self.say("Es war einmal ... nein, es ist zu albern")
+        elif language == 'fr-FR':
+            self.say(u"Il √©tait une fois ... non c'est trop stupide")
+>>>>>>> 5194b777e300be9728d1d71016f49e7e55b5252e
         else:
             self.say("Far far away, there was ... no, too stupid")
         self.complete_request()
 
-    @register("de-DE", "(.*Was tr‰gst Du?.*)|(.*Was.*hast.*an.*)")
+    @register("de-DE", "(.*Was tr√§gst Du?.*)|(.*Was.*hast.*an.*)")
     @register("en-US", ".*what.*wearing*")
     @register("fr-FR", "(.*que.*porte.*)|(.*qu'est-ce-que.*porte.*)")
     def st_tell_clothes(self, speech, language):
         if language == 'de-DE':
+<<<<<<< HEAD
             self.say("Das kleine schwarze oder war es das weiﬂe?")
             self.say("Bin morgends immer so neben der Spur.")  
+=======
+            self.say("Das kleine schwarze oder war es das wei√üe?")
+            self.say("Bin morgends immer so neben der Spur.")
+>>>>>>> 5194b777e300be9728d1d71016f49e7e55b5252e
         elif language == 'fr-FR':
             self.say("Je ne sais pas mais je suis beau.")
         else:
@@ -110,9 +139,15 @@ class smalltalk(Plugin):
     @register("fr-FR", u"(.*ai l'air.*gros.*)|(.*suis.*gros.*)")
     def st_fat(self, speech, language):
         if language == 'de-DE':
+<<<<<<< HEAD
             self.say("Dazu mˆchte ich nichts sagen.")
         elif language == 'fr-FR':
             self.say(u"Je prÈfËre ne pas rÈpondre.")
+=======
+            self.say("Dazu m√∂chte ich nichts sagen.")
+        elif language == 'fr-FR':
+            self.say(u"Je pr√©f√®re ne pas r√©pondre.")
+>>>>>>> 5194b777e300be9728d1d71016f49e7e55b5252e
         else:
             self.say("I would prefer not to say.")
         self.complete_request()
@@ -171,7 +206,7 @@ class smalltalk(Plugin):
             self.say("I can here you very clear.")
         self.complete_request()
 
-    @register("de-DE", ".*Herzlichen.*Gl¸ckwunsch.*Geburtstag.*")
+    @register("de-DE", ".*Herzlichen.*Gl√ºckwunsch.*Geburtstag.*")
     @register("en-US", ".*Happy.*birthday.*")
     @register("fr-FR", "(.*Joyeux.*anniversaire.*)|(.*Bon.*anniversaire.*)")
     def st_birthday(self, speech, language):
@@ -187,19 +222,23 @@ class smalltalk(Plugin):
     @register("en-US", ".*Why.*I.*World.*")
     def st_why_on_world(self, speech, language):
         if language == 'de-DE':
-            self.say("Das weiﬂ ich nicht.")
+            self.say("Das wei√ü ich nicht.")
             self.say("Ehrlich gesagt, frage ich mich das schon lange!")       
         else:
             self.say("I don't know that.")
             self.say("Ask my self this for a long time!")
         self.complete_request()
 
-    @register("de-DE", ".*Ich bin m¸de.*")
+    @register("de-DE", ".*Ich bin m√ºde.*")
     @register("en-US", ".*I.*so.*tired.*")
+<<<<<<< HEAD
     @register("fr-FR", u".*Je.*fatiguÈ.*")
+=======
+    @register("fr-FR", u".*Je.*fatigu√©.*")
+>>>>>>> 5194b777e300be9728d1d71016f49e7e55b5252e
     def st_so_tired(self, speech, language):
         if language == 'de-DE':
-            self.say("Ich hoffe, Du f‰hrst nicht gerade Auto!")            
+            self.say("Ich hoffe, Du f√§hrst nicht gerade Auto!")            
         else:
             self.say("I hope you are not driving a car right now!")
         self.complete_request()

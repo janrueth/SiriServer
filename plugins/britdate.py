@@ -28,7 +28,10 @@ class talkToMe(Plugin):
     @register("de-DE", "(Welcher Tag.*)|(Welches Datum.*)")
     @register("en-GB", "(What Day.*)|(What.*Date.*)")
     @register("fr-FR", "(Quel jour.*)|(Quel.*Date.*)")
+<<<<<<< HEAD
     
+=======
+>>>>>>> 5194b777e300be9728d1d71016f49e7e55b5252e
     def ttm_say_date(self, speech, language):
         now = date.today()
         if language == 'de-DE':

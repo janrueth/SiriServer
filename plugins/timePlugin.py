@@ -52,7 +52,11 @@ class timePlugin(Plugin):
     
     @register("de-DE", "(Wieviel Uhr.*in ([\w ]+))|(Uhrzeit.*in ([\w ]+))")
     @register("en-US", "(What.*time.*in ([\w ]+))|(.*current time.*in ([\w ]+))")
+<<<<<<< HEAD
     @register("fr-FR", u'.*(Q|q)uel.*heure.*(à|en|au) ([\w ]+)')
+=======
+    @register("fr-FR", u'.*(Q|q)uel.*heure.*(à|en|au) [\w ]+')
+>>>>>>> 5194b777e300be9728d1d71016f49e7e55b5252e
     def currentTimeIn(self, speech, language):
         view = AddViews(self.refId, dialogPhase="Reflection")
         view.views = [AssistantUtteranceView(text=timePlugin.localizations['currentTimeIn']['search'][language], speakableText=timePlugin.localizations['currentTimeIn']['search'][language], dialogIdentifier="Clock#getTime")]
@@ -65,7 +69,7 @@ class timePlugin(Plugin):
             countryOrCity = re.match(u".*(in) ([\w]+)$", speech, re.IGNORECASE)
 
         if countryOrCity != None:
-            countryOrCity = countryOrCity.group(1).strip()
+            countryOrCity = countryOrCity.group(2).strip()
             # lets see what we got, a country or a city... 
             # lets use google geocoding API for that
             url = "http://maps.googleapis.com/maps/api/geocode/json?address={0}&sensor=false&language={1}".format(urllib.quote_plus(countryOrCity.encode('utf8')), language)
