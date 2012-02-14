@@ -326,6 +326,12 @@ class frenchtalk(Plugin):
         self.say(random.choice(rep))
         self.complete_request()
 
+    # Duplicate of smalltalk
+    @register("fr-FR", u".*Je.*suis.*(fatigue|fatigué).*")
+    def ft_jesuisfatigue(self, speech, language):
+        self.say(u"J'espère que vous n'êtes pas en train de conduire !")
+        self.complete_request()
+
     @register("fr-FR", u"je.*suis.*")
     def ft_jesuis(self, speech, language):
         rep = [u"Tu es ce que tu es, pas la peine de m'en vouloir pour ça.", u"Ce que tu es ne dépends que de toi, pas de moi.", u"Et alors ? Tu es ce que tu es, un point c'est tout.", u"Tu l'es, et tu le resteras probablement encore longtemps.", u"A ce rythme-là, tu le seras encore dans très longtemps..."]
