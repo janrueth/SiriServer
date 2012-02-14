@@ -282,7 +282,7 @@ class Location(DomainObject):
     AccuracyKilometerValue = "Kilometer"
     AccuracyThreeKilometersValue = "ThreeKilometers"
     def __init__(self, label="", street="", city="", stateCode="", countryCode="", postalCode="", latitude=0, longitude=0, accuracy=0, group="com.apple.ace.system", clazz="Location"):
-        super(Location, self).__init__(group, clazz)
+        super(Location, self).__init__(group, None, clazz)
         self.label = label
         self.street = street
         self.city = city

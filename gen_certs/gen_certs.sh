@@ -27,11 +27,11 @@ fi
 cd $script_dir
 
 # Feel free to change any of these defaults
-commonName="SiriProxyCA"
+commonName="SiriServer"
 countryName="US"
 stateOrProvinceName="Missouri"
 localityName=""
-organizationName="Siri Proxy"
+organizationName="Siri Server"
 organizationalUnitName=""
 emailAddress=""
 

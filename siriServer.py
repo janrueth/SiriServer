@@ -400,6 +400,11 @@ class HandleConnection(ssl_dispatcher):
         self.output_buffer += self.compressor.compress(self.unzipped_output_buffer)
         #make sure everything is compressed
         self.output_buffer += self.compressor.flush(zlib.Z_SYNC_FLUSH)
+        ratio = float(len(self.unzipped_output_buffer))/float(len(self.output_buffer)) - 1
+        if ratio < 0:
+            self.logger.debug("Blowed up by {0:.2f} bytes ({1:.2%}) due to compression".format(-1*ratio*len(self.unzipped_output_buffer),ratio))
+        else:
+            self.logger.debug("Saved {0:.2f} bytes ({1:.2%}) using compression".format(ratio*len(self.unzipped_output_buffer), ratio))
         self.unzipped_output_buffer = ""
 
         self.flush_output_buffer()
