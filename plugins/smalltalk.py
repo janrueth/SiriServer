@@ -409,7 +409,8 @@ class smalltalk(Plugin):
         if language == 'en-US':
             self.say("Wherever you are.")
         elif language == 'fr-FR':
-            self.say(u"Je suis partout où tu es.")
+            rep = [u"Je suis partout où tu es.",u"Je suis partout où tu es. Mais tu le savais déjà.", u"Je te suivrai, partout où tu iras, j'irai...", u"Je suis au même endroit que toi.", u"Je parie que tu sais où je me trouve."]
+            self.say(random.choice(rep))
         self.complete_request()
     
     @register("en-US",".*why.are.you.*")
@@ -418,7 +419,8 @@ class smalltalk(Plugin):
         if language == 'en-US':
             self.say("I just am.")
         elif language == 'fr-FR':
-            self.say("Je suis ce que je suis parce que je suis ce que je suis.")
+            rep = [u"Je suis ce que je suis parce que je suis ce que je suis.", "Pourquoi faudrait-il tout expliquer ?", u"Il existe certaines choses qui ne s'expliquent pas. C'est comme ça."]
+            self.say(random.choice(rep))
         self.complete_request()
     
     @register("en-US",".*you.*smoke.pot.*")
@@ -428,13 +430,17 @@ class smalltalk(Plugin):
         self.complete_request()
     
     @register("en-US",".*I'm.*drunk.driving.*")
-    @register("fr-FR",u".*je.*(conduit|conduis|conduire).(bourré|saoul|soul|soûl|sous|bourrer).*|(j'ai|je).vol(é|er|e).*")
+    @register("fr-FR",u".*je.*(conduit|conduis|conduire).(bourré|saoul|soul|soûl|sous|bourrer).*")
     def st_dui(self, speech, language):
         if language == 'en=US':
             self.say("I couldn't find any DUI lawyers nearby.")
         elif language == 'fr-FR':
-            self.say("Je recherche la patrouille de police la plus proche...")
-            self.say(u"Je n'ai trouvé aucune voiture de police dans le secteur.")
+            choix = random.randint(0,1)
+            if choix == 1:
+                self.say("Je recherche la patrouille de police la plus proche...")
+                self.say(u"Je n'ai trouvé aucune voiture de police dans le secteur.")
+            else:
+                self.say(u"Boire ou conduire, il faut choisir !")
         self.complete_request()
     
     @register("en-US",".*shit.*myself.*")

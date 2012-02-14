@@ -35,7 +35,8 @@ class frenchtalk(Plugin):
 		
     @register("fr-FR", u"(Veux|Veut).*tu.*|.*tu.*(veux|veut).*|as.*tu besoin d.*|.*tu.*(as|a).*besoin d.*|.*qu.*(puis|peux|peut).*toi.*|.*que.*veux.*tu")
     def ft_veuxtu(self, speech, language):
-        self.say(u"Merci, mais j'ai déjà tout ce dont j'ai besoin dans le nuage.");
+        rep = [u"Merci, mais j'ai déjà tout ce dont j'ai besoin dans le nuage.", u"J'ai déjà tout ce dont j'ai besoin."]
+        self.say(random.choice(rep));
         self.complete_request()
 
     @register("fr-FR", u".*(j'ai|j'|je).*besoin.*")
@@ -137,7 +138,7 @@ class frenchtalk(Plugin):
 
     @register("fr-FR", u".*fai(s|t).*(tu|quoi).*")
     def ft_faitquoi(self, speech, language):
-        rep = [u"Je suis en train de te parler.", u"Je te parle, mais tu le savais déjà."]
+        rep = [u"Je suis en train de te parler.", u"Je te parle, mais tu le savais déjà.", u"J'entretiens une conversation très intéressante avec un bon ami.", u"Je suis en pleine conversation avec quelqu'un.", u"Je parle à une personnne très sympathique."]
         self.say(random.choice(rep));
         self.complete_request()
 
@@ -309,6 +310,25 @@ class frenchtalk(Plugin):
     @register("fr-FR", u".*je.*(suis|sens|sent).*seul.*")
     def ft_seul(self, speech, language):
         rep = [u"Si vous me le demander, je peux vous chercher de la compagnie.", u"Vous êtes seul ? Et moi ! Je compte pour du beurre ?", u"Voyons, je suis là.", u"Je crois que vous oubliez que je suis là."]
+        self.say(random.choice(rep))
+        self.complete_request()
+
+    @register("fr-FR", u".*(drogue|coca(i|ï)ne).*")
+    def ft_drogue(self, speech, language):
+        rep = [u"La drogue, c'est mal.", u"Je vous conseille vivement d'arrêter."]
+        self.say(random.choice(rep))
+        self.complete_request()
+
+
+    @register("fr-FR", u".*j.*vol(é|e).*")
+    def ft_vole(self, speech, language):
+        rep = [u"Le vol, c'est mal.", u"Qui vole un oeuf, vole un boeuf."]
+        self.say(random.choice(rep))
+        self.complete_request()
+
+    @register("fr-FR", u"je.*suis.*")
+    def ft_jesuis(self, speech, language):
+        rep = [u"Tu es ce que tu es, pas la peine de m'en vouloir pour ça.", u"Ce que tu es ne dépends que de toi, pas de moi.", u"Et alors ? Tu es ce que tu es, un point c'est tout.", u"Tu l'es, et tu le resteras probablement encore longtemps.", u"A ce rythme-là, tu le seras encore dans très longtemps..."]
         self.say(random.choice(rep))
         self.complete_request()
 
