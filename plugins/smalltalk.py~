@@ -119,7 +119,6 @@ class smalltalk(Plugin):
 
     @register("de-DE", ".*klopf.*klopf.*")
     @register("en-US", ".*knock.*knock.*")
-    @register("fr-FR", ".*toc.*toc.*")
     def st_knock(self, speech, language):
         if language == 'de-DE':
             answer = self.ask(u"Wer ist da?")
@@ -133,7 +132,6 @@ class smalltalk(Plugin):
 
     @register("de-DE", ".*Antwort.*alle.*Fragen.*")
     @register("en-US", ".*Ultimate.*Question.*Life.*")
-    @register("fr-FR", ".*question.*ultime.*vie.*")
     def st_anstwer_all(self, speech, language):
         if language == 'de-DE':
             self.say("42")            
@@ -143,7 +141,6 @@ class smalltalk(Plugin):
 
     @register("de-DE", ".*Ich liebe Dich.*")
     @register("en-US", ".*I love you.*")
-    @register("fr-FR", ".*Je t'aime'.*")
     def st_love_you(self, speech, language):
         if language == 'de-DE':
             self.say("Oh. Sicher sagst Du das zu allen Deinen Apple-Produkten.")            
@@ -153,7 +150,6 @@ class smalltalk(Plugin):
 
     @register("de-DE", ".*Android.*")
     @register("en-US", ".*Android.*")
-    @register("fr-FR", ".*Android.*")
     def st_android(self, speech, language):
         if language == 'de-DE':
             self.say("Ich denke da anders.")            
@@ -163,7 +159,6 @@ class smalltalk(Plugin):
 
     @register("de-DE", ".*Test.*1.*2.*3.*")
     @register("en-US", ".*test.*1.*2.*3.*")
-    @register("fr-FR", ".*test.*1.*2.*3.*")
     def st_123_test(self, speech, language):
         if language == 'de-DE':
             self.say("Ich kann Dich klar und deutlich verstehen.")            
@@ -173,7 +168,6 @@ class smalltalk(Plugin):
 
     @register("de-DE", ".*Herzlichen.*Glückwunsch.*Geburtstag.*")
     @register("en-US", ".*Happy.*birthday.*")
-    @register("fr-FR", "(.*Joyeux.*anniversaire.*)|(.*Bon.*anniversaire.*)")
     def st_birthday(self, speech, language):
         if language == 'de-DE':
             self.say("Ich habe heute Geburtstag?")
@@ -196,7 +190,6 @@ class smalltalk(Plugin):
 
     @register("de-DE", ".*Ich bin müde.*")
     @register("en-US", ".*I.*so.*tired.*")
-    @register("fr-FR", u".*Je.*fatigué.*")
     def st_so_tired(self, speech, language):
         if language == 'de-DE':
             self.say("Ich hoffe, Du fährst nicht gerade Auto!")            
@@ -206,7 +199,6 @@ class smalltalk(Plugin):
 
     @register("de-DE", ".*Sag mir.*Schmutzige.*")
     @register("en-US", ".*Tell me.*dirty*")
-    @register("fr-FR", ".*parle.*salement")
     def st_dirty(self, speech, language):
         if language == 'de-DE':
             self.say("Humus. Kompost. Bims. Schlamm. Kies.")            

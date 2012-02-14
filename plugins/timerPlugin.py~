@@ -71,7 +71,7 @@ class timerPlugin(Plugin):
 
     res = {
         'articles': {
-            'en-US': 'a|an|the', 'fr-FR': 'une|pour'
+            'en-US': 'a|an|the'
         }, 'pauseTimer': {
             'en-US': '.*(pause|freeze|hold).*timer', 'fr-FR': '(.*pause.*minuteur.*)|(.*minuteur.*pause.*)'
         }, 'resetTimer': {
@@ -88,7 +88,6 @@ class timerPlugin(Plugin):
     }
 
     @register("en-US", res['setTimer']['en-US'])
-    @register("fr-FR", res['setTimer']['fr-FR'])
     def setTimer(self, speech, language):
         m = re.match(timerPlugin.res['setTimer'][language], speech, re.IGNORECASE)
         timer_length = ' '.join(m.group(1, 2))
@@ -153,7 +152,6 @@ class timerPlugin(Plugin):
         self.complete_request()
 
     @register("en-US", res['resetTimer']['en-US'])
-    @register("fr-FR", res['resetTimer']['fr-FR'])
     def resetTimer(self, speech, language):
         response = self.getResponseForRequest(TimerGet(self.refId))
         timer_properties = response['properties']['timer']['properties']
@@ -176,7 +174,6 @@ class timerPlugin(Plugin):
             self.complete_request()
 
     @register("en-US", res['resumeTimer']['en-US'])
-    @register("fr-FR", res['resumeTimer']['fr-FR'])
     def resumeTimer(self, speech, language):
         response = self.getResponseForRequest(TimerGet(self.refId))
         timer_properties = response['properties']['timer']['properties']
@@ -201,7 +198,6 @@ class timerPlugin(Plugin):
             self.complete_request()
 
     @register("en-US", res['pauseTimer']['en-US'])
-    @register("fr-FR", res['pauseTimer']['fr-FR'])
     def pauseTimer(self, speech, language):
         response = self.getResponseForRequest(TimerGet(self.refId))
         timer_properties = response['properties']['timer']['properties']
@@ -232,7 +228,6 @@ class timerPlugin(Plugin):
             self.complete_request()
 
     @register("en-US", res['showTimer']['en-US'])
-    @register("fr-FR", res['showTimer']['fr-FR'])
     def showTimer(self, speech, language):
         response = self.getResponseForRequest(TimerGet(self.refId))
         timer_properties = response['properties']['timer']['properties']

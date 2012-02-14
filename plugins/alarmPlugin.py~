@@ -28,9 +28,9 @@ class alarmPlugin(Plugin):
             "settingAlarm": {
                 "en-US": u"Setting the Alarm\u2026", "fr-FR": u"Programmation de l'alarme."
             }, "alarmWasSet": {
-                "en-US": "Your alarm is set for {0}:{1} {2}.", "fr-FR": "Votre alarme est programmée pour {0}h{1}."
+                "en-US": "Your alarm is set for {0}:{1} {2}.", "fr-FR": "Votre alarme est programmée pour {0}:{1}."
             }, "alarmSetWithLabel": {
-                "en-US": "Your alarm {0} {1} is set for {2}:{3} {4}.", "fr-FR": u"Votre alarme {0} {1} est programmée pour {2}h{3}."
+                "en-US": "Your alarm {0} {1} is set for {2}:{3} {4}.", "fr-FR": u"Votre alarme {0} {1} est programmée pour {2}:{3}."
             }
         }
     }
@@ -45,7 +45,7 @@ class alarmPlugin(Plugin):
     @register("fr-FR", res['setAlarm']['fr-FR'])
     def setAlarm(self, speech, language):
         alarmString = re.match(alarmPlugin.res['setAlarm'][language], speech, re.IGNORECASE)
-        print alarmString.group()
+        
         alarmHour = int(alarmString.group(1))
         alarm24Hour = alarmHour
         alarmMinutes = alarmString.group(2)
