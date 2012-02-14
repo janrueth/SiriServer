@@ -140,9 +140,11 @@ class wolfram(Plugin):
                   wolfram_pod8 = pod.getAttribute('title')
                count_wolfram += 1
         if language == 'de-DE':
-            self.say("Dies könnte Ihre Frage zu beantworten:")
+            if wolfram_pod0 != 12:
+                self.say("Dies könnte Ihre Frage zu beantworten:")
         else:
-            self.say("This might answer your question:")
+            if wolfram_pod0 != 12:
+                self.say("This might answer your question:")
         view = AddViews(self.refId, dialogPhase="Completion")
         if wolfram_pod0 != 12:
             if wolfram0_img == 1:
@@ -191,7 +193,7 @@ class wolfram(Plugin):
                 if language == 'de-DE':
                     self.say("Es tut mir leid. Ich konnte keine Antwort auf Ihre Frage finden.")
                 else:
-                    self.say("Nothing has found for your query!")
+                    self.say("Nothing has been found for your query!")
             self.complete_request()
             view1 = 0
         elif wolfram_pod1 == 12:
