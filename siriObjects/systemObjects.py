@@ -54,9 +54,9 @@ class DomainObject(AceObject):
         return super(DomainObject, self).to_plist()
 
 class DomainObjectCreate(ClientBoundCommand):
-    def __init__(self, refId, object=None):
+    def __init__(self, refId, obj=None):
         super(DomainObjectCreate, self).__init__("DomainObjectCreate", "com.apple.ace.system", None, refId)
-        self.object = object
+        self.object = obj
     
     def to_plist(self):
         self.add_property('object')
