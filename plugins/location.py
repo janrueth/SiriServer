@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# Based on the WhereAmI plugins
+
 import re
 import urllib2, urllib
 import json
@@ -15,8 +17,9 @@ APIKEY = APIKeyForAPI("googleplaces")
 
 class location(Plugin):
     
-    @register("fr-FR", u".*(o(u|ù) (est|se trouve|trouv(e|é)r?)) (.*)|.*(recherche|cherche|trouve) (.*) près de moi.*")
-    def whereis(self, speech, language, regex):
+    # temp regex, need to use group name...
+    @register("fr-FR", u".*(o(u|ù) (puis.je trouv(e|é)r?)) (.*)|.*(o(ù|u) est|recherche|cherche|trouve) (.*) près de moi.*|.*(o(ù|u) est|recherche|cherche|trouve) (.*) près d'ici.*|.*(o(ù|u) est|recherche|cherche|trouve) (.*) le plus proche.*")
+    def whereisPlaces(self, speech, language, regex):
         keyword = regex.group(regex.lastindex).strip()
         location = self.getCurrentLocation(force_reload=True,accuracy=GetRequestOrigin.desiredAccuracyBest)
         latlong = str(location.latitude)+","+str(location.longitude)
@@ -92,3 +95,72 @@ class location(Plugin):
         self.sendRequestWithoutAnswer(view)
         self.say(u"Vous êtes "+result)
         self.complete_request()
+
+    @register("de-DE", "(Wo liegt.*)")    
+    @register("en-US", "(Where is.*)")
+    @register("fr-FR", u".*(o(ù|u) (est|se trouve|se situe|ce situe)) (.*)")
+    def whereIs(self, speech, language, regex):
+        the_location = None
+        if language == "de-DE":
+            the_location = re.match("(?u).* liegt ([\w ]+)$", speech, re.IGNORECASE)
+            the_location = the_location.group(1).strip()
+        elif language == 'fr-FR':
+            the_location == regex.group(regex.lastindex).strip()
+        else:
+            the_location = re.match("(?u).* is ([\w ]+)$", speech, re.IGNORECASE)
+            the_location = the_location.group(1).strip()
+            
+        if the_location != None:
+            the_location = the_location[0].upper()+the_location[1:]
+        else:
+            if language == "de-DE":
+                self.say('Ich habe keinen Ort gefunden!',None)
+            elif language == 'fr-FR':
+                self.say(u"Désolé, je n'arrive pas à trouver cet endroit !")
+            else:
+                self.say('No location found!',None)
+            self.complete_request() 
+            return
+        url = u"http://maps.googleapis.com/maps/api/geocode/json?address={0}&sensor=false&language={1}".format(urllib.quote_plus(the_location.encode("utf-8")), language)
+        jsonString=None
+        try:
+            jsonString = urllib2.urlopen(url, timeout=3).read()
+        except:
+            pass
+        if jsonString != None:
+            response = json.loads(jsonString)
+            if response['status'] == 'OK':
+                location = response['results'][0]['geometry']['location']
+                city=response['results'][0]['address_components'][0]['long_name']
+                try:
+                    country=response['results'][0]['address_components'][2]['long_name']
+                    countryCode=response['results'][0]['address_components'][2]['short_name']
+                except:
+                    country=the_location
+                    countryCode=the_location
+                if language=="de-DE":
+                    the_header=u"Hier liegt {0}".format(the_location)
+                elif language =="fr-FR":
+                    the_header=u"Voici l'emplacement de {0} :".format(the_location)
+                else:
+                    the_header=u"Here is {0}".format(the_location)
+                view = AddViews(self.refId, dialogPhase="Completion")
+                s_Location=Location(the_header, city, city, "", countryCode, "", str(location['lat']), str(location['lng']))
+                mapsnippet = SiriMapItemSnippet(items=[SiriMapItem(the_header, s_Location, "BUSINESS_ITEM")])
+                view.views = [AssistantUtteranceView(text=the_header, dialogIdentifier="Map"), mapsnippet]
+                self.sendRequestWithoutAnswer(view)
+            else:
+                if language=="de-DE":
+                    self.say('Die Googlemaps informationen waren ungenügend!','Fehler')
+                elif language == "fr-FR":
+                    self.say(u"Les informations demandées ne sont pas sur Google Maps !", u'Erreur')
+                else:
+                    self.say('The Googlemaps response did not hold the information i need!','Error')
+        else:
+            if language=="de-DE":
+                self.say('Ich konnte keine Verbindung zu Googlemaps aufbauen','Fehler')
+            elif language == 'fr-FR':
+                self.say(u"Je n'arrive pas à joindre Google Maps.", 'Erreur')
+            else:
+                self.say('Could not establish a conenction to Googlemaps','Error');
+        self.complete_request()        
