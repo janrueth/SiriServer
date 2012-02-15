@@ -19,7 +19,7 @@ class location(Plugin):
     
     # temp regex, need to use group name...
     #@register("fr-FR", u".*(o(u|ù) (puis.je trouv(e|é)r?)) (.*)|.*(o(ù|u) est|recherche|cherche|trouve) (.*) près de moi.*|.*(o(ù|u) est|recherche|cherche|trouve) (.*) près d'ici.*|.*(o(ù|u) est|recherche|cherche|trouve) (.*) (les?|la) plus proche.*")
-    @register("fr-FR", u".*o(ù|u) puis.je trouv(é|e)r? (?P<keyword>.*) (par ici|paris 6|près (d'ici|de moi)|(la|les?) plus proche)?.*|.*(trouv(e|ait|ais)|cherch(e|é)r?|est) (?P<keyword2>.*) (par ici|paris 6|près d'ici|près de moi|(la|les?) plus proche).*")
+    @register("fr-FR", u".*o(ù|u) puis.je trouv(é|e)r? (?P<keyword>.*)( par ici| paris 6| près (d'ici|de moi)| (la|les?) plus proche)?.*|.*(trouv(e|ait|ais)|cherch(e|é)r?|est) (?P<keyword2>.*) (par ici|paris 6|près d'ici|près de moi|(la|les?) plus proche).*")
     def whereisPlaces(self, speech, language, regex):
         keyword = regex.group('keyword')
         if keyword == None:
@@ -32,6 +32,7 @@ class location(Plugin):
         
         if speech.count("pied") > 0:
             radius = "2500"
+            keyword = keyword.replace(u"à pied","").replace(u"a pied","").replace("pied","")
         else:
             radius = "15000"
         
@@ -112,14 +113,14 @@ class location(Plugin):
 
     @register("de-DE", "(Wo liegt.*)")    
     @register("en-US", "(Where is.*)")
-    @register("fr-FR", u".*(o(ù|u) (est|se trouve|ce trouve|se situe|ce situe) )(?P<endroit>.*)")
+    @register("fr-FR", u".*o(ù|u) (est |se trouve |ce trouve |se situe |ce situe )([\w ]+)")
     def whereIs(self, speech, language, regex):
         the_location = None
         if language == "de-DE":
             the_location = re.match("(?u).* liegt ([\w ]+)$", speech, re.IGNORECASE)
             the_location = the_location.group(1).strip()
         elif language == 'fr-FR':
-            the_location == regex.group('endroit').strip()
+            the_location == regex.group(regex.lastindex).strip()
         else:
             the_location = re.match("(?u).* is ([\w ]+)$", speech, re.IGNORECASE)
             the_location = the_location.group(1).strip()
