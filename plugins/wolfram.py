@@ -33,7 +33,7 @@ class wolfram(Plugin):
     def wolfram(self, speech, language, regex):
         if language == 'fr-FR':
             wolframQuestion = regex.group(regex.lastindex).strip()
-            wolframQuestion = wolframQuestion.replace("le","").replace("la","").replace("les","").replace("un","").replace("une","").replace("de","").replace("du","").replace("des","")
+            wolframQuestion = wolframQuestion.replace("le ","").replace("la ","").replace("les ","").replace("un ","").replace("une ","").replace("de ","").replace("du ","").replace("des ","")
             wolframTranslation = 'true'
         elif language == "en-US":
             wolframQuestion = speech.replace('who is ','').replace('what is ','').replace('what was ','').replace('Who is ','').replace('What is ','').replace('What was ','').replace(' ', '%20')

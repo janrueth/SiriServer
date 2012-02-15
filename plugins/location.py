@@ -6,7 +6,7 @@
 import re
 import urllib2, urllib
 import json
-
+import math
 from plugin import *
 
 from siriObjects.uiObjects import AddViews, AssistantUtteranceView
@@ -18,14 +18,26 @@ APIKEY = APIKeyForAPI("googleplaces")
 class location(Plugin):
     
     # temp regex, need to use group name...
-    @register("fr-FR", u".*(o(u|ù) (puis.je trouv(e|é)r?)) (.*)|.*(o(ù|u) est|recherche|cherche|trouve) (.*) près de moi.*|.*(o(ù|u) est|recherche|cherche|trouve) (.*) près d'ici.*|.*(o(ù|u) est|recherche|cherche|trouve) (.*) le plus proche.*")
+    #@register("fr-FR", u".*(o(u|ù) (puis.je trouv(e|é)r?)) (.*)|.*(o(ù|u) est|recherche|cherche|trouve) (.*) près de moi.*|.*(o(ù|u) est|recherche|cherche|trouve) (.*) près d'ici.*|.*(o(ù|u) est|recherche|cherche|trouve) (.*) (les?|la) plus proche.*")
+    @register("fr-FR", u".*o(ù|u) puis.je trouv(é|e)r? (?P<keyword>.*) (par ici|paris 6|près (d'ici|de moi)|(la|les?) plus proche)?.*|.*(trouv(e|ait|ais)|cherch(e|é)r?|est) (?P<keyword2>.*) (par ici|paris 6|près d'ici|près de moi|(la|les?) plus proche).*")
     def whereisPlaces(self, speech, language, regex):
-        keyword = regex.group(regex.lastindex).strip()
+        keyword = regex.group('keyword')
+        if keyword == None:
+            keyword = regex.group('keyword2')
+        keyword = keyword.strip();
+        keyword = keyword.replace(u"près","").replace("par","").replace('la ','').replace('les ','').replace('le ','').replace('des ','').replace('de ','').replace('du ','').replace('une ','').replace('un ','')
+        print "MC : " + keyword
         location = self.getCurrentLocation(force_reload=True,accuracy=GetRequestOrigin.desiredAccuracyBest)
         latlong = str(location.latitude)+","+str(location.longitude)
+        
+        if speech.count("pied") > 0:
+            radius = "2500"
+        else:
+            radius = "15000"
+        
         response = None
-        url = "https://maps.googleapis.com/maps/api/place/search/json?location={0}&radius=15000&keyword={1}&sensor=true&key={2}".format(latlong,urllib.quote_plus(keyword.encode("utf-8")),APIKEY)
-
+        url = "https://maps.googleapis.com/maps/api/place/search/json?location={0}&radius={1}&keyword={2}&sensor=true&key={3}".format(latlong,radius,urllib.quote_plus(keyword.encode("utf-8")),APIKEY)
+        print url
         try:
             jsonString = urllib2.urlopen(url, timeout=3)
             response = json.load(jsonString);
@@ -44,10 +56,12 @@ class location(Plugin):
                     rating = result["rating"]
                 else:
                     rating = 0.0
-        
+                
+                distance = self.haversine_distance(location.latitude, location.longitude, lat, lng)
+                
                 view = AddViews(self.refId, dialogPhase="Completion")
                 mapsnippet = SiriMapItemSnippet(items=[SiriMapItem(name, Location(label=vicinity,latitude=lat,longitude=lng, street=vicinity))])
-                view.views = [AssistantUtteranceView(text="Distance : x km", dialogIdentifier="Map#test"), mapsnippet]
+                view.views = [AssistantUtteranceView(text="Distance : "+str(distance)+" km", dialogIdentifier="Map#test"), mapsnippet]
                 self.sendRequestWithoutAnswer(view)
 
         elif response["status"] == "ZERO_RESULTS":
@@ -98,18 +112,19 @@ class location(Plugin):
 
     @register("de-DE", "(Wo liegt.*)")    
     @register("en-US", "(Where is.*)")
-    @register("fr-FR", u".*(o(ù|u) (est|se trouve|se situe|ce situe)) (.*)")
+    @register("fr-FR", u".*(o(ù|u) (est|se trouve|ce trouve|se situe|ce situe) )(?P<endroit>.*)")
     def whereIs(self, speech, language, regex):
         the_location = None
         if language == "de-DE":
             the_location = re.match("(?u).* liegt ([\w ]+)$", speech, re.IGNORECASE)
             the_location = the_location.group(1).strip()
         elif language == 'fr-FR':
-            the_location == regex.group(regex.lastindex).strip()
+            the_location == regex.group('endroit').strip()
         else:
             the_location = re.match("(?u).* is ([\w ]+)$", speech, re.IGNORECASE)
             the_location = the_location.group(1).strip()
-            
+        
+        print the_location
         if the_location != None:
             the_location = the_location[0].upper()+the_location[1:]
         else:
@@ -164,3 +179,19 @@ class location(Plugin):
             else:
                 self.say('Could not establish a conenction to Googlemaps','Error');
         self.complete_request()        
+
+    def haversine_distance(self, lat1, lon1, lat2, lon2):
+        RAD_PER_DEG = 0.017453293
+        Rkm = 6371        
+        dlon = lon2-lon1
+        dlat = lat2-lat1
+        dlon_rad = dlon*RAD_PER_DEG
+        dlat_rad = dlat*RAD_PER_DEG
+        lat1_rad = lat1*RAD_PER_DEG
+        lon1_rad = lon1*RAD_PER_DEG
+        lat2_rad = lat2*RAD_PER_DEG
+        lon2_rad = lon2*RAD_PER_DEG
+        
+        a = (math.sin(dlat_rad/2))**2 + math.cos(lat1_rad) * math.cos(lat2_rad) * (math.sin(dlon_rad/2))**2
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+        return round(Rkm * c,2)
