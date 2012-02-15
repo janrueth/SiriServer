@@ -3,6 +3,10 @@ Siri Server
 
 IMPORTANT
 ---------
+
+If you have problems with the server in setup or something else, first read this file to the end and if you have still problems visit: [SiriServer Board](http://hack.silentspark.net/phpbb/index.php)
+Please do NOT post installation problems or other non-code related stuff in the github issues section
+
 There are currently only 8 plugins here, you can chat a little bit with siri.
 You can ask it for the current time and the current time at a certain point in the world.
 And you can ask it for the meaning of life.
