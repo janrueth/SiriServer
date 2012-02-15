@@ -50,7 +50,7 @@ class XBMC(Plugin):
         view1 = AnswerSnippet(answers=[ImageAnswer])
         view.views = [view1]
         self.sendRequestWithoutAnswer(view)
-	
+        
     global xbmc
     xbmc = XBMC_object()
             
@@ -72,6 +72,31 @@ class XBMC(Plugin):
                     json.Player.PlayPause(playerid=1)
                 except:
                     self.say('Nothing to play/pause')
+            elif command == 'update library' or command == 'scan':
+                json.VideoLibrary.Scan()
+            elif command == 'clean library':
+                json.VideoLibrary.Clean()
+            elif command == 'latest movies':
+                recentMovies = json.VideoLibrary.GetRecentlyAddedMovies(properties=['playcount'])['movies']
+                movieList = ''
+                for movie in recentMovies:
+                    if movie['playcount'] > 0:
+                        watched = 'Watched: Yes'
+                    else:
+                        watched = 'Watched: No'
+                    movieList = movieList + movie['label'] + '\n' + watched + '\n\n'
+                self.say(movieList, "Here you go:")
+            elif command == 'latest episodes':
+                recentEpisodes = json.VideoLibrary.GetRecentlyAddedEpisodes(properties=['showtitle','season','episode','playcount'])['episodes']
+                episodeList = ''
+                for episode in recentEpisodes:
+                    ep = '%s\nS%02dE%02d: %s\n' % (episode['showtitle'],episode['season'],episode['episode'],episode['label'])
+                    if episode['playcount'] > 0:
+                        watched = 'Watched: Yes'
+                    else:
+                        watched = 'Watched: No'
+                    episodeList = episodeList + ep + watched + '\n\n'
+                self.say(episodeList, "Here you go:")
             elif 'play trailer of' in command or 'play trailer for' in command or 'play trailer 4' in command:
                 if 'play trailer of' in command:
                     title = command.replace('play trailer of ','')
