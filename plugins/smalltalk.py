@@ -56,7 +56,7 @@ class smalltalk(Plugin):
             self.say("This is my job.")
         self.complete_request()     
     
-    @register("de-DE", "(.*möchtest.*heiraten.*)|(.*willst.*heiraten.*)")
+    @register("de-DE", u"(.*möchtest.*heiraten.*)|(.*willst.*heiraten.*)")
     @register("en-US", ".*Want.*marry*")
     @register("fr-FR", u"(.*m'épouser.*)|(.*marier.*moi.*)")
     def st_marry_me(self, speech, language):
@@ -127,6 +127,10 @@ class smalltalk(Plugin):
             answer = self.ask(u"Wer ist da?")
             answer = self.ask(u"\"{0}\" wer?".format(answer))
             self.say(u"Wer nervt mich mit diesen Klopf Klopf Witzen?")
+        elif language =='fr-FR':
+            answer = self.ask(u"Qui est là ?")
+            answer = self.ask(u"\"{0}\" qui ?".format(answer))
+            self.say(u"Je ne fais pas de blagues.")
         else:
             answer = self.ask(u"Who's there?")
             answer = self.ask(u"\"{0}\" who?".format(answer))
@@ -227,6 +231,7 @@ class smalltalk(Plugin):
         self.complete_request()
    
     @register("en-US", ".*favorite.*color.*")
+    @register("fr-FR", u".*couleur.*préféré.*")
     def st_favcolor(self, speech, language):
         if language == 'en-US':
             self.say("My favorite color is... Well, I don't know how to say it in your language. It's sort of greenish, but with more dimensions.")
