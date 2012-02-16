@@ -1,9 +1,8 @@
-
 import os
 import re
 import logging
 
-from plugin import Plugin, __criteria_key__, NecessaryModuleNotFound
+from plugin import Plugin, __criteria_key__, NecessaryModuleNotFound, ApiKeyNotFoundException
 from types import FunctionType
 
 
@@ -16,6 +15,7 @@ __apikeys_file__ = "apiKeys.conf"
 
 
 plugins = dict()
+prioritizedPlugins = dict()
 apiKeys = dict()
 
 def load_plugins():
@@ -28,7 +28,9 @@ def load_plugins():
             try:
                 __import__(pluginPath+"."+line,  globals(), locals(), [], -1)
             except NecessaryModuleNotFound as e:
-                logger.critical("Failed loading Plugin due to missing module: "+str(e))
+                logger.critical("Failed loading plugin due to missing module: "+str(e))
+            except ApiKeyNotFoundException as e:
+                logger.critical("Failed loading plugin due to missing API key: "+str(e))
             except:
                 logger.exception("Plugin loading failed")
             
@@ -62,10 +64,10 @@ def load_api_keys():
             try:
                 apiName = str.lower(kv[0]).strip()
                 kv[1] = kv[1].strip()
-                apiKey = kv[1][1:len(kv[1])-1] #stip the ""
+                apiKey = kv[1][1:-1] #stip the ""
                 apiKeys[apiName] = apiKey
             except:
-                logger.critial("There was an error parsing an API in the line: "+ line)
+                logger.critical("There was an error parsing an API in the line: "+ line)
 
 def getAPIKeyForAPI(APIname):
     apiName = str.lower(APIname) 
@@ -79,7 +81,45 @@ def getPlugin(speech, language):
             if regex.match(speech) != None:
                 return (clazz, method)
     return (None, None)
-                
+
+def clearPriorityFor(assistantId):
+    if assistantId in prioritizedPlugins:
+        del prioritizedPlugins[assistantId]
+
+def prioritizePluginObject(pluginObj, assistantId):
+    prioritizedPlugins[assistantId] = dict()
+    for lang in plugins.keys():
+        for (regex, clazz, method) in plugins[lang]:
+            if pluginObj.__class__ == clazz:
+                if not lang in prioritizedPlugins[assistantId]:
+                    prioritizedPlugins[assistantId][lang] = []
+                prioritizedPlugins[assistantId][lang].append((regex, pluginObj, method))
+
+def searchPrioritizedPlugin(assistantId, speech, language):
+    if assistantId in prioritizedPlugins:
+        if language in prioritizedPlugins[assistantId]:
+            for (regex, pluginObj, method) in prioritizedPlugins[assistantId][language]:
+                if regex.match(speech) != None:
+                    return (pluginObj, method)
+    return (None, None)
+
+def getPluginForImmediateExecution(assistantId, speech, language, otherPluginParams):
+    (sendObj, sendPlist, assistant, location) = otherPluginParams
+
+    (pluginObj, method) = searchPrioritizedPlugin(assistantId, speech, language)
+    if pluginObj == None and method == None:
+        (clazz, method) = getPlugin(speech, language)
+        if clazz != None and method != None:
+            pluginObj = clazz()
+            pluginObj.initialize(method, speech, language, sendObj, sendPlist, assistant, location)
+            #prioritizePluginObject(pluginObj, assistantId)
+    else:
+        #reinitialize it
+        logger.info("Found a matching prioritized plugin")
+        pluginObj.initialize(method, speech, language, sendObj, sendPlist, assistant, location)
+    
+    return pluginObj
+        
 
 
 

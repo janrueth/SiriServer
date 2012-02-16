@@ -24,26 +24,28 @@ def parse_number(s, language):
 
 
 def parse_timer_length(t, language):
-    m = re.search(timerPlugin.res['timerLength'][language], t, re.IGNORECASE)
-    if m:
+    seconds = None
+    for m in re.finditer(timerPlugin.res['timerLength'][language], t, re.IGNORECASE):
+        print(m.groups())
+        seconds = seconds or 0
         unit = m.group(2)[0]
         count = parse_number(m.group(1), language)
         if unit == 'h':
-            return count * 60 * 60
+            seconds += count * 3600
         elif unit == 'm':
-            return count * 60
+            seconds += count * 60
         elif unit == 's':
-            return count
+            seconds += count
         else:
-            # shouldn't ever get here, but just in case...
-            return count * 60
+            seconds += count * 60
+
+    return seconds
 
 
 class timerPlugin(Plugin):
 
     localizations = {
         'Timer': {
-<<<<<<< HEAD
             'durationTooBig': {
                'en-US': 'Sorry, I can only set timers up to 24 hours.', 'fr-FR': u"Désolé mais je ne peux pas programmer le minuteur plus de 24 heures."
             }, "settingTimer": {
@@ -66,62 +68,26 @@ class timerPlugin(Plugin):
                 "en-US": "Your timer is set for {0}.", "fr-FR": u"Votre minuteur est programmé pour {0}"
             }, "wontSetTimer": {
                 "en-US": "OK.", "fr-FR": u"D'accord"
-=======
-            "settingTimer": {
-                "en-US": u"Setting the timer\u2026", "fr-FR": u"Programmation du minuteur"
-            }, "timerWasSet": {
-                "en-US": "Your timer is set for {0}.", "fr-FR": u"Votre minuteur est programmé pour {0}"
-            }, "timerIsAlreadyRunning": {
-                "en-US": u"Your timer\u2019s already running:", "fr-FR": u"Un minuteur est déjà en cours"
-            }, "wontSetTimer": {
-                "en-US": "OK.", "fr-FR": u"D'accord"
-            }, 'timerWasReset': {
-                'en-US': u'I\u2019ve canceled the timer.', "fr-FR": u"J'ai annulé le minuteur."
-            }, 'timerIsAlreadyStopped': {
-                'en-US': u'It\u2019s already stopped.', "fr-FR": u"Le minuteur est déjà arrếté !"
-            }, 'timerWasResumed': {
-                'en-US': u'It\u2019s resumed.', "fr-FR": u"Le minuteur a repris."
-            }, 'timerWasPaused': {
-                'en-US': u'It\u2019s paused.', "fr-FR": u"Le minuteur est en pause."
-            }, 'timerIsAlreadyPaused': {
-                'en-US': u'It\u2019s already paused.', "fr-FR": u"Le minuteur est déjà en pause !"
-            }, 'showTheTimer': {
-                'en-US': u'Here\u2019s the timer:', "fr-FR": u"Voici le minuteur"
->>>>>>> 5194b777e300be9728d1d71016f49e7e55b5252e
             }
         }
     }
 
     res = {
-<<<<<<< HEAD
         'articles': {
             'en-US': 'a|an|the', 'fr-FR': 'une|pour'
         }, 'pauseTimer': {
             'en-US': '.*(pause|freeze|hold).*timer', 'fr-FR': '(.*pause.*minuteur.*)|(.*minuteur.*pause.*)'
-=======
-        'setTimer': {
-            'en-US': '.*timer.*\s+([0-9/ ]*|a|an|the)\s+(secs?|seconds?|mins?|minutes?|hrs?|hours?)', 'fr-FR': '.*minuteur.*\s+([0-9/ ]*|une|deux|trois|quatre|cinq|six|sept|huit|neuf)\s+(secondes?|minutes?|heures?)'
->>>>>>> 5194b777e300be9728d1d71016f49e7e55b5252e
         }, 'resetTimer': {
             'en-US': '.*(cancel|reset|stop).*timer', 'fr-FR': u'.*(annule|déprogramme).*minuteur'
         }, 'resumeTimer': {
             'en-US': '.*(resume|thaw|continue).*timer', 'fr-FR': '.*(reprends|continue|remets).*minuteur'
-<<<<<<< HEAD
         }, 'setTimer': {
-            'en-US': '.*timer.*\s+([0-9/ ]*|a|an|the)\s+(secs?|seconds?|mins?|minutes?|hrs?|hours?)', 'fr-FR': '.*minuteur.*\s+([0-9/ ]*|une|deux|trois|quatre|cinq|six|sept|huit|neuf)\s+(secondes?|minutes?|heures?)'
-=======
-        }, 'pauseTimer': {
-            'en-US': '.*(pause|freeze|hold).*timer', 'fr-FR': '(.*pause.*minuteur.*)|(.*minuteur.*pause.*)'
->>>>>>> 5194b777e300be9728d1d71016f49e7e55b5252e
+            # 'en-US': '.*timer[^0-9]*(((([0-9/ ]*|a|an|the)\s+(seconds?|secs?|minutes?|mins?|hours?|hrs?))\s*(and)?)+)'
+            'en-US': '.*timer[^0-9]*(?P<length>([0-9/ ]|seconds?|secs?|minutes?|mins?|hours?|hrs?|and|the|an|a){2,})', 'fr-FR': '.*minuteur.*\s+([0-9/ ]*|une|deux|trois|quatre|cinq|six|sept|huit|neuf)\s+(secondes?|minutes?|heures?)'
         }, 'showTimer': {
             'en-US': '.*(show|display|see).*timer', 'fr-FR': '.*montre.*minuteur'
         }, 'timerLength': {
-            'en-US': '([0-9/ ]*|a|an|the)\s+(secs?|seconds?|mins?|minutes?|hrs?|hours?)', 'fr-FR': '([0-9/ ]*|une|deux|trois|quatre|cinq|six|sept|huit|neuf)\s+(secondes?|minutes?|heures?)'
-<<<<<<< HEAD
-=======
-        }, 'articles': {
-            'en-US': 'a|an|the', 'fr-FR': 'un|une|pour'
->>>>>>> 5194b777e300be9728d1d71016f49e7e55b5252e
+            'en-US': '([0-9][0-9 /]*|an|a|the)\s+(seconds?|secs?|minutes?|mins?|hours?|hrs?)', 'fr-FR': '([0-9/ ]*|une|deux|trois|quatre|cinq|six|sept|huit|neuf)\s+(secondes?|minutes?|heures?)'
         }
     }
 
@@ -129,7 +95,7 @@ class timerPlugin(Plugin):
     @register("fr-FR", res['setTimer']['fr-FR'])
     def setTimer(self, speech, language):
         m = re.match(timerPlugin.res['setTimer'][language], speech, re.IGNORECASE)
-        timer_length = ' '.join(m.group(1, 2))
+        timer_length = m.group('length')
         duration = parse_timer_length(timer_length, language)
 
         view = AddViews(self.refId, dialogPhase="Reflection")

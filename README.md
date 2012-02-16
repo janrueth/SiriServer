@@ -3,6 +3,10 @@ Siri Server
 
 IMPORTANT
 ---------
+
+If you have problems with the server in setup or something else, first read this file to the end and if you have still problems visit: [SiriServer Board](http://hack.silentspark.net/phpbb/index.php)
+Please do NOT post installation problems or other non-code related stuff in the github issues section
+
 There are currently only 8 plugins here, you can chat a little bit with siri.
 You can ask it for the current time and the current time at a certain point in the world.
 And you can ask it for the meaning of life.
@@ -129,6 +133,29 @@ Please make sure to install the CA certificate on your iDevice (you can simply m
 It is the CA.pem file that was copied by gen_certs.sh to the servers root. 
 In your mail, just click on the certificate and install it.
 
+**Installing API Keys**
+
+
+Some of the plugins included require API/APPID keys to use. You'll need to register with the respective websites to obtain these keys.
+
+The general format is as follows:
+
+	apiName="PLUGIN-API-KEY"
+
+The apiName is usually printed in error messages when you miss a certain API Key.
+
+***Where to obtain API Keys***
+
+Register and sign up for an API with the following sites:
+
+- Wolfram Alpha : [http://products.wolframalpha.com/developers/](http://products.wolframalpha.com/developers/)
+- Wordnik : [http://developer.wordnik.com/](http://developer.wordnik.com/)
+- Weather Wunderground : [http://www.wunderground.com/weather/api/](http://www.wunderground.com/weather/api/)
+
+***Why don't you give me your key?***
+
+The API (Application Programming Interface) keys are necessary to allow some plugins to use different services on the internet. Those api keys are like a username password combination and grant access to several resources online, like wolframalpha, they make it very easy to use the resources in a computer program. As you must buy a API key if you want to use it for multiple users or commercially (That are usually the terms for APIs) we cannot distribute the keys here in github and must require users to create them on their own, they are usually free for noncommercial and personal use.
+
 **Running the server**
 
 Now you are ready to go, start the server with:
@@ -137,6 +164,19 @@ Now you are ready to go, start the server with:
 Note: You need to run it as root, as we use https port 443
 (non root can only use ports > 1024) for incomming connections.
 
+**Running the server as a service**
+For Ubuntu/Debian/...
+
+1. Copy the script from startupScripts/siriserver to /etc/init.d "sudo cp startupScripts/siriserver /etc/init.d/siriserver"
+2. Edit the script, fill in the path to your SiriServer folder "sudo nano /etc/init.d/siriserver"
+3. Make executable "sudo chmod a+x /etc/init.d/siriserver"
+4. Add it to the startup items: "sudo update-rc.d siriserver defaults"
+5. Start with "sudo service siriserver start" You can now start, restart and stop SiriServer just as you started it in step 5.
+
+For Mac
+
+1. "sudo cp startupScripts/net.siriserver.plist /Library/LaunchDaemons"
+2. "sudo launchctl load /Library/LaunchDaemons/net.siriserver.plist"
 
 Common Errors
 -------------
@@ -218,7 +258,9 @@ It should output something like this, note the Ace http request near the end:
 	 User-Agent: Assistant(iPhone/iPhone3,1; iPhone OS/5.0.1/9A405) Ace/1.0
 	 Content-Length: 2000000000
 
-
+HELP
+------
+If you followed every step of the installation and you still need help to get SiriServer up and running, join #SiriServer channel on Freenode (IRC).
 
 Thanks
 ------

@@ -44,21 +44,21 @@ class SiriWeatherFunctions():
 class weatherPlugin(Plugin):
     localizations = {"weatherForecast": 
                         {"search":{
-                            0:{"de-DE": u"Einen Moment Geduld bitte...", "en-US": "Checking my sources..."},
-                            1:{"de-DE": u"Ich suche nach der Vorhersage ...", "en-US": "Please wait while I check that..."},
-                            2:{"de-DE": u"Einen Moment bitte ...", "en-US": "One moment please..."},
-                            3:{"de-DE": u"Ich suche nach Wetterdaten...", "en-US": "Trying to get weather data for this location..."},
+                            0:{"de-DE": u"Einen Moment Geduld bitte...", "en-US": u"Checking my sources..."},
+                            1:{"de-DE": u"Ich suche nach der Vorhersage ...", "en-US": u"Please wait while I check that..."},
+                            2:{"de-DE": u"Einen Moment bitte ...", "en-US": u"One moment please..."},
+                            3:{"de-DE": u"Ich suche nach Wetterdaten...", "en-US": u"Trying to get weather data for this location..."},
                             }, 
                         "forecast":{
                             "DAILY": {
-                                0:{"de-DE": u"Hier ist die Vorhersage für {0}, {1}", "en-US": "Here is the forecast for {0}, {1}"},
-                                1:{"de-DE": u"Hier ist die Wetterprognose für {0}, {1}", "en-US": "This is the forecast for {0}, {1}"},
-                                2:{"de-DE": u"Ich habe folgende Vorhersage für {0}, {1} gefunden", "en-US": "I found the following forecast for {0}, {1}"},
+                                0:{"de-DE": u"Hier ist die Vorhersage für {0}, {1}", "en-US": u"Here is the forecast for {0}, {1}"},
+                                1:{"de-DE": u"Hier ist die Wetterprognose für {0}, {1}", "en-US": u"This is the forecast for {0}, {1}"},
+                                2:{"de-DE": u"Ich habe folgende Vorhersage für {0}, {1} gefunden", u"en-US": "I found the following forecast for {0}, {1}"},
                                 },
                             "HOURLY": {
-                                0:{"de-DE": u"Hier ist die heutige Vorhersage für {0}, {1}", "en-US": "Here is today's forecast for {0}, {1}"},
-                                1:{"de-DE": u"Hier ist die Wetterprognose von heute für {0}, {1}", "en-US": "This is today's forecast for {0}, {1}"},
-                                2:{"de-DE": u"Ich habe folgende Tagesprognose für {0}, {1} gefunden", "en-US": "I found the following hourly forecast for {0}, {1}"},
+                                0:{"de-DE": u"Hier ist die heutige Vorhersage für {0}, {1}", "en-US": u"Here is today's forecast for {0}, {1}"},
+                                1:{"de-DE": u"Hier ist die Wetterprognose von heute für {0}, {1}", "en-US": u"This is today's forecast for {0}, {1}"},
+                                2:{"de-DE": u"Ich habe folgende Tagesprognose für {0}, {1} gefunden", "en-US": u"I found the following hourly forecast for {0}, {1}"},
                                 }
                             },
                         "failure": {
@@ -70,11 +70,7 @@ class weatherPlugin(Plugin):
     @register("de-DE", "(.*Wetter.*)|(.*Vorhersage.*)")     
     @register("en-US", "(.*Weather.*)|(.*forecast.*)")
     def weatherForecastLookUp(self, speech, language):
-        if weatherApiKey =="":
-            self.say("Please obtain an API key from http://api.wunderground.com/weather/api/ and enter it in line 17!")
-            self.complete_request()
-            return False
-	speech = speech.replace(u".","")
+        speech = speech.replace(u".","")
         viewType ="DAILY"
         if (speech.count("today") > 0 or speech.count("current") > 0 or speech.count(" for today") > 0) and language=="en-US":
             viewType = "HOURLY"
@@ -188,15 +184,9 @@ class weatherPlugin(Plugin):
                                 weatherTempNightTime = False
                                 
                             conditionSwapper = SiriWeatherFunctions()
-                            
-                            dayOfWeek=dict()
-                            dayOfWeek[0]=2
-                            dayOfWeek[1]=3
-                            dayOfWeek[2]=4
-                            dayOfWeek[3]=5
-                            dayOfWeek[4]=6
-                            dayOfWeek[5]=7
-                            dayOfWeek[6]=1
+                            dayOfWeek=[] #
+                            for i in range(1,8):
+                                dayOfWeek.append(i % 7 + 1)
                             
                             tempNight=weatherTempNightTime
                             weatherTemp["currentTemperature"] =str(response["current_observation"]["temp_c"])

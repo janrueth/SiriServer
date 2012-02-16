@@ -1,7 +1,24 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import socket, ssl, sys, zlib, binascii, time, select, struct, biplist, uuid, json, asyncore, re, threading, logging, pprint, sqlite3
+try:
+    import biplist
+except ImportError:
+    print "You need to install biplist package on your system! e.g. \"sudo easy_install biplist\""
+    exit(-1)
+
+try:
+    from M2Crypto import BIO, RSA, X509
+except ImportError:
+    print "You must install M2Crypto on your system! (this might require openssl and SWIG) e.g. \"sudo easy_install m2crypto\""
+    exit(-1)
+
+import sys
+if sys.version_info < (2, 6):
+    print "You must use python 2.6 or greater"
+    exit(-1)
+
+import socket, ssl, zlib, binascii, time, select, struct, uuid, json, asyncore, re, threading, logging, pprint, sqlite3
 from optparse import OptionParser
 from email.utils import formatdate
 
@@ -11,8 +28,6 @@ import db
 from db import Assistant
 
 import PluginManager
-
-from M2Crypto import BIO, RSA, X509
 
 from siriObjects import speechObjects, baseObjects, uiObjects, systemObjects
 from siriObjects.baseObjects import ObjectIsCommand
@@ -151,9 +166,8 @@ class HandleConnection(ssl_dispatcher):
                 
                 if not dictation:
                     if self.current_running_plugin == None:
-                        (clazz, method) = PluginManager.getPlugin(best_match, self.assistant.language)
-                        if clazz != None and method != None:
-                            plugin = clazz(method, best_match, self.assistant.language, self.send_object, self.send_plist, self.assistant, self.current_location)
+                        plugin = PluginManager.getPluginForImmediateExecution(self.assistant.assistantId, best_match, self.assistant.language, (self.send_object, self.send_plist, self.assistant, self.current_location))
+                        if plugin != None:
                             plugin.refId = requestId
                             plugin.connection = self
                             self.current_running_plugin = plugin
@@ -203,8 +217,9 @@ class HandleConnection(ssl_dispatcher):
                             # don't change it's refId, further requests must reference last FinishSpeech
                             self.logger.info("Forwarding object to plugin")
                             self.plugin_lastAceId = None
-                            self.current_running_plugin.response = reqObject
+                            self.current_running_plugin.response = reqObject if reqObject['class'] != "StartRequest" else reqObject['properties']['utterance']
                             self.current_running_plugin.waitForResponse.set()
+                            continue
                 
                 if ObjectIsCommand(reqObject, StartSpeechRequest) or ObjectIsCommand(reqObject, StartSpeechDictation):
                     self.logger.info("New start of speech received")
@@ -280,9 +295,7 @@ class HandleConnection(ssl_dispatcher):
 
                 elif ObjectIsCommand(reqObject, GetSessionCertificate):
                     getSessionCertificate = GetSessionCertificate(reqObject)
-                    response = GetSessionCertificateResponse(getSessionCertificate.aceId)
-                    response.caCert = caCert.as_der()
-                    response.sessionCert = serverCert.as_der()
+                    response = GetSessionCertificateResponse(getSessionCertificate.aceId, caCert.as_der(), serverCert.as_der())
                     self.send_object(response)
 
                 elif ObjectIsCommand(reqObject, CreateSessionInfoRequest):
@@ -387,6 +400,11 @@ class HandleConnection(ssl_dispatcher):
         self.output_buffer += self.compressor.compress(self.unzipped_output_buffer)
         #make sure everything is compressed
         self.output_buffer += self.compressor.flush(zlib.Z_SYNC_FLUSH)
+        ratio = float(len(self.unzipped_output_buffer))/float(len(self.output_buffer)) - 1
+        if ratio < 0:
+            self.logger.debug("Blowed up by {0:.2f} bytes ({1:.2%}) due to compression".format(-1*ratio*len(self.unzipped_output_buffer),ratio))
+        else:
+            self.logger.debug("Saved {0:.2f} bytes ({1:.2%}) using compression".format(ratio*len(self.unzipped_output_buffer), ratio))
         self.unzipped_output_buffer = ""
 
         self.flush_output_buffer()

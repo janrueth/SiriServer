@@ -52,11 +52,7 @@ class timePlugin(Plugin):
     
     @register("de-DE", "(Wieviel Uhr.*in ([\w ]+))|(Uhrzeit.*in ([\w ]+))")
     @register("en-US", "(What.*time.*in ([\w ]+))|(.*current time.*in ([\w ]+))")
-<<<<<<< HEAD
     @register("fr-FR", u'.*(Q|q)uel.*heure.*(à|en|au) ([\w ]+)')
-=======
-    @register("fr-FR", u'.*(Q|q)uel.*heure.*(à|en|au) [\w ]+')
->>>>>>> 5194b777e300be9728d1d71016f49e7e55b5252e
     def currentTimeIn(self, speech, language):
         view = AddViews(self.refId, dialogPhase="Reflection")
         view.views = [AssistantUtteranceView(text=timePlugin.localizations['currentTimeIn']['search'][language], speakableText=timePlugin.localizations['currentTimeIn']['search'][language], dialogIdentifier="Clock#getTime")]
@@ -69,10 +65,10 @@ class timePlugin(Plugin):
             countryOrCity = re.match(u".*(in) ([\w]+)$", speech, re.IGNORECASE)
 
         if countryOrCity != None:
-            countryOrCity = countryOrCity.group(2).strip()
+            countryOrCity = countryOrCity.group(1).strip()
             # lets see what we got, a country or a city... 
             # lets use google geocoding API for that
-            url = "http://maps.googleapis.com/maps/api/geocode/json?address={0}&sensor=false&language={1}".format(urllib.quote_plus(countryOrCity.encode('utf8')), language)
+            url = u"http://maps.googleapis.com/maps/api/geocode/json?address={0}&sensor=false&language={1}".format(urllib.quote_plus(countryOrCity), language)
             # lets wait max 3 seconds
             jsonString = None
             try:
@@ -88,7 +84,7 @@ class timePlugin(Plugin):
                     if "country" in types:
                         # OK we have a country as input, that sucks, we need the capital, lets try again and ask for capital also
                         components = filter(lambda x: True if "country" in x['types'] else False, components)
-                        url = "http://maps.googleapis.com/maps/api/geocode/json?address=capital%20{0}&sensor=false&language={1}".format(urllib.quote_plus(components[0]['long_name'].encode("utf8")), language)
+                        url = u"http://maps.googleapis.com/maps/api/geocode/json?address=capital%20{0}&sensor=false&language={1}".format(urllib.quote_plus(components[0]['long_name']), language)
                             # lets wait max 3 seconds
                         jsonString = None
                         try:
@@ -103,7 +99,7 @@ class timePlugin(Plugin):
                 if response['status'] == 'OK':
                     # get latitude and longitude
                     location = response['results'][0]['geometry']['location']
-                    url = "http://api.geonames.org/timezoneJSON?lat={0}&lng={1}&username={2}".format(location['lat'], location['lng'], geonames_user)
+                    url = u"http://api.geonames.org/timezoneJSON?lat={0}&lng={1}&username={2}".format(location['lat'], location['lng'], geonames_user)
                     jsonString = None
                     try:
                         jsonString = urllib2.urlopen(url, timeout=3).read()

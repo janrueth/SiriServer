@@ -1,5 +1,7 @@
 from siriObjects.baseObjects import ClientBoundCommand, AceObject, ServerBoundCommand
 
+import biplist, struct
+
 class GetRequestOrigin(ClientBoundCommand):
     desiredAccuracyThreeKilometers = "ThreeKilometers"
     desiredAccuracyKilometer = "Kilometer"
@@ -52,9 +54,9 @@ class DomainObject(AceObject):
         return super(DomainObject, self).to_plist()
 
 class DomainObjectCreate(ClientBoundCommand):
-    def __init__(self, refId, object=None):
+    def __init__(self, refId, obj=None):
         super(DomainObjectCreate, self).__init__("DomainObjectCreate", "com.apple.ace.system", None, refId)
-        self.object = object
+        self.object = obj
     
     def to_plist(self):
         self.add_property('object')
@@ -131,8 +133,8 @@ class SendCommands(AceObject):
         return super(SendCommands, self).to_plist()
 
 class Person(DomainObject):
-    def __init__(self):
-        super(Person, self).__init__("com.apple.ace.system", clazz="Person")
+    def __init__(self, group="com.apple.ace.system"):
+        super(Person, self).__init__(group, clazz="Person")
         self.suffix = None # string
         self.relatedNames = None # array
         self.prefix = None # string
@@ -169,6 +171,47 @@ class Person(DomainObject):
         self.add_property('addresses')
         return super(Person, self).to_plist()
 
+class PersonAttribute(AceObject):
+    def __init__(self, obj=None, displayText="", data=""):
+        super(PersonAttribute, self).__init__("PersonAttribute", "com.apple.ace.system")
+        self.object = obj if obj != None else Person()
+        self.displayText = ""
+        self.data = ""
+    
+    def to_plist(self):
+        self.add_property('object')
+        self.add_property('displayText')
+        self.add_property('data')
+        return super(PersonAttribute, self).to_plist()
+
+class Phone(AceObject):
+    def __init__(self, number="", label="", favoriteVoice=0, favoriteFacetime=0, group="com.apple.ace.system"):
+        super(Phone, self).__init__("Phone", group)
+        self.number = number
+        self.label = label
+        self.favoriteVoice = favoriteVoice
+        self.favoriteFacetime = favoriteFacetime
+    
+    def to_plist(self):
+        self.add_property('number')
+        self.add_property('label')
+        self.add_property('favoriteVoice')
+        self.add_property('favoriteFacetime')
+        return super(Phone, self).to_plist()
+
+
+class RelatedName(AceObject):
+    def __init__(self, name="", label="", group="com.apple.ace.system"):
+        super(RelatedName, self).__init__("RelatedName", group)
+        self.name = name
+        self.label = label
+
+    def to_plist(self):
+        self.add_property('name')
+        self.add_property('label')
+        return super(RelatedName, self).to_plist()
+
+
 class CancelRequest(ServerBoundCommand):
     groupIdentifier = "com.apple.ace.system"
     classIdentifier = "CancelRequest"
@@ -188,10 +231,11 @@ class GetSessionCertificate(ServerBoundCommand):
         super(GetSessionCertificate, self).__init__(plist)
 
 class GetSessionCertificateResponse(ClientBoundCommand):
-    def __init__(self, refId):
+    def __init__(self, refId, caCert, sessionCert):
         super(GetSessionCertificateResponse, self).__init__("GetSessionCertificateResponse", "com.apple.ace.system", None, refId)
-        self.caCert = None
-        self.sessionCert = None
+        self.certificate = None
+        self.caCert = caCert
+        self.sessionCert = sessionCert
 
     def to_plist(self):
         self.certificate = biplist.Data("\x01\x02"+struct.pack(">I", len(self.caCert))+self.caCert + struct.pack(">I", len(self.sessionCert))+self.sessionCert)
@@ -228,3 +272,35 @@ class CommandFailed(ClientBoundCommand):
         self.add_property('reason')
         self.add_property('errorCode')
         return super(CommandFailed, self).to_plist()
+
+
+
+class Location(DomainObject):
+    AccuracyBestValue = "Best"
+    AccuracyNearestTenMetersValue = "NearestTenMeters"
+    AccuracyHundredMetersValue = "HundredMeters"
+    AccuracyKilometerValue = "Kilometer"
+    AccuracyThreeKilometersValue = "ThreeKilometers"
+    def __init__(self, label="", street="", city="", stateCode="", countryCode="", postalCode="", latitude=0, longitude=0, accuracy=0, group="com.apple.ace.system", clazz="Location"):
+        super(Location, self).__init__(group, None, clazz)
+        self.label = label
+        self.street = street
+        self.city = city
+        self.stateCode = stateCode
+        self.countryCode = countryCode
+        self.postalCode = postalCode
+        self.latitude = latitude
+        self.longitude = longitude
+        self.accuracy = accuracy
+
+    def to_plist(self):
+        self.add_property('label')
+        self.add_property('street')
+        self.add_property('city')
+        self.add_property('stateCode')
+        self.add_property('countryCode')
+        self.add_property('postalCode')
+        self.add_property('latitude')
+        self.add_property('longitude')
+        self.add_property('accuracy')
+        return super(Location, self).to_plist()
