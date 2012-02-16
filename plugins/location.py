@@ -113,14 +113,14 @@ class location(Plugin):
 
     @register("de-DE", "(Wo liegt.*)")    
     @register("en-US", "(Where is.*)")
-    @register("fr-FR", u".*o(ù|u) (est |se trouve |ce trouve |se situe |ce situe )([\w ]+)")
+    @register("fr-FR", u".*o(ù|u) (est |se trouve |ce trouve |se situe |ce situe )(.*)")
     def whereIs(self, speech, language, regex):
         the_location = None
         if language == "de-DE":
             the_location = re.match("(?u).* liegt ([\w ]+)$", speech, re.IGNORECASE)
             the_location = the_location.group(1).strip()
         elif language == 'fr-FR':
-            the_location == regex.group(regex.lastindex).strip()
+            the_location = regex.group(regex.lastindex).strip()
         else:
             the_location = re.match("(?u).* is ([\w ]+)$", speech, re.IGNORECASE)
             the_location = the_location.group(1).strip()
