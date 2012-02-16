@@ -2,9 +2,9 @@ from siriObjects.baseObjects import ClientBoundCommand, AceObject, ServerBoundCo
 from siriObjects.systemObjects import DomainObject, Location
 from siriObjects.uiObjects import Snippet
 
-class LocalSearchMapItemSnippet(Snippet):
+class MapItemSnippet(Snippet):
     def __init__(self, userCurrentLocation=True, items=None):
-        super(LocalSearchMapItemSnippet, self).__init__("com.apple.ace.localsearch", clazz="MapItemSnippet")
+        super(MapItemSnippet, self).__init__("com.apple.ace.localsearch", clazz="MapItemSnippet")
         self.userCurrentLocation = userCurrentLocation
         self.items = items
         self.searchRegionCenter = None # systemObjects.Location
@@ -17,9 +17,9 @@ class LocalSearchMapItemSnippet(Snippet):
         self.add_property('searchRegionCenter')
         self.add_property('regionOfInterestRadiusInMiles')
         self.add_property('providerCommand')
-        return super(LocalSearchMapItemSnippet, self).to_plist()
+        return super(MapItemSnippet, self).to_plist()
 
-class LocalSearchMapItem(DomainObject):
+class MapItem(DomainObject):
     TypeCURRENT_LOCATIONValue = "CURRENT_LOCATION"
     TypeBUSINESS_ITEMValue = "BUSINESS_ITEM"
     TypePERSON_ITEMValue = "PERSON_ITEM"
@@ -27,7 +27,7 @@ class LocalSearchMapItem(DomainObject):
     TypeHOME_ITEMValue = "HOME_ITEM"
     
     def __init__(self, label="", street="", city="", stateCode="", countryCode="", postalCode="", latitude=0, longitude=0, detailType="BUSINESS_ITEM", clazz="MapItem"):
-        super(LocalSearchMapItem, self).__init__("com.apple.ace.localsearch", clazz="MapItem")
+        super(MapItem, self).__init__("com.apple.ace.localsearch", clazz="MapItem")
         self.label = label
         self.detailType = detailType
         self.location = Location(label,street,city,stateCode,countryCode,postalCode,latitude,longitude)
@@ -42,21 +42,21 @@ class LocalSearchMapItem(DomainObject):
         self.add_property('placeId')
         self.add_property('distanceInMiles')
         self.add_property('detail')
-        return super(LocalSearchMapItem, self).to_plist()
+        return super(MapItem, self).to_plist()
 
-class LocalSearchActionableMapItem(LocalSearchMapItem):
-    def __init__(self, label="", street="", city="", stateCode="", countryCode="", postalCode="", latitude=0, longitude=0, detailType=LocalSearchMapItem.TypeCURRENT_LOCATIONValue, commands=None):
-        super(LocalSearchActionableMapItem, self).__init__(self, label, street, city, stateCode, countryCode, postalCode, latitude, longitude, detailType, clazz="ActionableMapItem")
+class ActionableMapItem(MapItem):
+    def __init__(self, label="", street="", city="", stateCode="", countryCode="", postalCode="", latitude=0, longitude=0, detailType=MapItem.TypeCURRENT_LOCATIONValue, commands=None):
+        super(ActionableMapItem, self).__init__(self, label, street, city, stateCode, countryCode, postalCode, latitude, longitude, detailType, clazz="ActionableMapItem")
         self.commands = commands if commands != None else []
     
     def to_plist(self):
         self.add_property('commands')
-        return super(LocalSearchActionableMapItem, self).to_plist()
+        return super(ActionableMapItem, self).to_plist()
 
 
-class LocalSearchRating(AceObject):
+class Rating(AceObject):
     def __init__(self, value=0.0, providerId="", description="", count=0):
-        super(LocalSearchRating, self).__init__("Rating", "com.apple.ace.localsearch")
+        super(Rating, self).__init__("Rating", "com.apple.ace.localsearch")
         self.value = value
         self.providerId = providerId
         self.description = description
@@ -67,13 +67,13 @@ class LocalSearchRating(AceObject):
         self.add_property('providerId')
         self.add_property('description')
         self.add_property('count')
-        return super(LocalSearchRating, self).to_plist()
+        return super(Rating, self).to_plist()
 
-class LocalSearchBusiness(AceObject):
+class Business(AceObject):
     def __init__(self, totalNumberOfReviews=0, rating=None, photo="", phoneNumbers=None, openingHours="", name="", extSessionGuid="", categories=None, businessUrl="", businessIds=None, businessId=0):
-        super(LocalSearchBusiness, self).__init__("Business", "com.apple.ace.localsearch")
+        super(Business, self).__init__("Business", "com.apple.ace.localsearch")
         self.totalNumberOfReviews = totalNumberOfReviews
-        self.rating = rating if rating != None else LocalSearchRating()
+        self.rating = rating if rating != None else Rating()
         self.photo = photo
         self.phoneNumbers = phoneNumbers if phoneNumbers != None else []
         self.openingHours = openingHours
@@ -96,47 +96,47 @@ class LocalSearchBusiness(AceObject):
         self.add_property('businessUrl')
         self.add_property('businessIds')
         self.add_property('businessId')
-        return super(LocalSearchBusiness, self).to_plist()
+        return super(Business, self).to_plist()
 
-class LocalSearchDisambiguationMap(Snippet):
+class DisambiguationMap(Snippet):
     def __init__(self, items=None):
-        super(LocalSearchDisambiguationMap, self).__init__("com.apple.ace.localsearch", clazz="DisambiguationMap")
+        super(DisambiguationMap, self).__init__("com.apple.ace.localsearch", clazz="DisambiguationMap")
         self.items = items if items != None else []
 
     def to_plist(self):
         self.add_property('items')
-        return super(LocalSearchDisambiguationMap, self).to_plist()
+        return super(DisambiguationMap, self).to_plist()
 
-class LocalSearchPhoneNumber(AceObject):
+class PhoneNumber(AceObject):
     TypePRIMARYValue = "PRIMARY"
     TypeSECONDARYValue =  "SECONDARY"
     TypeFAXValue = "FAX"
     TTYValue = "TTY"
 
     def __init__(self, value="", type="PRIMARY"):
-        super(LocalSearchPhoneNumber, self).__init__("PhoneNumber", "com.apple.ace.localsearch")
+        super(PhoneNumber, self).__init__("PhoneNumber", "com.apple.ace.localsearch")
         self.value = value
         self.type = type
 
     def to_plist(self):
         self.add_property('value')
         self.add_property('type')
-        return super(LocalSearchPhoneNumber, self).to_plist()
+        return super(PhoneNumber, self).to_plist()
 
 
 
-class LocalSearchReview(AceObject):
+class Review(AceObject):
     TypePROFESSIONALValue = "PROFESSIONAL"
     TypeCOMMUNITYValue = "COMMUNITY"
     TypePERSONALValue = "PERSONAL"
 
     def __init__(self, url="", type="PROFESSIONAL", reviewerUrl="", reviewerName="", rating=None, publication="", provider="", fullReview="", excerpt=""):
-        super(LocalSearchReview, self).__init__("Review", "com.apple.ace.localsearch")
+        super(Review, self).__init__("Review", "com.apple.ace.localsearch")
         self.url = url
         self.type = type
         self.reviewerUrl = reviewerUrl
         self.reviewerName = reviewerName
-        self.rating = rating if rating != None else LocalSearchRating()
+        self.rating = rating if rating != None else Rating()
         self.publication = publication
         self.provider = provider
         self.fullReview = fullReview
@@ -152,21 +152,21 @@ class LocalSearchReview(AceObject):
         self.add_property('provider')
         self.add_property('fullReview')
         self.add_property('excerpt')
-        return super(LocalSearchReview, self).to_plist()
+        return super(Review, self).to_plist()
 
-class LocalSearchShowMapPoints(ClientBoundCommand):
+class ShowMapPoints(ClientBoundCommand):
     DirectionsTypeByCarValue = "ByCar"
     DirectionsTypeByPublicTransitValue = "ByPublicTransit"
     DirectionsTypeWalkingValue = "Walking"
     DirectionsTypeBikingValue = "Biking"
 
     def __init__(self, refId, showTraffic=False, showDirections=False, regionOfInterestRadiusInMiles=0, itemSource=None, itemDestination=None, directionsType="ByCar", targetAppId=""):
-        super(LocalSearchShowMapPoints, self).__init__("ShowMapPoints", "com.apple.ace.localsearch", None, refId)
+        super(ShowMapPoints, self).__init__("ShowMapPoints", "com.apple.ace.localsearch", None, refId)
         self.showTraffic = showTraffic
         self.showDirections = showDirections
         self.regionOfInterestRadiusInMiles = regionOfInterestRadiusInMiles
-        self.itemSource = itemSource if itemSource != None else LocalSearchMapItem()
-        self.itemDestination = itemDestination if itemDestination != None else LocalSearchMapItem()
+        self.itemSource = itemSource if itemSource != None else MapItem()
+        self.itemDestination = itemDestination if itemDestination != None else MapItem()
         self.directionsType = directionsType
         self.targetAppId = targetAppId
 
@@ -178,12 +178,12 @@ class LocalSearchShowMapPoints(ClientBoundCommand):
         self.add_property('itemDestination')
         self.add_property('directionsType')
         self.add_property('targetAppId')
-        return super(LocalSearchShowMapPoints, self).to_plist()
+        return super(ShowMapPoints, self).to_plist()
 
-class LocalSearchShowMapPointsCompleted(ServerBoundCommand):
+class ShowMapPointsCompleted(ServerBoundCommand):
     classIdentifier = "ShowMapPointsCompleted"
     groupIdentifier = "com.apple.ace.localsearch"
     
     def __init__(self, plist):
-        super(LocalSearchShowMapPointsCompleted, self).__init__(plist)
+        super(ShowMapPointsCompleted, self).__init__(plist)
 
