@@ -37,7 +37,7 @@ class alarmPlugin(Plugin):
 
     res = {
         'setAlarm': {
-            'en-US': '.*set.* alarm for.* (0?[1-9]|1[012])([0-5]\d)?\s?([APap][mM])\s?(\bcalled|named|labeled\b)?\s?(([a-z0-9]{1,7}\s)?([a-z0-9]{1,7})\s?([a-z0-9]{1,7}))?', 'fr-FR': u'.*[Pp]rogramme.*alarme.*(pour|à).* ([01]\d|2[0-3])( heures? )([0-5]\d)?\s?(.*appel.*|.*nommé.*)?\s?([\w ]+)?'
+            'en-US': '.*set.* alarm for.* (0?[1-9]|1[012])([0-5]\d)?\s?([APap][mM])\s?(\bcalled|named|labeled\b)?\s?(([a-z0-9]{1,7}\s)?([a-z0-9]{1,7})\s?([a-z0-9]{1,7}))?', 'fr-FR': u'.*[Pp]rogramme.*alarme.*(pour|à).* ([01]\d|2[0-3])( heures )?([0-5]\d)?\s?(.*appel.*|.*nommé.*)?\s?([\w ]+)?'
         }
     }
 
