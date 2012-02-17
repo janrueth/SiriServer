@@ -60,7 +60,7 @@ class timePlugin(Plugin):
         
         error = False
 	if language == 'fr-FR':
-	    countryOrCity = re.match(u'.*(à|en|au) ([\wéèàêë]+)$', speech, re.IGNORECASE)
+	    countryOrCity = re.match(u".*(à|en|au) ([\wéèàêë]+)$", speech, re.IGNORECASE)
 	else:
             countryOrCity = re.match(u".*(in) ([\w]+)$", speech, re.IGNORECASE)
 
