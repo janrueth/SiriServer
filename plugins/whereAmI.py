@@ -35,7 +35,10 @@ class whereAmI(Plugin):
                 components = response['results'][0]['address_components']              
                 street = filter(lambda x: True if "route" in x['types'] else False, components)[0]['long_name']
                 stateLong= filter(lambda x: True if "administrative_area_level_1" in x['types'] or "country" in x['types'] else False, components)[0]['long_name']
-                postalCode= filter(lambda x: True if "postal_code" in x['types'] else False, components)[0]['long_name']
+                try:
+                    postalCode= filter(lambda x: True if "postal_code" in x['types'] else False, components)[0]['long_name']
+                except:
+                    postalCode=""
                 try:
                     city = filter(lambda x: True if "locality" in x['types'] or "administrative_area_level_1" in x['types'] else False, components)[0]['long_name']
                 except:
