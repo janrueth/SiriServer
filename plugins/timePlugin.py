@@ -33,7 +33,7 @@ class timePlugin(Plugin):
 
     @register("de-DE", "(Wie ?viel Uhr.*)|(.*Uhrzeit.*)")     
     @register("en-US", "(What.*time.*)|(.*current time.*)")
-    @register("fr-FR", u".*(Q|q)uel.*heure.*")
+    @register("fr-FR", ".*Quel.*heure.*")
     def currentTime(self, speech, language):
         #first tell that we look it up
         view = AddViews(self.refId, dialogPhase="Reflection")
@@ -52,7 +52,7 @@ class timePlugin(Plugin):
     
     @register("de-DE", "(Wieviel Uhr.*in ([\w ]+))|(Uhrzeit.*in ([\w ]+))")
     @register("en-US", "(What.*time.*in ([\w ]+))|(.*current time.*in ([\w ]+))")
-    @register("fr-FR", u'.*(Q|q)uel.*heure.*(à|en|au) ([\w ]+)')
+    @register("fr-FR", u'.*Quel.*heure.*(à|en|au) ([\w ]+)')
     def currentTimeIn(self, speech, language):
         view = AddViews(self.refId, dialogPhase="Reflection")
         view.views = [AssistantUtteranceView(text=timePlugin.localizations['currentTimeIn']['search'][language], speakableText=timePlugin.localizations['currentTimeIn']['search'][language], dialogIdentifier="Clock#getTime")]

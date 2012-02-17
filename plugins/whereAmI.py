@@ -56,7 +56,7 @@ class whereAmI(Plugin):
             else:
                 if language=="de-DE":
                     self.say('Die Googlemaps informationen waren ungenügend!','Fehler')
-                elif language == 'fr-FR'
+                elif language == 'fr-FR':
                     self.say(u"La réponse de Googlemaps ne contient pas l'information nécessaire",'Erreur')
                 else:
                     self.say('The Googlemaps response did not hold the information i need!','Error')
