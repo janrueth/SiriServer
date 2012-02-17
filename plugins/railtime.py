@@ -67,8 +67,20 @@ class Railtime(Plugin):
             for departure in response["departures"]["departure"]:
                    
                 if departure["platform"] == "":
-                    departure["platform"] = departure["platforminfo"]["normal"]
-                self.say(u"{0} sur la voie {1} à {2}.".format(departure["station"], departure["platform"], datetime.fromtimestamp(float(departure["time"])).strftime("%H:%M")))
+                    departure["platform"] == u"inconnue"
+                   
+                string = u"{0} sur la voie {1}".format(departure["station"], departure["platform"])
+                
+                if departure["platforminfo"]["normal"] != "1":
+                    string += u" (changement de voie)"
+                
+                string += u" à {0}.".format(datetime.fromtimestamp(float(departure["time"])).strftime("%H:%M"))
+                
+                
+                if departure["delay"] != "0":
+                    string += u" En retard de {0} minutes.".format(int(departure["delay"])/60)
+                   
+                self.say(string)
         else:
             self.say(u"Je ne parviens pas à récupérer le liveboard pour {0} !".format(gare))
 
