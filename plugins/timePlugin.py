@@ -65,7 +65,7 @@ class timePlugin(Plugin):
             countryOrCity = re.match(u".*(in) ([\w]+)$", speech, re.IGNORECASE)
 
         if countryOrCity != None:
-            countryOrCity = countryOrCity.group(1).strip()
+            countryOrCity = countryOrCity.group(2).strip().encode('utf8')
             # lets see what we got, a country or a city... 
             # lets use google geocoding API for that
             url = u"http://maps.googleapis.com/maps/api/geocode/json?address={0}&sensor=false&language={1}".format(urllib.quote_plus(countryOrCity), language)
