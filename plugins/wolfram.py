@@ -9,9 +9,9 @@
 
 import re, urlparse
 import urllib2, urllib
-import json
 from urllib2 import urlopen
 from xml.dom import minidom
+import random
 
 from plugin import *
 
@@ -144,12 +144,7 @@ class wolfram(Plugin):
                   wolfram8 = xmlData
                   wolfram_pod8 = pod.getAttribute('title')
                count_wolfram += 1
-        if language == 'de-DE':
-            self.say("Dies könnte Ihre Frage zu beantworten:")
-        elif language == 'fr-FR':
-			self.say(u"Cela pourrait répondre à votre question : ");
-        else:
-            self.say("This might answer your question:")
+        # Waiting for a response
         view = AddViews(self.refId, dialogPhase="Completion")
         if wolfram_pod0 != 12:
             if wolfram0_img == 1:
@@ -191,16 +186,23 @@ class wolfram(Plugin):
                 wolframAnswer8 = AnswerObject(title=wolfram_pod8,lines=[AnswerObjectLine(image=wolfram8)])
             else:
                 wolframAnswer8 = AnswerObject(title=wolfram_pod8,lines=[AnswerObjectLine(text=wolfram8)])
-        if wolfram_pod0 == 12:
-            if APPID == "":
-                self.say("Sorry I can't process your request. Your APPID is not set! Please register free dev account at http://wolframalpha.com and edit line 21 with you APPID.")
+        if wolfram_pod0 != 12:
+            # I found it
+            if language == 'de-DE':
+                self.say("Dies könnte Ihre Frage zu beantworten:")
+            elif language == 'fr-FR':
+                rep = [u"Cela pourrait répondre à votre question : ", u"Voici la réponse à votre question : ", u"Cela répond peut-être à votre question : "]
+                self.say(random.choice(rep))
             else:
-                if language == 'de-DE':
-                    self.say("Es tut mir leid. Ich konnte keine Antwort auf Ihre Frage finden.")
-                elif language == 'fr-FR':
-                    self.say(u"Je n'ai rien trouvé !");
-                else:
-                    self.say("Nothing has found for your query!")
+                self.say("This might answer your question:")
+        if wolfram_pod0 == 12:
+            if language == 'de-DE':
+                self.say("Es tut mir leid. Ich konnte keine Antwort auf Ihre Frage finden.")
+            elif language == 'fr-FR':
+                rep = [u"Je n'ai trouvé aucune réponse à votre question !", u"Je ne trouve pas la réponse à votre question !", u"Je ne trouve aucune réponse à votre question !", u"Désolé, je ne connais pas de réponse à votre question !"]
+                self.say(random.choice(rep));
+            else:
+                self.say("Nothing has found for your query!")
             self.complete_request()
             view1 = 0
         elif wolfram_pod1 == 12:
