@@ -12,7 +12,7 @@ from plugin import *
 
 class Railtime(Plugin):
     
-    @register("fr-FR", u"(quel|o(ù|u)).*(train | train|gare | gare).*")
+    @register("fr-FR", u"(keltrain|quel|o(ù|u)).*(train | train|gare | gare).*")
     def railtime(self, speech, language, regex):
         gare = None
         lang = language[:2]
@@ -66,10 +66,10 @@ class Railtime(Plugin):
             print response
             for departure in response["departures"]["departure"]:
                    
-                if departure["platform"] == "":
-                    departure["platform"] == u"inconnue"
-                   
-                string = u"{0} sur la voie {1}".format(departure["station"], departure["platform"])
+                if departure["platform"] == u'':                   
+                    string = u"{0}".format(departure["station"])
+                else:
+                    string = u"{0} sur la voie {1}".format(departure["station"], departure["platform"])
                 
                 if departure["platforminfo"]["normal"] != "1":
                     string += u" (changement de voie)"
@@ -78,7 +78,10 @@ class Railtime(Plugin):
                 
                 
                 if departure["delay"] != "0":
-                    string += u" En retard de {0} minutes.".format(int(departure["delay"])/60)
+                    if departure["delay"] == "cancel":
+                        string += u" Annulé."
+                    else:
+                        string += u" En retard de {0} minutes.".format(int(departure["delay"])/60)
                    
                 self.say(string)
         else:
