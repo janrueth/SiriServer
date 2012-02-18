@@ -68,6 +68,18 @@ class imdbPlugin(Plugin):
         'no_director': {
             'fr-FR': u"Je ne trouve pas le réalisateur du film {0}.",
         },
+        'played_in': {
+            'fr-FR': u".*(kel|quel|quelle) film.*jou((e|é)r?|ait) (.*)|.*liste des films?( avec| de)? (.*)",
+        },
+        'search_played_in': {
+            'fr-FR': u"Je recherche la filmographie de l'acteur {0}...",
+        },
+        'here_played_in': {
+            'fr-FR': u"Voici la liste des film avec {0} :",
+        },
+        'no_played_in': {
+            'fr-FR': u"Je ne trouve pas de films avec {0}.",
+        },
         'cover': {
             'fr-FR': u"(.*(affiche|la fiche).*film) (.*)",
         },
@@ -83,6 +95,9 @@ class imdbPlugin(Plugin):
         'dont_find_movie': {
             'fr-FR': u"Je ne trouve pas le film {0}",
         },
+        'dont_find_people': {
+            'fr-FR': u"Je ne trouve pas l'acteur {0}",
+        },
     }
 
     def searchMovie(self, title, language):
@@ -96,6 +111,18 @@ class imdbPlugin(Plugin):
         infos = search_result[0]
         ia.update(infos)
         return infos
+
+    def searchPeople(self, name, language):
+        ia = IMDb()
+        search_result = ia.search_person(name.encode("utf-8"))
+        if not search_result:
+            dontfind = self.res["dont_find_people"][language];
+            self.say(dontfind.format(name))
+            self.complete_request()
+            return None
+        people = search_result[0]
+        ia.update(people)
+        return people
 
     @register("fr-FR", res["who_is"]["fr-FR"])
     def actors(self, speech, language, regex):
@@ -201,5 +228,28 @@ class imdbPlugin(Plugin):
             view1 = AnswerSnippet(answers=[ImageAnswer])
             view.views = [view1]
             self.sendRequestWithoutAnswer(view)
+
+        self.complete_request()
+
+    @register("fr-FR", res["played_in"]["fr-FR"])
+    def movieplayedin(self, speech, language, regex):
+
+        query = regex.group(regex.lastindex).strip()
+        search = self.res["search_played_in"][language]
+        self.say(search.format(query))
+        infos = self.searchPeople(query,language)
+        
+        if infos != None:
+            try:
+                here = self.res["here_played_in"][language];
+                self.say(here.format(infos["name"]))
+                films = ""
+                act = infos.get('actor') or infos.get('actress')
+                for film in act:
+                    films += film["title"] + ", \n"
+                self.say(films)
+            except:
+                no = self.res["no_played_in"][language];
+                self.say(no.format(infos["name"]))
 
         self.complete_request()
