@@ -261,6 +261,7 @@ class weatherPlugin(Plugin):
                             if country == "":
                                 speakCountry = components[0]['long_name']
                             
+                            rep = None
                             if viewType == "HOURLY":
                                 if speech.count(u"chaud") > 0:
                                     rep = u"Oui, il fait chaud, {0}°C à {1}, {2}."
@@ -268,10 +269,12 @@ class weatherPlugin(Plugin):
                                     rep = u"Non, pas très froid, {0}°C à {1}, {2}."
                                 elif speech.count(u"température") > 0:
                                     rep = u"La température actuelle est de {0}°C à {1}, {2}."
-                                rep = rep.format(response["current_observation"]["temp_c"],city,speakCountry)
-                            else:
+                                
+                            if rep == None:
                                 randomNumber = random.randint(0,2)
                                 rep = weatherPlugin.localizations['weatherForecast']['forecast'][viewType][randomNumber][language].format(city,speakCountry)
+                            else:
+                                rep = rep.format(response["current_observation"]["temp_c"],city,speakCountry)
                                 
                             view.views = [AssistantUtteranceView(text=rep,speakableText=rep, dialogIdentifier="Weather#forecastCommentary"), weather]
                             self.sendRequestWithoutAnswer(view)
