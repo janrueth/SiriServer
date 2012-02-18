@@ -281,8 +281,10 @@ class HandleConnection(ssl_dispatcher):
                     del self.speech[finishSpeech.refId]
                     
                     self.logger.info("Sending flac to google for recognition")
-                    self.httpClient.make_google_request(flacBin, finishSpeech.refId, dictation, language=self.assistant.language, allowCurses=True)
-                        
+                    try:
+                        self.httpClient.make_google_request(flacBin, finishSpeech.refId, dictation, language=self.assistant.language, allowCurses=True)
+                    except AttributeError, TypeError:
+                        self.logger.info("Unable to find language record for this assistant. Try turning Siri off and then back on.")
                         
                 elif ObjectIsCommand(reqObject, CancelRequest):
                         # this is probably called when we need to kill a plugin
