@@ -11,7 +11,7 @@ class talkToMe(Plugin):
     @register("de-DE", ".*Dein.*Status.*")
     @register("en-US", ".*Your.*Status.*")
     @register("en-GB", ".*Your.*Status.*")
-    @register("fr-FR", u"(ton statu(t|s)|.*statut.*serveu?r).*")
+    @register("fr-FR", u"(ton statu(t|s)|.*statu(t|s).*serveu?r).*")
     def ttm_uptime_status(self, speech, language):
         uptime = os.popen("uptime").read()
         if language == 'de-DE':

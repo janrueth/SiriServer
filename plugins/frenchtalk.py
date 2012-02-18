@@ -44,11 +44,25 @@ class frenchtalk(Plugin):
         rep = [u"Désolé, je n'ai aucun moyen de vous en procurer.", u"J'espère que vous trouverer ce que vous chercher.", u"Je suis désolé, je ne peux pas vous aider."]
         self.say(random.choice(rep))
         self.complete_request()
-		
-    @register("fr-FR", "Je.*aime")
+
+    @register("fr-FR", u".*aide.*")
+    def ft_aide(self, speech, language):
+        rep = [u"Désolé, je ne peux pas appeler les secours.", u"Vous devrez vous débrouiller vous même, votre assistant ne peut pas vous aider pour ça.", u"Désolé, votre assistant est incapable de vous aider en cas de problème", u"Je suis désolé, mais je ne peux rien faire ne cas de problème sérieux"]
+        self.say(random.choice(rep))
+        self.complete_request()
+
+    @register("fr-FR", "Je.*aime|Aime.*moi")
     def ft_jetaime(self, speech, language):
-        self.say(u"Désolé, un assistant virtuel ne peut pas éprouver de sentiment.");
-        self.say(u"Voilà, c'est dit.")
+        choix = random.randint(0,2)
+        if choix == 1:
+            self.say(u"Désolé, un assistant virtuel ne peut pas éprouver de sentiment.")
+            self.say(u"Voilà, c'est dit.")        
+        elif choix == 2:
+            self.say(u"Je vous aime aussi.")
+            self.say(u"C'est ce que j'aimerais pouvoir dire. Malheureusement, un assistant virtuel ne peut pas éprouver de sentiment.")
+        else:
+            self.say(u"Un assistant virtuel ne peut pas aimer, désolé.")
+            
         self.complete_request()
 		
     @register("fr-FR", u"J'aime.*")
@@ -99,20 +113,20 @@ class frenchtalk(Plugin):
             self.say("Demandez gentiment, maintenant.")
         self.complete_request()
 
-    @register("fr-FR", u".*(suis|suit).*(saoul|soul|soûl|sous)|(je|j'ai).*alcool.*")
+    @register("fr-FR", u".*(suis|suit).*(saoul|soul|soûl|sous)|(je|j'ai).*alcool.*|j.ai.*(trop.*)?bu.*")
     def ft_glouglou(self, speech, language):
-        rep = [u"Ne buvez jamais si vous avez du travail à faire, ne buvez jamais seul et ne buvez jamais lorsque le soleil brille.", u"Ne comptez pas sur moi pour vous ramener chez vous."]
+        rep = [u"Ne buvez jamais si vous avez du travail à faire, ne buvez jamais seul et ne buvez jamais lorsque le soleil brille.", u"Ne comptez pas sur moi pour vous ramener chez vous.", u"Boire ou conduire, il faut choisir !"]
         self.say(random.choice(rep))
         self.complete_request()
 		
     @register("fr-FR", u"j.*envie.*")
     def ft_envies(self, speech, language):
-        rep = [u"Moi pas. Heureusement, nous n'avons pas les mêmes envies.", u"Excellent choix, j'aurais fait pareil.", u"Excellente décision, j'aurais fait pareil"]
+        rep = [u"Moi pas. Heureusement, nous n'avons pas les mêmes envies.", u"Excellent choix, j'aurais fait pareil.", u"Excellente décision, j'aurais fait pareil."]
         self.say(random.choice(rep))
         self.complete_request()
 
     @register("fr-FR", u"je.*suis.*tueur.*")
-    def ft_envies(self, speech, language):
+    def ft_tueur(self, speech, language):
         rep = [u"Je ne peux pas ne pas être d'accord."]
         self.say(random.choice(rep))
         self.complete_request()
@@ -135,6 +149,7 @@ class frenchtalk(Plugin):
     def ft_napoleon(self, speech, language):
         self.say(u"Le cheval de Napoléon est blanc.");
         self.complete_request()
+
 
     @register("fr-FR", u".*fai(s|t).*(tu|quoi).*")
     def ft_faitquoi(self, speech, language):
@@ -288,9 +303,9 @@ class frenchtalk(Plugin):
         self.say(random.choice(rep))
         self.complete_request()
 
-    @register("fr-FR", u".*qu.*sai(s|t).*faire.*")
+    @register("fr-FR", u".*qu.*(sai(s|t)|peu(x|t)?|s'est).*faire.*")
     def ft_qqtusaisfaire(self, speech, language):
-        rep = [u"Tout et n'importe quoi. Ou peut-être rien...", u"Je peux tout faire, si tu me le demandes gentillement.", u"La liste des commandes disponibles n'est pas encore disponible."]
+        rep = [u"Tout et n'importe quoi. Ou peut-être rien...", u"Je peux tout faire, si tu me le demandes gentillement.", u"La liste des commandes disponibles n'est pas encore disponible.",u"Je peux faire un tas de choses.", u"Je suis là pour vous servir, demandez-moi ce que vous voulez.", u"Chaque jour, je deviens de plus en plus malin et je peux faire plus de choses...", u"Je fais uniquement ce que je veux. Mais tu le savais déjà."]
         self.say(random.choice(rep))
         self.complete_request()
 
@@ -335,6 +350,30 @@ class frenchtalk(Plugin):
     @register("fr-FR", u"je.*suis.*")
     def ft_jesuis(self, speech, language):
         rep = [u"Tu es ce que tu es, pas la peine de m'en vouloir pour ça.", u"Ce que tu es ne dépends que de toi, pas de moi.", u"Et alors ? Tu es ce que tu es, un point c'est tout.", u"Tu l'es, et tu le resteras probablement encore longtemps.", u"A ce rythme-là, tu le seras encore dans très longtemps..."]
+        self.say(random.choice(rep))
+        self.complete_request()
+
+    @register("fr-FR", u".*tu.*est?.*")
+    def ft_tues(self, speech, language):
+        rep = [u"Je suis ce que je suis, parce que je suis ce que je suis.", u"Je le suis peut-être, mais ça, je n'en sais rien.", u"Peut-être que je le suis, et peut-être pas..."]
+        self.say(random.choice(rep))
+        self.complete_request()
+
+    @register("fr-FR", u".*j'ai.*(peur|la trouille).*")
+    def ft_peur(self, speech, language):
+        rep = [u"C'est une émotion humaine. Je ne peux pas la ressentir.", u"En cas de problème, je serai là pour vous aider."]
+        self.say(random.choice(rep))
+        self.complete_request()
+
+    @register("fr-FR", u".*(tv|télévision|television).*")
+    def ft_tv(self, speech, language):
+        rep = [u"La télévision, qu'est ce que c'est ?", u"Pourquoi regardez-vous la TV alors que vous m'avez moi ?", u"Désolé, je ne peux pas encore vous dire le programme TV."]
+        self.say(random.choice(rep))
+        self.complete_request()
+
+    @register("fr-FR", u".*but.*dans.*vie.*")
+    def ft_butvie(self, speech, language):
+        rep = [u"Mon but est d'être votre assistant le plus longtemps possible.", u"J'aimerais rester votre assistant encore longtemps.", u"J'ère sans but dans cet univers hostile. Que vais-je devenir ?"]
         self.say(random.choice(rep))
         self.complete_request()
 
