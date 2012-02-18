@@ -33,7 +33,7 @@ class smalltalk(Plugin):
 
     @register("de-DE", "Wie geht es dir?")
     @register("en-US", "How are you?")
-    @register("fr-FR", u".*((ça|ca) va|va bien|comment va|gaze).*")
+    @register("fr-FR", u".*((ça|ca) vas?|vas? bien|comment vas?|gaze).*")
     def st_howareyou(self, speech, language):
         if language == 'de-DE':
             self.say("Gut danke der Nachfrage.")
@@ -52,8 +52,8 @@ class smalltalk(Plugin):
             self.say("Bitte.")
             self.say("Kein Ding.")
         elif language == 'fr-FR':
-			self.say("Avec plaisir.");
-			self.say("C'est mon travail.");
+            rep = [u"Avec plaisir.", u"De rien, je ne fais que mon travail.", u"De rien.", u"C'est mon travail."]
+            self.say(random.choice(rep));
         else:
             self.say("You are welcome.")
             self.say("This is my job.")
@@ -378,9 +378,12 @@ class smalltalk(Plugin):
         self.complete_request()
     
     @register("en-US",".*buy.*drugs.*")
+    @register("fr-FR",".*achete.*drogue.*")
     def st_drugs(self, speech, language):
         if language == 'en-US':
             self.say("I didn't find any addiction treatment centers.")
+        elif language == 'fr-FR':
+            self.say(u"Je ne trouve aucun centre de soin pour les addictions.")
         self.complete_request()
     
     @register("en-US",".*I.can't.*")
@@ -400,7 +403,8 @@ class smalltalk(Plugin):
         if language == 'en-US':
             self.say("Really!?")
         elif language == 'fr-FR':
-            self.say("Vraiment !?")
+            rep = [u"Vraiment !?", u"Cool !", u"Bravo !", u"Pas mal !", u"Super !"]
+            self.say(random.choice(rep))
         self.complete_request()
     
     @register("en-US",".*where.*are.*you.*")
@@ -499,7 +503,7 @@ class smalltalk(Plugin):
         self.complete_request()
    
     @register("en-US",".*sing.*song.*")
-    @register("fr-FR",".*chante.*chanson.*")
+    @register("fr-FR",".*chante.*chanson.*|chante.*")
     def st_sing_song(self, speech, language):
         if language == 'en-US':
             self.say("Daisy, Daisy, give me your answer do...")

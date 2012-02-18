@@ -19,7 +19,7 @@ class location(Plugin):
     
     # temp regex, need to use group name...
     #@register("fr-FR", u".*(o(u|ù) (puis.je trouv(e|é)r?)) (.*)|.*(o(ù|u) est|recherche|cherche|trouve) (.*) près de moi.*|.*(o(ù|u) est|recherche|cherche|trouve) (.*) près d'ici.*|.*(o(ù|u) est|recherche|cherche|trouve) (.*) (les?|la) plus proche.*")
-    @register("fr-FR", u".*o(ù|u) puis.je trouv(é|e)r? (?P<keyword>.*)( par ici| paris 6| près (d'ici|de moi)| (la|les?) plus proche)?.*|.*(trouv(e|ait|ais)|cherch(e|é)r?|est) (?P<keyword2>.*) (par ici|paris 6|près d'ici|près de moi|(la|les?) plus proche).*")
+    @register("fr-FR", u".*o(ù|u) puis.je trouv(é|e)r? (?P<keyword>.*)( par ici| paris 6| près (d'ici|de moi)| (la|les?) plus proche)?.*|.*(trouv(e|ait|ais)|cherch(e|é)r?|est|sont) (?P<keyword2>.*) (par ici|paris 6|près d'ici|près de moi|(la|les?) plus proche).*")
     def whereisPlaces(self, speech, language, regex):
         keyword = regex.group('keyword')
         if keyword == None:

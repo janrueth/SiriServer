@@ -33,7 +33,7 @@ class timePlugin(Plugin):
 
     @register("de-DE", "(Wie ?viel Uhr.*)|(.*Uhrzeit.*)")     
     @register("en-US", "(What.*time.*)|(.*current time.*)")
-    @register("fr-FR", "(Quel.*heure.*)|(.*heure actuelle.*)")
+    @register("fr-FR", "(.*Quel.*heure.*)|(.*heure actuelle.*)")
     def currentTime(self, speech, language):
         #first tell that we look it up
         view = AddViews(self.refId, dialogPhase="Reflection")
