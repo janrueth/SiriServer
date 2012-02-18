@@ -60,7 +60,7 @@ class Railtime(Plugin):
             except:
                 pass
             
-        if response != None:
+        if "departures" in response:
             number = response["departures"]["number"]
             self.say(u"J'ai trouvé {0} trains au départ de {1} :".format(number,response["station"]))
             print response
@@ -85,7 +85,7 @@ class Railtime(Plugin):
                    
                 self.say(string)
         else:
-            self.say(u"Je ne parviens pas à récupérer le liveboard pour {0} !".format(gare))
+            self.say(u"Je ne parviens pas à récupérer le panneau d'affichage de {0} !".format(gare))
 
         self.complete_request()
 
