@@ -42,7 +42,7 @@ import signal, os
 class HandleConnection(ssl_dispatcher):
     __not_recognized = {"de-DE": u"Entschuldigung, ich verstehe \"{0}\" nicht.", "en-US": u"Sorry I don't understand {0}"}
     __websearch = {"de-DE": u"Websuche", "en-US": u"Websearch"}
-    def __init__(self, conn):
+    def __init__(self, conn, lang):
         asyncore.dispatcher_with_send.__init__(self, conn)
         
         self.ssled = False
@@ -71,6 +71,7 @@ class HandleConnection(ssl_dispatcher):
         self.current_location = None
         self.plugin_lastAceId = None
         self.logger = logging.getLogger("logger")
+        self.lang = lang
     
     def handle_ssl_established(self):                
         self.ssled = True
@@ -334,7 +335,10 @@ class HandleConnection(ssl_dispatcher):
                         objProperties = reqObject['properties'] 
                         self.assistant.censorSpeech = objProperties['censorSpeech']
                         self.assistant.timeZoneId = objProperties['timeZoneId']
-                        self.assistant.language = objProperties['language']
+                        if self.lang != None:
+                            self.assistant.language = self.lang
+                        else:
+                            self.assistant.language = objProperties['language']
                         self.assistant.region = objProperties['region']
                         c.execute("update assistants set assistant = ? where assistantId = ?", (self.assistant, self.assistant.assistantId))
                         self.dbConnection.commit()
@@ -418,12 +422,13 @@ class HandleConnection(ssl_dispatcher):
 
 class SiriServer(asyncore.dispatcher):
 
-    def __init__(self, host, port):
+    def __init__(self, host, port, lang):
         asyncore.dispatcher.__init__(self)
         self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
         self.set_reuse_addr()
         self.bind((host, port))
         self.listen(5)
+        self.lang = lang
         logging.getLogger("logger").info("Listening on port {0}".format(port))
         signal.signal(signal.SIGTERM, self.handler)
    
@@ -440,7 +445,7 @@ class SiriServer(asyncore.dispatcher):
         else:
             sock, addr = pair
             logging.getLogger("logger").info('Incoming connection from {0}'.format(repr(addr)))
-            handler = HandleConnection(sock)
+            handler = HandleConnection(sock, self.lang)
 
 # load the certificates
 caCertFile = open('OrigAppleSubCACert.der')
@@ -464,6 +469,7 @@ log_levels = {'debug':logging.DEBUG,
 parser = OptionParser()
 parser.add_option('-l', '--loglevel', default='info', dest='logLevel', help='This sets the logging level you have these options: debug, info, warning, error, critical \t\tThe standard value is info')
 parser.add_option('-p', '--port', default=443, type='int', dest='port', help='This options lets you use a custom port instead of 443 (use a port > 1024 to run as non root user)')
+parser.add_option('--lang', default=None, dest='lang', help='Force server to run with the language')
 parser.add_option('--logfile', default=None, dest='logfile', help='Log to a file instead of stdout.')
 (options, args) = parser.parse_args()
 
@@ -490,7 +496,7 @@ PluginManager.load_plugins()
 
 #start server
 x.info("Starting Server")
-server = SiriServer('', options.port)
+server = SiriServer('', options.port, options.lang)
 try:
     asyncore.loop()
 except (asyncore.ExitNow, KeyboardInterrupt, SystemExit):
