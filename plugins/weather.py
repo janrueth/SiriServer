@@ -53,23 +53,23 @@ class weatherPlugin(Plugin):
                             "DAILY": {
                                 0:{"de-DE": u"Hier ist die Vorhersage für {0}, {1}", "en-US": u"Here is the forecast for {0}, {1}", "fr-FR": u"Voici les prévisions pour {0}, {1}"},
                                 1:{"de-DE": u"Hier ist die Wetterprognose für {0}, {1}", "en-US": u"This is the forecast for {0}, {1}", "fr-FR": u"Voilà les prévisions pour {0}, {1}"},
-                                2:{"de-DE": u"Ich habe folgende Vorhersage für {0}, {1} gefunden", "en-US": u"I found the following forecast for {0}, {1}", "fr-FR": u"J'ai trouvé les prévisions suivantes pour {0}, {1}"},
+                                2:{"de-DE": u"Ich habe folgende Vorhersage für {0}, {1} gefunden", "en-US": u"I found the following forecast for {0}, {1}", "fr-FR": u"J'ai trouvé les prévisions suivantes pour {0}, {1}."},
                                 },
                             "HOURLY": {
-                                0:{"de-DE": u"Hier ist die heutige Vorhersage für {0}, {1}", "en-US": u"Here is today's forecast for {0}, {1}","fr-FR": u"Voici les prévisions d'aujourd'hui pour {0}, {1}"},
-                                1:{"de-DE": u"Hier ist die Wetterprognose von heute für {0}, {1}", "en-US": u"This is today's forecast for {0}, {1}", "fr-FR": u"Voici les prévisions d'aujourd'hui pour {0}, {1}"},
-                                2:{"de-DE": u"Ich habe folgende Tagesprognose für {0}, {1} gefunden", "en-US": u"I found the following hourly forecast for {0}, {1}","fr-FR": u"J'ai trouvé les prévisions pour {0}, {1}"},
-                                },
+                                0:{"de-DE": u"Hier ist die heutige Vorhersage für {0}, {1}", "en-US": u"Here is today's forecast for {0}, {1}","fr-FR": u"Voici les prévisions d'aujourd'hui pour {0}, {1}."},
+                                1:{"de-DE": u"Hier ist die Wetterprognose von heute für {0}, {1}", "en-US": u"This is today's forecast for {0}, {1}", "fr-FR": u"Voici les prévisions d'aujourd'hui pour {0}, {1}."},
+                                2:{"de-DE": u"Ich habe folgende Tagesprognose für {0}, {1} gefunden", "en-US": u"I found the following hourly forecast for {0}, {1}","fr-FR": u"J'ai trouvé les prévisions pour {0}, {1}."},
+                                }
+                        },
                         "failure": {
                                    "de-DE": "Ich konnte leider keine Wettervorhersage finden!", "en-US": "I'm sorry but I could not find the forecast for this location!","fr-FR": u"Je suis désolé, je ne trouve pas cet endroit !"
                                    }
-                            }
                         }
                     }
     
     @register("de-DE", "(.*Wetter.*)|(.*Vorhersage.*)")     
     @register("en-US", "(.*Weather.*)|(.*forecast.*)")
-    @register("fr-FR", u".*(Météo|prévision|Quel.*temps|(fais|fait|faire).*(chaud|froid)).*|j.*chaud.*")
+    @register("fr-FR", u".*(Météo|prévision|Quel.*temps|(fais|fait|faire).*(chaud|froid)).*|j.*chaud.*|.*température.*")
     def weatherForecastLookUp(self, speech, language):
         speech = speech.replace(u".","")
         viewType ="DAILY"
@@ -213,6 +213,7 @@ class weatherPlugin(Plugin):
                             
                             tempNight=weatherTempNightTime
                             weatherTemp["currentTemperature"] =str(response["current_observation"]["temp_c"])
+                            
                             dailyForecasts=[]
                             for x in range(0,6):
                                 forecastDate = date(int(response["forecast"]["simpleforecast"]["forecastday"][x]["date"]["year"]),int(response["forecast"]["simpleforecast"]["forecastday"][x]["date"]["month"]),int(response["forecast"]["simpleforecast"]["forecastday"][x]["date"]["day"]))
@@ -259,9 +260,20 @@ class weatherPlugin(Plugin):
                                 city = components[0]['short_name']
                             if country == "":
                                 speakCountry = components[0]['long_name']
+                            
+                            if viewType == "HOURLY":
+                                if speech.count(u"chaud") > 0:
+                                    rep = u"Oui, il fait chaud, {0}°C à {1}, {2}."
+                                elif speech.count(u"froid") > 0:
+                                    rep = u"Non, pas très froid, {0}°C à {1}, {2}."
+                                elif speech.count(u"température") > 0:
+                                    rep = u"La température actuelle est de {0}°C à {1}, {2}."
+                                rep = rep.format(response["current_observation"]["temp_c"],city,speakCountry)
+                            else:
+                                randomNumber = random.randint(0,2)
+                                rep = weatherPlugin.localizations['weatherForecast']['forecast'][viewType][randomNumber][language].format(city,speakCountry)
                                 
-                            randomNumber = random.randint(0,2)
-                            view.views = [AssistantUtteranceView(text=weatherPlugin.localizations['weatherForecast']['forecast'][viewType][randomNumber][language].format(city, speakCountry),speakableText=weatherPlugin.localizations['weatherForecast']['forecast'][viewType][randomNumber][language].format(city,speakCountry), dialogIdentifier="Weather#forecastCommentary"), weather]
+                            view.views = [AssistantUtteranceView(text=rep,speakableText=rep, dialogIdentifier="Weather#forecastCommentary"), weather]
                             self.sendRequestWithoutAnswer(view)
                         else:
                             error = True
