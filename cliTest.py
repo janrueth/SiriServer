@@ -12,7 +12,10 @@ load_plugins()
 lang = 'fr-FR'
 
 while 1:
-    speech = sys.stdin.readline().decode("utf-8")
+    try:
+        speech = sys.stdin.readline().decode("utf-8")
+    except:
+        exit()
     (clazz, method) = getPlugin(speech, lang)
     print clazz
     print method
