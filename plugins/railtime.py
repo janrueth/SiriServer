@@ -12,7 +12,7 @@ from plugin import *
 
 class Railtime(Plugin):
     
-    @register("fr-FR", u"(keltrain|quel|o(ù|u)).*(train | train|gare | gare).*")
+    @register("fr-FR", u"(kel|quel|o(ù|u)).*(train | train|gare | gare).*")
     def railtime(self, speech, language, regex):
         gare = None
         lang = language[:2]
