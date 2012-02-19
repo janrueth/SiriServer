@@ -11,8 +11,8 @@ from siriObjects.uiObjects import AddViews, AssistantUtteranceView
 from siriObjects.systemObjects import DomainObject, ResultCallback
 from siriObjects.websearchObjects import WebSearch
 
-webSearchAnswerText = {"de": u"Das Web nach {0} durchsuchen …", "en": u"Searching the web for {0} …", "fr": u"Je recherche {0} sur le web …"}
-webSearchAnswerFailureText = {"de": u"Entschuldigung, Ich, ich kann jetzt nicht das Web durchsuchen.", "en": u"Sorry but I cannot search the web right now.", "fr": u"Désolé mais je ne peux pas rechercher sur le web pour le moment."}
+webSearchAnswerText = {"de": u"Das Web nach {0} durchsuchen …", "en": u"Searching the web for {0} …", "fr": u"Recherche de {0} sur le web…"}
+webSearchAnswerFailureText = {"de": u"Entschuldigung, Ich, ich kann jetzt nicht das Web durchsuchen.", "en": u"Sorry but I cannot search the web right now.", "fr": u"Désolé, je ne peux pas chercher sur le web maintenant."}
 class startRequestHandler(Plugin):    
 
     #we should provide a shortcut for this....
@@ -20,11 +20,8 @@ class startRequestHandler(Plugin):
     @register("en-US", u"\^webSearchQuery\^=\^([a-z, ]+)\^\^webSearchConfirmation\^=\^([a-z]+)\^")
     @register("en-AU", u"\^webSearchQuery\^=\^([a-z, ]+)\^\^webSearchConfirmation\^=\^([a-z]+)\^")
     @register("en-GB", u"\^webSearchQuery\^=\^([a-z, ]+)\^\^webSearchConfirmation\^=\^([a-z]+)\^")
-    @register("fr-FR", u"\^webSearchQuery\^=\^([a-z, ]+)\^\^webSearchConfirmation\^=\^([a-z]+)\^")
-    def webSearchConfirmation(self, speech, language):
-        # lets use a little hack to get that regex
-        matcher = self.webSearchConfirmation.__dict__[__criteria_key__]['fr-FR']
-        regMatched = matcher.match(speech)
+    @register("fr-FR", u"\^webSearchQuery\^=\^(.*)\^\^webSearchConfirmation\^=\^([a-z]+)\^")
+    def webSearchConfirmation(self, speech, language, regMatched):
         webSearchQuery = regMatched.group(1)
         webSearchConfirmation = regMatched.group(2)
         

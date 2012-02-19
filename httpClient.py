@@ -22,7 +22,7 @@ class AsyncOpenHttp(threading.Thread):
         url = "https://www.google.com/speech-api/v1/recognize?xjerr=1&client=chromium&pfilter={0}&lang={1}&maxresults=6".format(0 if self.allowCurses else 2, self.language)
         req = urllib2.Request(url, data = self.currentFlac, headers = {'Content-Type': 'audio/x-flac; rate=16000', 'User-Agent': 'Siri-Server'})
         try:
-            content  = urllib2.urlopen(req, timeout=3).read()
+            content  = urllib2.urlopen(req, timeout=30).read()
             self.finished = True
             self.successCallback(content, self.requestId, self.dictation)
         except:

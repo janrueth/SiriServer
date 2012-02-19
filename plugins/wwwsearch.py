@@ -7,8 +7,8 @@ from siriObjects.websearchObjects import WebSearch
 class wwwSearch(Plugin):
     @register("de-DE", "(websuche.*)|(web suche.*)|(internetsuche.*)|(internet suche.*)|(web.*)|(internet.*)")
     @register("en-US", "(web search.*)|(web.*)|(internet.*)|(internet search.*)")
-    @register("fr-FR", "(recherche.*)|(web.*)|(internet.*)|(recherche.*internet.*)")
-    def webSearch(self, speech, language):
+    @register("fr-FR", ".*(recherche web de|rechercher? sur internet|chercher? sur internet|recherche de|rechercher?|cherche|google|trouver?)(.*)")
+    def webSearch(self, speech, language, regex):
         if (language == "en-US"):
             if (speech.find('Web search') == 0):
                 speech = speech.replace('Web search', ' ',1)
@@ -21,6 +21,10 @@ class wwwSearch(Plugin):
             speech = speech.strip()
             if speech == "":
                 speech = self.ask("What is your query?")
+        elif(language == 'fr-FR'):
+            speech = regex.group(regex.lastindex).strip()
+            if(speech == ""):
+                speech = self.ask(u"Que voulez-vous rechercher ?")
         elif (language == "de-DE"):
             if (speech.find('Websuche') == 0):
                 speech = speech.replace('Websuche',' ',1)
@@ -37,18 +41,6 @@ class wwwSearch(Plugin):
             speech = speech.strip()
             if speech == "":
                 speech = self.ask("Nach was soll ich suchen?")
-        elif (language == "fr-FR"):
-            if (speech.find('Recherche web') == 0):
-                speech = speech.replace('Recherche web',' ',1)
-            elif (speech.find('Recherche internet') == 0):
-                speech = speech.replace('Recherche internet',' ',1)
-            elif (speech.find('Recherche') == 0):
-                speech = speech.replace('Recherche',' ',1)
-            elif (speech.find('internet') == 0):
-                speech = speech.replace('internet',' ',1)
-            speech = speech.strip()
-            if speech == "":
-                speech = self.ask("Que voulez vous rechercher ?")
 
         search = WebSearch(refId=self.refId, query=speech)
         self.sendRequestWithoutAnswer(search)

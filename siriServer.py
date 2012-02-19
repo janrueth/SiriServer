@@ -267,6 +267,7 @@ class HandleConnection(ssl_dispatcher):
                     encoder.encode(pcm)
                         
                 elif reqObject['class'] == 'StartCorrectedSpeechRequest':
+                    
                     self.process_recognized_speech({u'hypotheses': [{'confidence': 1.0, 'utterance': str.lower(reqObject['properties']['utterance'])}]}, reqObject['aceId'], False)
             
                 elif ObjectIsCommand(reqObject, FinishSpeech):

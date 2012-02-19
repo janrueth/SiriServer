@@ -47,47 +47,66 @@ class timerPlugin(Plugin):
     localizations = {
         'Timer': {
             'durationTooBig': {
-               'en-US': 'Sorry, I can only set timers up to 24 hours.', 'fr-FR': u"Désolé mais je ne peux pas programmer le minuteur plus de 24 heures."
+               'en-US': 'Sorry, I can only set timers up to 24 hours.',
+               'fr-FR': u'Désolé, je peux uniquement régler le minuteur pour 24 heures.'
             }, "settingTimer": {
-                "en-US": u"Setting the timer\u2026", "fr-FR": u"Programmation du minuteur"
+                "en-US": u"Setting the timer\u2026",
+                "fr-FR": u"Démarrage du minuteur\u2026"
             }, 'showTheTimer': {
-                'en-US': u'Here\u2019s the timer:', "fr-FR": u"Voici le minuteur"
+                'en-US': u'Here\u2019s the timer:',
+                'fr-FR': u'Voici votre minuteur :'
             }, 'timerIsAlreadyPaused': {
-                'en-US': u'It\u2019s already paused.', "fr-FR": u"Le minuteur est déjà en pause !"
+                'en-US': u'It\u2019s already paused.',
+                'fr-FR': u'Il est déjà en pause.'
             }, "timerIsAlreadyRunning": {
-                "en-US": u"Your timer\u2019s already running:", "fr-FR": u"Un minuteur est déjà en cours"
+                "en-US": u"Your timer\u2019s already running:",
+                "fr-FR": u"Votre minuteur est déjà en marche :"
             }, 'timerIsAlreadyStopped': {
-                'en-US': u'It\u2019s already stopped.', "fr-FR": u"Le minuteur est déjà arrếté !"
+                'en-US': u'It\u2019s already stopped.',
+                'fr-FR': u'Votre minuteur est déjà arrêté.'
             }, 'timerWasPaused': {
-                'en-US': u'It\u2019s paused.', "fr-FR": u"Le minuteur est en pause."
+                'en-US': u'It\u2019s paused.',
+                'fr-FR': u'Il est arrêté.'
             }, 'timerWasReset': {
-                'en-US': u'I\u2019ve canceled the timer.'
+                'en-US': u'I\u2019ve canceled the timer.',
+                'fr-FR': u'J\'ai remis à zéro le minuteur.'
             }, 'timerWasResumed': {
-                'en-US': u'It\u2019s resumed.', "fr-FR": u"Le minuteur a repris."
+                'en-US': u'It\u2019s resumed.',
+                'fr-FR': u'C\'est reparti.'
             }, "timerWasSet": {
-                "en-US": "Your timer is set for {0}.", "fr-FR": u"Votre minuteur est programmé pour {0}"
+                "en-US": "Your timer is set for {0}.",
+                "fr-FR": "Votre minuteur est en marche pour {0}."
             }, "wontSetTimer": {
-                "en-US": "OK.", "fr-FR": u"D'accord"
+                "en-US": "OK.",
+                "fr-FR": "OK."
             }
         }
     }
 
     res = {
         'articles': {
-            'en-US': 'a|an|the', 'fr-FR': 'une|pour'
+            'en-US': 'a|an|the',
+            'fr-FR': u'un|une|le',
         }, 'pauseTimer': {
-            'en-US': '.*(pause|freeze|hold).*timer', 'fr-FR': '(.*pause.*minuteur.*)|(.*minuteur.*pause.*)'
+            'en-US': '.*(pause|freeze|hold).*timer',
+            'fr-FR': u'.*(pause|pose|suspend|interromp).*minuteur'
         }, 'resetTimer': {
-            'en-US': '.*(cancel|reset|stop).*timer', 'fr-FR': u'.*(annule|déprogramme).*minuteur'
+            'en-US': '.*(cancel|reset|stop).*timer',
+            'fr-FR': u'.*(annule|reset|arret|arrêt|zero|zéro|stop).*minuteur'
         }, 'resumeTimer': {
-            'en-US': '.*(resume|thaw|continue).*timer', 'fr-FR': '.*(reprends|continue|remets).*minuteur'
+            'en-US': '.*(resume|thaw|continue).*timer',
+            'fr-FR': u'.*(reprend|continue|relance).*minuteur'
         }, 'setTimer': {
+            #'fr-FR': u'.*minuteur.*\s+([0-9/ ]*|un|une|le|la|pour|sur)\s+(secs?|secondes?|mins?|minutes?|hrs?|heures?)'
             # 'en-US': '.*timer[^0-9]*(((([0-9/ ]*|a|an|the)\s+(seconds?|secs?|minutes?|mins?|hours?|hrs?))\s*(and)?)+)'
-            'en-US': '.*timer[^0-9]*(?P<length>([0-9/ ]|seconds?|secs?|minutes?|mins?|hours?|hrs?|and|the|an|a){2,})', 'fr-FR': '.*minuteur.*\s+([0-9/ ]*|une|deux|trois|quatre|cinq|six|sept|huit|neuf)\s+(secondes?|minutes?|heures?)'
+            'en-US': '.*timer[^0-9]*(?P<length>([0-9/ ]|seconds?|secs?|minutes?|mins?|hours?|hrs?|and|the|an|a){2,})',
+            'fr-FR': '.*minuteur[^0-9]*(?P<length>([0-9/ ]|secondes?|secs?|minutes?|mins?|heures?|hrs?|et){2,})'
         }, 'showTimer': {
-            'en-US': '.*(show|display|see).*timer', 'fr-FR': '.*montre.*minuteur'
+            'en-US': '.*(show|display|see).*timer',
+            'fr-FR': u'.*(montre|affiche|voir).*minuteur'
         }, 'timerLength': {
-            'en-US': '([0-9][0-9 /]*|an|a|the)\s+(seconds?|secs?|minutes?|mins?|hours?|hrs?)', 'fr-FR': '([0-9/ ]*|une|deux|trois|quatre|cinq|six|sept|huit|neuf)\s+(secondes?|minutes?|heures?)'
+            'en-US': '([0-9][0-9 /]*|an|a|the)\s+(seconds?|secs?|minutes?|mins?|hours?|hrs?)',
+            'fr-FR': '([0-9][0-9 /]*|un|une|le|la|pour|sur)\s+(secs?|secondes?|mins?|minutes?|hrs?|heures?)',
         }
     }
 
