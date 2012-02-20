@@ -29,7 +29,7 @@ class wolfram(Plugin):
     
     @register("de-DE", "(Was ist [a-zA-Z0-9]+)|(Wer ist [a-zA-Z0-9]+)|(Wie viel [a-zA-Z0-9]+)|(Was war [a-zA-Z0-9]+)|(Wer ist [a-zA-Z0-9]+)|(Wie lang [a-zA-Z0-9]+)|(Was ist [a-zA-Z0-9]+)|(Wie weit [a-zA-Z0-9]+)|(Wann ist [a-zA-Z0-9]+)|(Zeig mir [a-zA-Z0-9]+)|(Wie hoch [a-zA-Z0-9]+)|(Wie tief [a-zA-Z0-9]+)")     
     @register("en-US", "(What is [a-zA-Z0-9]+)|(Who is [a-zA-Z0-9]+)|(How many [a-zA-Z0-9]+)|(What was [a-zA-Z0-9]+)|(Who's [a-zA-Z0-9]+)|(How long [a-zA-Z0-9]+)|(What's [a-zA-Z0-9]+)|(How far [a-zA-Z0-9]+)|(When is [a-zA-Z0-9]+)|(Show me [a-zA-Z0-9]+)|(How high [a-zA-Z0-9]+)|(How deep [a-zA-Z0-9]+)")
-    @register("fr-FR", u"(Wolfram |Qu'est ce que |Est-ce que |Quesque |Quesqui est|Esque |Qui est |Combien de |Qu'étais |Combien de temps |Combien font |A quelle distance |Quand est |Montre moi |(A|à) (quelle|quel) hauteur |(A|à) (quelle|quel) profondeur |Quelle est |Quel est |Que vaux |Que vaut )(.*)")
+    @register("fr-FR", u"(Wolfram |Qu'est ce que |Est.ce que |Quesque |Quesqui est|Esque |Qui est |Combien de |Qu'étais |Combien de temps |Combien font |A quelle distance |Quand est |Montre moi |(A|à) (quelle|quel) hauteur |(A|à) (quelle|quel) profondeur |Quelle est |Quel est |Que vaux |Que vaut )(.*)")
     def wolfram(self, speech, language, regex):
         if language == 'fr-FR':
             wolframQuestion = regex.group(regex.lastindex).strip()
