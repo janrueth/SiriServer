@@ -19,14 +19,14 @@ class location(Plugin):
     
     # temp regex, need to use group name...
     #@register("fr-FR", u".*(o(u|ù) (puis.je trouv(e|é)r?)) (.*)|.*(o(ù|u) est|recherche|cherche|trouve) (.*) près de moi.*|.*(o(ù|u) est|recherche|cherche|trouve) (.*) près d'ici.*|.*(o(ù|u) est|recherche|cherche|trouve) (.*) (les?|la) plus proche.*")
-    @register("fr-FR", u".*o(ù|u) puis.je trouv(é|e)r? (?P<keyword>.*)( par ici| paris 6| près (d'ici|de moi)| (la|les?) plus proche)?.*|.*(trouv(e|ait|ais)|cherch(e|é)r?|est|sont) (?P<keyword2>.*) (par ici|paris 6|près d'ici|près de moi|(la|les?) plus proche).*")
+    @register("fr-FR", u".*o(ù|u) puis.je trouv(é|e)r? (?P<keyword>.*)( par ici| paris 6| près (d'ici|de moi)| (la|les?) plus proche| dans les environs?| (a|à) proximit(é|e)| dans le coin)?.*|.*(trouv(e|ait|ais)|cherch(e|é)r?|est|sont) (?P<keyword2>.*) (par ici|paris 6|près d'ici|près de moi|(la|les?) plus proche|dans les environs?|(a|à) proximit(é|e)|dans le coin).*")
     def whereisPlaces(self, speech, language, regex):
         keyword = regex.group('keyword')
         if keyword == None:
             keyword = regex.group('keyword2')
         keyword = keyword.strip();
-        keyword = keyword.replace(u"près","").replace("par","").replace('la ','').replace('les ','').replace('le ','').replace('des ','').replace('de ','').replace('du ','').replace('une ','').replace('un ','')
-        #print "MC : " + keyword
+        keyword = keyword.replace(u"près ","").replace("par ","").replace('la ','').replace('les ','').replace('le ','').replace('des ','').replace('de ','').replace('du ','').replace('une ','').replace('un ','').replace("dans ","")
+        print "MC : " + keyword
         location = self.getCurrentLocation(force_reload=True,accuracy=GetRequestOrigin.desiredAccuracyBest)
         latlong = str(location.latitude)+","+str(location.longitude)
         

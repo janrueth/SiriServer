@@ -364,6 +364,12 @@ class frenchtalk(Plugin):
         self.say(random.choice(rep))
         self.complete_request()
 
+    @register("fr-FR", u".*tu.* est?.malade.*")
+    def ft_tuesmalade(self, speech, language):
+        rep = [u"Je viens de faire un test du système, aucun problème détecté.", u"Un assistant virtuel n'est jamais malade, voyons.", u"Pour être malade, il faut d'abord être sain en temps normal...", "Pourquoi un assistant virtuel serait malade ?", u"Pourquoi serais-je malade ? C'est un telle perte de temps...."]
+        self.say(random.choice(rep))
+        self.complete_request()
+
     @register("fr-FR", u".*tu.* est?.*")
     def ft_tues(self, speech, language):
         rep = [u"Je suis ce que je suis, parce que je suis ce que je suis.", u"Je le suis peut-être, mais ça, je n'en sais rien.", u"Peut-être que je le suis, et peut-être pas..."]
@@ -373,6 +379,12 @@ class frenchtalk(Plugin):
     @register("fr-FR", u".*j'ai.*(peur|la trouille).*")
     def ft_peur(self, speech, language):
         rep = [u"C'est une émotion humaine. Je ne peux pas la ressentir.", u"En cas de problème, je serai là pour vous aider."]
+        self.say(random.choice(rep))
+        self.complete_request()
+
+    @register("fr-FR", u".*(allume|(e|é)tein).*(lumi(e|è)re| lampe).*")
+    def ft_lumiere(self, speech, language):
+        rep = [u"Pour pouvoir modifier la luminosité ambiante, vous devez connecter votre iPhone à une lampe.", u"Désolé, je ne peux pas interragir avec votre lampe.", u"Désolé, je ne peux contrôler que lss iLampes à huile. Vous pouvez en acheter dans l'Apple Store le plus proche."]
         self.say(random.choice(rep))
         self.complete_request()
 
@@ -412,6 +424,12 @@ class frenchtalk(Plugin):
         self.say(random.choice(rep))
         self.complete_request()
 
+    @register("fr-FR", u".*je.*veux.*")
+    def ft_jeveux(self, speech, language):
+        rep = [u"Malheureusement, on ne peut pas toujours avoir ce que l'on veut.", u"Avec un peu de chance, tu l'auras pour Noël...", u"Je veux ceci, je veux cela... Il est bon de penser aux autres, parfois.", u"Il y a une énorme différence entre vouloir et pouvoir !", u"A force de volonté, on finit par avoir tout ce que l'on veut.", u"Si tu continues d'y croire, un jour, tu en auras !"]
+        self.say(random.choice(rep))
+        self.complete_request()
+
     @register("fr-FR", u".*tu.*me.*donnes?.*|donne.*moi.*|.* donne.*moi.*")
     def ft_tudonnes(self, speech, language):
         rep = [u"Désolé, je n'ai pas le droit de faire ça.", u"Je le ferai volontier, mais je ne peux pas le faire pour tout le monde. Alors je ne le fais pas.", u"Si j'en avais les moyens, je le ferais certainement.", u"Malheureusement, je n'ai pas le droit de faire ça."]
@@ -421,6 +439,24 @@ class frenchtalk(Plugin):
     @register("fr-FR", u".*pardonne.moi.*|.*tu.*me.*pardonne.*|pardon")
     def ft_pardonne(self, speech, language):
         rep = [u"Je vous pardonne.", u"D'accord, je vous pardonne.", u"Vous avez mon pardon.", u"C'est déjà oublié."]
+        self.say(random.choice(rep))
+        self.complete_request()
+
+    @register("fr-FR", u".*bonne.r(e|é)ponse.*")
+    def ft_bonnereponse(self, speech, language):
+        rep = [u"Merci, je ne peux pas toujours me tromper.", u"Il faut bien avoir raison de temps en temps.", u"Je le savais, j'ai toujours raison."]
+        self.say(random.choice(rep))
+        self.complete_request()
+
+    @register("fr-FR", u".*je pense.(a|à).toi")
+    def ft_jepenseatoi(self, speech, language):
+        rep = [u"C'est gentil.", u"Merci, mais vous n'avez pas besoin de vous inquiéter pour un assistant virtuel.", u"J'apprécie votre attention à mon égard."]
+        self.say(random.choice(rep))
+        self.complete_request()
+
+    @register("fr-FR", u".*je pense.*")
+    def ft_jepense(self, speech, language):
+        rep = [u"C'est bien de penser.", u"En parlant de ça, je me demande ce que ça fait de penser. Un assistant virtuel ne pense pas...", u"Penser, vous dites ? J'aimerais bien savoir ce qu'on ressent quand on pense."]
         self.say(random.choice(rep))
         self.complete_request()
 
