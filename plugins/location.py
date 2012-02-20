@@ -26,7 +26,7 @@ class location(Plugin):
             keyword = regex.group('keyword2')
         keyword = keyword.strip();
         keyword = keyword.replace(u"près","").replace("par","").replace('la ','').replace('les ','').replace('le ','').replace('des ','').replace('de ','').replace('du ','').replace('une ','').replace('un ','')
-        print "MC : " + keyword
+        #print "MC : " + keyword
         location = self.getCurrentLocation(force_reload=True,accuracy=GetRequestOrigin.desiredAccuracyBest)
         latlong = str(location.latitude)+","+str(location.longitude)
         
@@ -38,7 +38,7 @@ class location(Plugin):
         
         response = None
         url = "https://maps.googleapis.com/maps/api/place/search/json?location={0}&radius={1}&keyword={2}&sensor=true&key={3}".format(latlong,radius,urllib.quote_plus(keyword.encode("utf-8")),APIKEY)
-        print url
+        #print url
         try:
             jsonString = urllib2.urlopen(url, timeout=3)
             response = json.load(jsonString);

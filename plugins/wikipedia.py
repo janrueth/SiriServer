@@ -40,7 +40,7 @@ class wikiPedia(Plugin):
                 if language=="de-DE":
                     self.say(u"Nach \"{0}\" suchen...".format(title), None)
                 elif language=="fr-FR":
-                    self.say(u"Recherche de \"{0}\" suchen...".format(title), None)
+                    self.say(u"Recherche de \"{0}\"...".format(title), None)
                 else:
                     self.say(u"Searching for \"{0}\"...".format(title), None)
                 wikiSearch = WebSearch(refId=self.refId,query=searchString,provider="Wikipedia")

@@ -109,7 +109,7 @@ class frenchtalk(Plugin):
             self.say(u"Excusez-moi. J'essayais simplement de vous aider.")
         self.complete_request()
 		
-    @register("fr-FR", u"(.*connard.*)|(.*idiot.*)|(.*crétin.*)|(.*pétasse.*)|(.*connasse.*)|(.*salope.*)|(.*putain.*)|(.*merde.*)|(.*débile.*)|(.* con .*)")
+    @register("fr-FR", u"(.*connard.*)|(.*idiot.*)|(.*crétin.*)|(.*pétasse.*)|(.*connasse.*)|(.*salope.*)|(.*putain.*)|(.*(?<!vie de )merde.*)|(.*débile.*)|(.* con .*)")
     def ft_insultes(self, speech, language):
         choix = random.randint(0,3)
         if choix == 1:
@@ -123,7 +123,7 @@ class frenchtalk(Plugin):
             self.say("Demandez gentiment, maintenant.")
         self.complete_request()
 
-    @register("fr-FR", u".*(suis|suit).*(saoul|soul|soûl|sous)|(je|j'ai).*alcool.*|j.ai.*(trop.*)?bu.*")
+    @register("fr-FR", u".*(suis|suit).*(saoule?|soule?|soûle?|sous)|(je|j'ai).*alcool.*|j.ai.*(trop.*)?bu.*")
     def ft_glouglou(self, speech, language):
         rep = [u"Ne buvez jamais si vous avez du travail à faire, ne buvez jamais seul et ne buvez jamais lorsque le soleil brille.", u"Ne comptez pas sur moi pour vous ramener chez vous.", u"Boire ou conduire, il faut choisir !"]
         self.say(random.choice(rep))

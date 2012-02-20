@@ -36,7 +36,7 @@ class alarmPlugin(Plugin):
     res = {
         'setAlarm': {
             'en-US': '.*set.* alarm for.* (0?[1-9]|1[012])([0-5]\d)?\s?([APap][mM])\s?(\bcalled|named|labeled\b)?\s?(([a-z0-9]{1,7}\s)?([a-z0-9]{1,7})\s?([a-z0-9]{1,7}))?',
-            'fr-FR': u'.*(programme|regle|règle)?.*(alarme|reveil|réveil)([^0-9]+)([0-2]?[0-9])([^0-9]+)?([0-5]?[0-9])?\s?(\appelée|appel|nommée|nommee|labellé|labelle\b)?\s?(([a-z0-9]{1,7}\s)?([a-z0-9]{1,7})\s?([a-z0-9]{1,7}))?'
+            'fr-FR': u'.*(programme|regle|règle|met|mai).*(alarme|reveil|réveil)([^0-9]+)([0-2]?[0-9])([^0-9]+)?([0-5]?[0-9])?\s?(\appelée|appel|nommée|nommee|labellé|labelle\b)?\s?(([a-z0-9]{1,7}\s)?([a-z0-9]{1,7})\s?([a-z0-9]{1,7}))?'
         }
     }
 
@@ -83,7 +83,7 @@ class alarmPlugin(Plugin):
         #create the alarm
         alarm = AlarmObject(alarmLabel, int(alarmMinutes), alarm24Hour, None, 1)
         response = self.getResponseForRequest(AlarmCreate(self.refId, alarm))
-        print(alarmPlugin.localizations['Alarm']['alarmWasSet'][language].format(alarmHour, alarmMinutes, alarmAMPM))
+        #print(alarmPlugin.localizations['Alarm']['alarmWasSet'][language].format(alarmHour, alarmMinutes, alarmAMPM))
         view = AddViews(self.refId, dialogPhase="Completion")
         if alarmLabel == None:
             view1 = AssistantUtteranceView(speakableText=alarmPlugin.localizations['Alarm']['alarmWasSet'][language].format(alarmHour, alarmMinutes, alarmAMPM), dialogIdentifier="Alarm#alarmWasSet")

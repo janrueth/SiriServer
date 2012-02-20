@@ -12,7 +12,7 @@ from plugin import *
 
 class vieDeMerde(Plugin):
     
-    @register("fr-FR", ".*vie.*(merde|merd).*")
+    @register("fr-FR", ".*vie.*(merde|merd).*|.*vdm.*")
     def fuckMyLife(self, speech, language):
         vdm = None
         lang = language[:2]
