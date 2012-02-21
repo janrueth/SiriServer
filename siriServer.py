@@ -362,7 +362,7 @@ class HandleConnection(ssl_dispatcher):
 
                 elif reqObject['class'] == 'DestroyAssistant':
                     c = self.dbConnection.cursor()
-                    c.execute("delete from assistants where assistantId = ?", (reqObject['properties']['assistantId'],))
+                    c.execute("DELETE from `assistants` where assistantId = %s", (reqObject['properties']['assistantId'],))
                     self.dbConnection.commit()
                     c.close()
                     self.send_plist({"class": "AssistantDestroyed", "properties": {"assistantId": reqObject['properties']['assistantId']}, "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
