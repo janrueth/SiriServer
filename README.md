@@ -48,6 +48,20 @@ The file SiriProtocol documents everything I (and others) found out about the pr
 Setup, Notes and Instructions
 -----------------------------
 
+**Install python mysql**
+
+* Please install Python-mysql module before proceding
+
+**Create the databse**
+
+* Connect to mysql 
+        mysql -u root -p
+
+* Create the database `googlesiri` 
+        CREATE DATABASE googlesiri;
+
+* Edit `db.py` to the passwords and user dataconfig your need
+
 **Installer**
 
 There is an experimental installer by [johanberglind](https://github.com/johanberglind) which does the steps described below, you may try it instead of the manual method.
