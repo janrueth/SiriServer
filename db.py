@@ -29,7 +29,7 @@ def setup():
     conn.close()
 
 def getConnection():
-    return mdb.connect("localhost","root","19836669","siri")
+    return mdb.connect("localhost","root","6xtylm","googlesiri")
 
 
 class Assistant(object):
