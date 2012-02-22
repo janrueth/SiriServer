@@ -1,9 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import cPickle
+import cPickle,base64
 import MySQLdb as mdb
-from uuid import uuid4
+import uuid 
 
 
 __database__ = "database.sqlite3"
@@ -33,12 +33,16 @@ def getConnection():
 
 
 class Assistant(object):
-    def __init__(self, assistantId=str.upper(str(uuid4())),speechId=str.upper(str(uuid4()))):
-        self.assistantId = assistantId
-        self.speechId = speechId
+    def __init__(self):
+        self.assistantId = None
+        self.speechId= None    
         self.censorSpeech = None
         self.timeZoneId = None
         self.language = None
         self.region = None
 
+def adaptAssistant(assistant):
+    return base64.encodestring(cPickle.dumps(assistant))
 
+def convertAssistant(fromDB):
+    return cPickle.loads(base64.decodestring(fromDB))

@@ -313,7 +313,8 @@ class HandleConnection(ssl_dispatcher):
                     
                 elif reqObject['class'] == 'CreateAssistant':
                     #create a new assistant
-                    helper = Assistant()
+                    helper = Assistant() 
+                    helper.assistantId=str.upper(str(uuid.uuid4()))                   
                     c = self.dbConnection.cursor()
                     noError = True
                     try:
@@ -438,7 +439,7 @@ class SiriServer(asyncore.dispatcher):
         if signum == signal.SIGTERM:
             x.info("Got SIGTERM, closing server")
             self.close()
-    
+            exit (1)
 
     def handle_accept(self):
         pair = self.accept()
