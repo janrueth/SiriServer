@@ -314,7 +314,8 @@ class HandleConnection(ssl_dispatcher):
                 elif reqObject['class'] == 'CreateAssistant':
                     #create a new assistant
                     helper = Assistant() 
-                    helper.assistantId=str.upper(str(uuid.uuid4()))                   
+                    helper.assistantId=str.upper(str(uuid.uuid4())) 
+                    helper.speechId=str.upper(str(uuid.uuid4())) 
                     c = self.dbConnection.cursor()
                     noError = True
                     try:
