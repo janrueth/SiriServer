@@ -5,31 +5,23 @@ import cPickle,base64
 import MySQLdb as mdb
 import uuid 
 
+__database__ = "mysql"
 
-__database__ = "database.sqlite3"
+__mysql_host__ = "localhost"
+__mysql_user__ = "user"
+__mysql_password__ = "password"
+__mysql_database__ = "database"
+
 
 def setup():
     conn = getConnection()
     c = conn.cursor()
-    c.execute("""
-        CREATE TABLE IF NOT EXISTS `assistants` (
-  `id` int(255) unsigned NOT NULL AUTO_INCREMENT,
-  `assistantId` text NOT NULL,
-  `speechId` text NOT NULL,
-  `censorSpeech` text NOT NULL,
-  `timeZoneId` text NOT NULL,
-  `language` text NOT NULL,
-  `region` text NOT NULL,
-  `date_created` datetime NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-        """)
-    #conn.commit()
+    c.execute("""CREATE TABLE IF NOT EXISTS `assistants` (`id` int(255) unsigned NOT NULL AUTO_INCREMENT,`assistantId` text NOT NULL,`speechId` text NOT NULL,`censorSpeech` text NOT NULL,`timeZoneId` text NOT NULL,`language` text NOT NULL,`region` text NOT NULL,`date_created` datetime NOT NULL, PRIMARY KEY (`id`)) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;""")    
     c.close()
     conn.close()
 
 def getConnection():
-    return mdb.connect("localhost","root","","googlesiri")
+    return mdb.connect(__mysql_host__, __mysql_user__, __mysql_password__, __mysql_database__, use_unicode=True)
 
 
 class Assistant(object):
