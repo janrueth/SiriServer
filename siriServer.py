@@ -380,8 +380,8 @@ class HandleConnection(ssl_dispatcher):
         
         if cmd == 3: #ping
             self.ping = data
-            self.logger.info("Received a Ping ({0})".format(data))
-            self.logger.info("Returning a Pong ({0})".format(self.pong))
+            self.logger.debug("Received a Ping ({0})".format(data))
+            self.logger.debug("Returning a Pong ({0})".format(self.pong))
             self.send_pong(self.pong)
             self.pong += 1
             self.unzipped_input = self.unzipped_input[5:]
