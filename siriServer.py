@@ -25,7 +25,8 @@ from email.utils import formatdate
 import speex
 import flac
 import db
-from db import Assistant
+import MySQLdb as mdb
+from db import Assistant,User
 
 import PluginManager
 
@@ -40,7 +41,7 @@ from sslDispatcher import ssl_dispatcher
 import signal, os
 
 class HandleConnection(ssl_dispatcher):
-    __not_recognized = {"de-DE": u"Entschuldigung, ich verstehe \"{0}\" nicht.", "en-US": u"Sorry I don't understand {0}"}
+    __not_recognized = {"de-DE": u"Entschuldigung, ich verstehe \"{0}\" nicht.", "en-US": u"Sorry, I don't understand {0}"}
     __websearch = {"de-DE": u"Websuche", "en-US": u"Websearch"}
     def __init__(self, conn):
         asyncore.dispatcher_with_send.__init__(self, conn)
@@ -166,7 +167,7 @@ class HandleConnection(ssl_dispatcher):
                 
                 if not dictation:
                     if self.current_running_plugin == None:
-                        plugin = PluginManager.getPluginForImmediateExecution(self.assistant.assistantId, best_match, self.assistant.language, (self.send_object, self.send_plist, self.assistant, self.current_location))
+                        plugin = PluginManager.getPluginForImmediateExecution(self.assistant.assistantId, best_match, self.assistant.language,(self.send_object, self.send_plist, self.assistant, self.current_location))
                         if plugin != None:
                             plugin.refId = requestId
                             plugin.connection = self
@@ -312,51 +313,81 @@ class HandleConnection(ssl_dispatcher):
                     
                 elif reqObject['class'] == 'CreateAssistant':
                     #create a new assistant
-                    helper = Assistant()
+                    helper = Assistant() 
+                    helper.assistantId=str.upper(str(uuid.uuid4())) 
+                    helper.speechId=str.upper(str(uuid.uuid4())) 
                     c = self.dbConnection.cursor()
                     noError = True
                     try:
-                        c.execute("insert into assistants(assistantId, assistant) values (?,?)", (helper.assistantId, helper))
+                        c.execute("INSERT INTO `assistants` (assistantId,speechId,censorSpeech,timeZoneId,language,region,firstName,nickName,date_created) values (%s,%s,%s,%s,%s,%s,%s,%s,NOW())", (helper.assistantId, helper.speechId,"","","","","",""))
                         self.dbConnection.commit()
-                    except sqlite3.Error, e: 
+                    except mdb.Error, e: 
                         noError = False
                     c.close()
                     if noError:
                         self.assistant = helper
-                        self.send_plist({"class": "AssistantCreated", "properties": {"speechId": str(uuid.uuid4()), "assistantId": helper.assistantId}, "group":"com.apple.ace.system", "callbacks":[], "aceId": str(uuid.uuid4()), "refId": reqObject['aceId']})
+                        self.send_plist({"class": "AssistantCreated", "properties": {"speechId": helper.speechId, "assistantId": helper.assistantId}, "group":"com.apple.ace.system", "callbacks":[], "aceId": str(uuid.uuid4()), "refId": reqObject['aceId']})
                     else:
                         self.send_plist({"class":"CommandFailed", "properties": {"reason":"Database error", "errorCode":2, "callbacks":[]}, "aceId": str(uuid.uuid4()), "refId": reqObject['aceId'], "group":"com.apple.ace.system"})
             
                 elif reqObject['class'] == 'SetAssistantData':
                     # fill assistant 
                     if self.assistant != None:
-                        c = self.dbConnection.cursor()
+                        c = self.dbConnection.cursor(mdb.cursors.DictCursor)       
+                        #Record assistant data
                         objProperties = reqObject['properties'] 
                         self.assistant.censorSpeech = objProperties['censorSpeech']
                         self.assistant.timeZoneId = objProperties['timeZoneId']
                         self.assistant.language = objProperties['language']
                         self.assistant.region = objProperties['region']
-                        c.execute("update assistants set assistant = ? where assistantId = ?", (self.assistant, self.assistant.assistantId))
-                        self.dbConnection.commit()
+                        #Record the user firstName and nickName
+                        self.user=User()                                
+                        self.user.assistantId=self.assistant.assistantId
+                        try:                        
+                            self.user.firstName=objProperties["meCards"][0]["properties"]["firstName"]
+                        except KeyError:
+                            self.user.firstName=''                        
+                        try:                        
+                            self.user.nickName=objProperties["meCards"][0]["properties"]["nickName"]       
+                        except KeyError:
+                            self.user.nickName=''
+                            
+                        c.execute("UPDATE `assistants` set censorSpeech=%s,timeZoneId=%s,language=%s,region=%s,firstName=%s,nickName=%s  where assistantId = %s", (self.assistant.censorSpeech,self.assistant.timeZoneId, self.assistant.language,self.assistant.region,self.user.firstName,self.user.nickName,self.assistant.assistantId))
                         c.close()
 
             
                 elif reqObject['class'] == 'LoadAssistant':
-                    c = self.dbConnection.cursor()
-                    c.execute("select assistant from assistants where assistantId = ?", (reqObject['properties']['assistantId'],))
-                    self.dbConnection.commit()
-                    result = c.fetchone()
+                    c = self.dbConnection.cursor(mdb.cursors.DictCursor)
+                    c.execute("SELECT * FROM `assistants` WHERE assistantId = %s", (reqObject['properties']['assistantId']))                    
+                    result = c.fetchone()                    
                     if result == None:
                         self.send_plist({"class": "AssistantNotFound", "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
-                    else:
-                        self.assistant = result[0]
-                        self.send_plist({"class": "AssistantLoaded", "properties": {"version": "20111216-32234-branches/telluride?cnxn=293552c2-8e11-4920-9131-5f5651ce244e", "requestSync":False, "dataAnchor":"removed"}, "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
+                    else:  
+                        if result["censorSpeech"]=='' or result["timeZoneId"]=='' or result["language"]=='' or result["region"]=='' :
+                            #destroy the buggy assistant
+                            self.send_plist({"class": "AssistantNotFound", "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"}) 
+                            c.execute("DELETE from `assistants` where assistantId = %s", (reqObject['properties']['assistantId']))                                             
+                        else:
+                            #Load the assistant Values
+                            self.assistant=Assistant()
+                            self.assistant.assistantId=result["assistantId"]                         
+                            self.assistant.speechId=result["speechId"]
+                            self.assistant.censorSpeech = result["censorSpeech"]
+                            self.assistant.timeZoneId = result["timeZoneId"]
+                            self.assistant.language = result["language"]
+                            self.assistant.region = result["region"]
+                            #Load the user info
+                            self.user=User()
+                            self.user.firstName=result["firstName"]
+                            self.user.nickName=result["nickName"]
+                            
+                            self.send_plist({"class": "AssistantLoaded", "properties": {"version": "20111216-32234-branches/telluride?cnxn=293552c2-8e11-4920-9131-5f5651ce244e", "requestSync":False, "dataAnchor":"removed"}, "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
+                            
                     c.close()
 
                 elif reqObject['class'] == 'DestroyAssistant':
                     c = self.dbConnection.cursor()
-                    c.execute("delete from assistants where assistantId = ?", (reqObject['properties']['assistantId'],))
-                    self.dbConnection.commit()
+                    c.execute("DELETE from `assistants` where assistantId = %s", (reqObject['properties']['assistantId']))
                     c.close()
                     self.send_plist({"class": "AssistantDestroyed", "properties": {"assistantId": reqObject['properties']['assistantId']}, "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
                 elif reqObject['class'] == 'StartRequest':
@@ -431,7 +462,7 @@ class SiriServer(asyncore.dispatcher):
         if signum == signal.SIGTERM:
             x.info("Got SIGTERM, closing server")
             self.close()
-    
+            exit (1)
 
     def handle_accept(self):
         pair = self.accept()
