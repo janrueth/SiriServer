@@ -12,7 +12,7 @@ class smalltalk(Plugin):
         if language == 'de-DE':
             self.say("Hallo.")
         else:
-            self.say("Hello")
+            self.say("Hello.")
         self.complete_request()
 
     @register("de-DE", ".*Dein Name.*")
