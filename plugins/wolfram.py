@@ -202,7 +202,7 @@ class wolfram(Plugin):
                 rep = [u"Je n'ai trouvé aucune réponse à votre question !", u"Je ne trouve pas la réponse à votre question !", u"Je ne trouve aucune réponse à votre question !", u"Désolé, je ne connais pas de réponse à votre question !"]
                 self.say(random.choice(rep));
             else:
-                self.say("Nothing has found for your query!")
+                self.say("Nothing was found for your query!")
             self.complete_request()
             view1 = 0
         elif wolfram_pod1 == 12:
