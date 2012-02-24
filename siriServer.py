@@ -315,15 +315,16 @@ class HandleConnection(ssl_dispatcher):
                     #create a new assistant
                     helper = Assistant() 
                     helper.assistantId=str.upper(str(uuid.uuid4())) 
-                    helper.speechId=str.upper(str(uuid.uuid4())) 
-                    c = self.dbConnection.cursor()
+                    helper.speechId=str.upper(str(uuid.uuid4()))                     
                     noError = True
                     try:
-                        c.execute("INSERT INTO `assistants` (assistantId,speechId,censorSpeech,timeZoneId,language,region,firstName,nickName,date_created) values (%s,%s,%s,%s,%s,%s,%s,%s,NOW())", (helper.assistantId, helper.speechId,"","","","","",""))
-                        self.dbConnection.commit()
+                        c = self.dbConnection.cursor()
+                        c.execute("INSERT INTO `assistants` (assistantId,speechId,censorSpeech,timeZoneId,language,region,firstName,nickName,date_created) values (%s,%s,%s,%s,%s,%s,%s,%s,NOW())", (helper.assistantId, helper.speechId,"","","","","",""))                        
                     except mdb.Error, e: 
                         noError = False
+                        
                     c.close()
+                    
                     if noError:
                         self.assistant = helper
                         self.send_plist({"class": "AssistantCreated", "properties": {"speechId": helper.speechId, "assistantId": helper.assistantId}, "group":"com.apple.ace.system", "callbacks":[], "aceId": str(uuid.uuid4()), "refId": reqObject['aceId']})
@@ -333,7 +334,7 @@ class HandleConnection(ssl_dispatcher):
                 elif reqObject['class'] == 'SetAssistantData':
                     # fill assistant 
                     if self.assistant != None:
-                        c = self.dbConnection.cursor(mdb.cursors.DictCursor)       
+                    
                         #Record assistant data
                         objProperties = reqObject['properties'] 
                         self.assistant.censorSpeech = objProperties['censorSpeech']
@@ -350,22 +351,28 @@ class HandleConnection(ssl_dispatcher):
                             self.assistant.nickName=objProperties["meCards"][0]["properties"]["nickName"]       
                         except KeyError:
                             self.assistant.nickName=''
-                            
-                        c.execute("UPDATE `assistants` set censorSpeech=%s,timeZoneId=%s,language=%s,region=%s,firstName=%s,nickName=%s  where assistantId = %s", (self.assistant.censorSpeech,self.assistant.timeZoneId, self.assistant.language,self.assistant.region,self.assistant.firstName,self.assistant.nickName,self.assistant.assistantId))
+                        c = self.dbConnection.cursor(mdb.cursors.DictCursor)           
+                        try:
+                            c.execute("UPDATE `assistants` set censorSpeech=%s,timeZoneId=%s,language=%s,region=%s,firstName=%s,nickName=%s  where assistantId = %s", (self.assistant.censorSpeech,self.assistant.timeZoneId, self.assistant.language,self.assistant.region,self.assistant.firstName,self.assistant.nickName,self.assistant.assistantId))
+                        except mdb.Error, e: 
+                            c.close()
                         c.close()
 
             
                 elif reqObject['class'] == 'LoadAssistant':
                     c = self.dbConnection.cursor(mdb.cursors.DictCursor)
                     c.execute("SELECT * FROM `assistants` WHERE assistantId = %s", (reqObject['properties']['assistantId']))                    
-                    result = c.fetchone()                    
+                    result = c.fetchone()   
+                    c.close()
                     if result == None:
                         self.send_plist({"class": "AssistantNotFound", "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
                     else:  
                         if result["censorSpeech"]=='' or result["timeZoneId"]=='' or result["language"]=='' or result["region"]=='' :
                             #destroy the buggy assistant
                             self.send_plist({"class": "AssistantNotFound", "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"}) 
+                            c = self.dbConnection.cursor()
                             c.execute("DELETE from `assistants` where assistantId = %s", (reqObject['properties']['assistantId']))                                             
+                            c.close()
                         else:
                             #Load the assistant Values
                             self.assistant=Assistant()
@@ -376,14 +383,10 @@ class HandleConnection(ssl_dispatcher):
                             self.assistant.language = result["language"]
                             self.assistant.region = result["region"]
                             #Load the user info
-                            
                             self.assistant.firstName=result["firstName"]
                             self.assistant.nickName=result["nickName"]
-                            
                             self.send_plist({"class": "AssistantLoaded", "properties": {"version": "20111216-32234-branches/telluride?cnxn=293552c2-8e11-4920-9131-5f5651ce244e", "requestSync":False, "dataAnchor":"removed"}, "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
                             
-                    c.close()
-
                 elif reqObject['class'] == 'DestroyAssistant':
                     c = self.dbConnection.cursor()
                     c.execute("DELETE from `assistants` where assistantId = %s", (reqObject['properties']['assistantId']))
