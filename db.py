@@ -9,7 +9,7 @@ __database__ = "mysql"
 
 __mysql_host__ = "localhost"
 __mysql_user__ = "root"
-__mysql_password__ = ""
+__mysql_password__ = "pass"
 __mysql_database__ = "googlesiri"
 
 
