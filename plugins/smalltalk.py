@@ -5,14 +5,25 @@
 from plugin import *
 
 class smalltalk(Plugin):
-    
+      
+        
     @register("de-DE", "(.*Hallo.*)|(.*Hi.*Siri.*)")
     @register("en-US", "(.*Hello.*)|(.*Hi.*Siri.*)")
-    def st_hello(self, speech, language):
+    def st_hello(self, speech, language):  
         if language == 'de-DE':
-            self.say("Hallo.")
-        else:
-            self.say("Hello.")
+            self.say("Hallo {0}".format(self.user_name()))
+        else:            
+            self.say("Hello {0}".format(self.user_name()))
+        self.complete_request()   
+
+
+    @register("de-DE", "Hi")
+    @register("en-US", "Hi")
+    def hi(self, speech, language):
+        if language == 'de-DE':
+            self.say("Hi {0}".format(self.user_name()))
+        else:            
+            self.say("Hi there {0}".format(self.user_name()))
         self.complete_request()
 
     @register("de-DE", ".*Dein Name.*")

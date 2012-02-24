@@ -26,7 +26,7 @@ import speex
 import flac
 import db
 import MySQLdb as mdb
-from db import Assistant,User
+from db import Assistant
 
 import PluginManager
 
@@ -340,19 +340,18 @@ class HandleConnection(ssl_dispatcher):
                         self.assistant.timeZoneId = objProperties['timeZoneId']
                         self.assistant.language = objProperties['language']
                         self.assistant.region = objProperties['region']
-                        #Record the user firstName and nickName
-                        self.user=User()                                
-                        self.user.assistantId=self.assistant.assistantId
+                        #Record the user firstName and nickName                                                 
+                        
                         try:                        
-                            self.user.firstName=objProperties["meCards"][0]["properties"]["firstName"]
+                            self.assistant.firstName=objProperties["meCards"][0]["properties"]["firstName"]
                         except KeyError:
-                            self.user.firstName=''                        
+                            self.assistant.firstName=''                        
                         try:                        
-                            self.user.nickName=objProperties["meCards"][0]["properties"]["nickName"]       
+                            self.assistant.nickName=objProperties["meCards"][0]["properties"]["nickName"]       
                         except KeyError:
-                            self.user.nickName=''
+                            self.assistant.nickName=''
                             
-                        c.execute("UPDATE `assistants` set censorSpeech=%s,timeZoneId=%s,language=%s,region=%s,firstName=%s,nickName=%s  where assistantId = %s", (self.assistant.censorSpeech,self.assistant.timeZoneId, self.assistant.language,self.assistant.region,self.user.firstName,self.user.nickName,self.assistant.assistantId))
+                        c.execute("UPDATE `assistants` set censorSpeech=%s,timeZoneId=%s,language=%s,region=%s,firstName=%s,nickName=%s  where assistantId = %s", (self.assistant.censorSpeech,self.assistant.timeZoneId, self.assistant.language,self.assistant.region,self.assistant.firstName,self.assistant.nickName,self.assistant.assistantId))
                         c.close()
 
             
@@ -377,9 +376,9 @@ class HandleConnection(ssl_dispatcher):
                             self.assistant.language = result["language"]
                             self.assistant.region = result["region"]
                             #Load the user info
-                            self.user=User()
-                            self.user.firstName=result["firstName"]
-                            self.user.nickName=result["nickName"]
+                            
+                            self.assistant.firstName=result["firstName"]
+                            self.assistant.nickName=result["nickName"]
                             
                             self.send_plist({"class": "AssistantLoaded", "properties": {"version": "20111216-32234-branches/telluride?cnxn=293552c2-8e11-4920-9131-5f5651ce244e", "requestSync":False, "dataAnchor":"removed"}, "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
                             
