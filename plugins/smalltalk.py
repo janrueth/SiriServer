@@ -16,12 +16,14 @@ class smalltalk(Plugin):
             self.say("Hello {0}".format(self.user_name()))
         self.complete_request()   
 
-
     @register("de-DE", "Hi")
     @register("en-US", "Hi")
+    @register("fr-FR", "Bonjour")
     def hi(self, speech, language):
         if language == 'de-DE':
             self.say("Hi {0}".format(self.user_name()))
+        elif language == 'fr-FR':
+            self.say("Bonjour {0}".format(self.user_name()))
         else:            
             self.say("Hi there {0}".format(self.user_name()))
         self.complete_request()
