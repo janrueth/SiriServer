@@ -341,8 +341,7 @@ class HandleConnection(ssl_dispatcher):
                         self.assistant.timeZoneId = objProperties['timeZoneId']
                         self.assistant.language = objProperties['language']
                         self.assistant.region = objProperties['region']
-                        #Record the user firstName and nickName                                                 
-                        
+                        #Record the user firstName and nickName                    
                         try:                        
                             self.assistant.firstName=objProperties["meCards"][0]["properties"]["firstName"]
                         except KeyError:
@@ -351,13 +350,10 @@ class HandleConnection(ssl_dispatcher):
                             self.assistant.nickName=objProperties["meCards"][0]["properties"]["nickName"]       
                         except KeyError:
                             self.assistant.nickName=''
-                        c = self.dbConnection.cursor(mdb.cursors.DictCursor)           
-                        try:
-                            c.execute("UPDATE `assistants` set censorSpeech=%s,timeZoneId=%s,language=%s,region=%s,firstName=%s,nickName=%s  where assistantId = %s", (self.assistant.censorSpeech,self.assistant.timeZoneId, self.assistant.language,self.assistant.region,self.assistant.firstName,self.assistant.nickName,self.assistant.assistantId))
-                        except mdb.Error, e: 
-                            c.close()
+                            
+                        c = self.dbConnection.cursor(mdb.cursors.DictCursor)          
+                        c.execute("UPDATE `assistants` set censorSpeech=%s,timeZoneId=%s,language=%s,region=%s,firstName=%s,nickName=%s  where assistantId = %s", (self.assistant.censorSpeech,self.assistant.timeZoneId, self.assistant.language,self.assistant.region,self.assistant.firstName,self.assistant.nickName,self.assistant.assistantId))
                         c.close()
-
             
                 elif reqObject['class'] == 'LoadAssistant':
                     c = self.dbConnection.cursor(mdb.cursors.DictCursor)
