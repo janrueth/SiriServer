@@ -6,6 +6,15 @@ from plugin import *
 
 class smalltalk(Plugin):
      
+     
+    @register("de-DE", "(.*Mein name.*)")
+    @register("en-US", "(.*My name.*)")
+    def st_my_name(self, speech, language):  
+        if language == 'de-DE':
+            self.say("Du heißt {0}.".format(self.user_name()).decode("utf-8"))
+        else:            
+            self.say("Your name is {0}. At least that's what you told me.".format(self.user_name()))
+        self.complete_request()   
       
     @register("de-DE", "(.*Fick.*)")
     @register("en-US", "(.*Fuck.*)")
