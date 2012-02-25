@@ -319,10 +319,10 @@ class HandleConnection(ssl_dispatcher):
                     noError = True
                     try:
                         c = self.dbConnection.cursor()
-                        c.execute("INSERT INTO `assistants` (assistantId,speechId,censorSpeech,timeZoneId,language,region,firstName,nickName,date_created) values (%s,%s,%s,%s,%s,%s,%s,%s,NOW())", (helper.assistantId, helper.speechId,"","","","","",""))                        
+                        c.execute("ISERT INTO `assistants` (assistantId,speechId,censorSpeech,timeZoneId,language,region,firstName,nickName,date_created) values (%s,%s,%s,%s,%s,%s,%s,%s,NOW())", (helper.assistantId, helper.speechId,"","","","","",""))                        
                     except mdb.Error, e: 
                         noError = False
-                        
+                        print e
                     c.close()
                     
                     if noError:
@@ -358,6 +358,10 @@ class HandleConnection(ssl_dispatcher):
                         c = self.dbConnection.cursor(mdb.cursors.DictCursor)          
                         c.execute("UPDATE `assistants` set censorSpeech=%s,timeZoneId=%s,language=%s,region=%s,firstName=%s,nickName=%s  where assistantId = %s", (self.assistant.censorSpeech,self.assistant.timeZoneId, self.assistant.language,self.assistant.region,self.assistant.firstName,self.assistant.nickName,self.assistant.assistantId))
                         c.close()
+                        
+                    else:
+                        #assistant not found lets send the command
+                        self.send_plist({"class":"CommandFailed", "properties": {"reason":"Databse error! Assistant not found", "errorCode":2, "callbacks":[]}, "aceId": str(uuid.uuid4()), "refId": reqObject['aceId'], "group":"com.apple.ace.system"})
             
                 elif reqObject['class'] == 'LoadAssistant':
                     c = self.dbConnection.cursor(mdb.cursors.DictCursor)
