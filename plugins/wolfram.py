@@ -191,7 +191,7 @@ class wolfram(Plugin):
                 if language == 'de-DE':
                     self.say("Es tut mir leid. Ich konnte keine Antwort auf Ihre Frage finden.")
                 else:
-                    self.say("Nothing has found for your query!")
+                    self.say("Nothing has been found for your query!")
             self.complete_request()
             view1 = 0
         elif wolfram_pod1 == 12:
