@@ -319,7 +319,7 @@ class HandleConnection(ssl_dispatcher):
                     noError = True
                     try:
                         c = self.dbConnection.cursor()
-                        c.execute("ISERT INTO `assistants` (assistantId,speechId,censorSpeech,timeZoneId,language,region,firstName,nickName,date_created) values (%s,%s,%s,%s,%s,%s,%s,%s,NOW())", (helper.assistantId, helper.speechId,"","","","","",""))                        
+                        c.execute("INSERT INTO `assistants` (assistantId,speechId,censorSpeech,timeZoneId,language,region,firstName,nickName,date_created) values (%s,%s,%s,%s,%s,%s,%s,%s,NOW())", (helper.assistantId, helper.speechId,"","","","","",""))                        
                     except mdb.Error, e: 
                         noError = False
                         print e
