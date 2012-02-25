@@ -12,46 +12,40 @@ from plugin import *
 from siriObjects.baseObjects import AceObject, ClientBoundCommand
 from siriObjects.systemObjects import GetRequestOrigin,Location
 from siriObjects.uiObjects import AddViews, AssistantUtteranceView
-from siriObjects.localsearchObjects import ActionableMapItem
 from siriObjects.mapObjects import SiriMapItemSnippet,SiriLocation, SiriMapItem
 
-yahoo_api_key = APIKeyForAPI("yahoo")
+yelp_api_key = APIKeyForAPI("yelp")
  
 class food(Plugin):
-    
-    @register("en-US", "(.*pizza.*)|(.*taco.*)|(.*burger.*)")
-    def food(self, speech, language):
+    @register("en-US", "(find nearest|find nearby|find closest|show closeset|show nearby).* ([\w ]+)")
+    def food(self, speech, language, regex):
         mapGetLocation = self.getCurrentLocation()
         latitude = mapGetLocation.latitude
         longitude = mapGetLocation.longitude
-	if (speech.count("pizza") > 0 or speech.count("Pizza") > 0):
-		foodType = "pizza"
-	if (speech.count("taco") > 0 or speech.count("Taco") > 0):
-		foodType = "taco"
-	if (speech.count("burger") > 0 or speech.count("Burger") > 0):
-		foodType = "burger"
-	foodurl = "http://local.yahooapis.com/LocalSearchService/V3/localSearch?appid={0}&query={1}&latitude={2}&longitude={3}&results=5&output=json".format(str(yahoo_api_key),str(foodType),latitude,longitude)
+        Title = regex.group(regex.lastindex)
+        Query = urllib.quote_plus(Title.encode("utf-8"))
+	random_results = random.randint(2,15)
+	foodurl = "http://api.yelp.com/business_review_search?term={0}&lat={1}&long={2}&radius=10&limit={3}&ywsid={4}".format(str(Query),latitude,longitude,random_results,str(yelp_api_key))
 	try:
 	     jsonString = urllib2.urlopen(foodurl, timeout=3).read()
 	except:
-		pass
+	     jsonString = None	
         if jsonString != None:
 		response = json.loads(jsonString)
-	if response['ResultSet']['totalResultsReturned'] >= 2:
-		for result in response['ResultSet']['Result']:
-			the_header = result['Title']
-			name = the_header
-			street = result['Address']
-			vicinity = street;
-			city = result['City']
-			stateLong = result['State']
-			countryCode= 'US';
-			lat = result['Latitude']
-			lng = result['Longitude']
-			distance = result['Distance']
+	if response['message']['text'] == 'OK':
+		self.say('I found '+str(random_results)+' for '+str(Query)+' near you:')
+		for result in response['businesses']:
+			name = result['name']
+			street = result['address1']
+			city = result['city']
+			stateCode = result['state']
+			countryCode= result['country_code'];
+			lat = result['latitude']
+			lng = result['longitude']
+			distance = "{0:.2f}".format(result['distance'])
 			view = AddViews(self.refId, dialogPhase="Completion")
-			mapsnippet = SiriMapItemSnippet(items=[SiriMapItem(name, Location(label=vicinity,latitude=lat,longitude=lng, street=vicinity))])
-			view.views = [AssistantUtteranceView(text="Distance : "+str(distance)+" miles", dialogIdentifier="Map#test"), mapsnippet]
+			mapsnippet = SiriMapItemSnippet(items=[SiriMapItem(name, Location(label=street,latitude=lat,longitude=lng, street=street))])
+			view.views = [AssistantUtteranceView(text="Distance : "+str(distance)+" miles", dialogIdentifier="FoodMap"), mapsnippet]
 			self.sendRequestWithoutAnswer(view)
 	else:
 		self.say("Could not get Restaurant Data!");		
