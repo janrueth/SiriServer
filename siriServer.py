@@ -363,25 +363,18 @@ class HandleConnection(ssl_dispatcher):
                     if result == None:
                         self.send_plist({"class": "AssistantNotFound", "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
                     else:  
-                        if result["censorSpeech"]=='' or result["timeZoneId"]=='' or result["language"]=='' or result["region"]=='' :
-                            #destroy the buggy assistant
-                            self.send_plist({"class": "AssistantNotFound", "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"}) 
-                            c = self.dbConnection.cursor()
-                            c.execute("DELETE from `assistants` where assistantId = %s", (reqObject['properties']['assistantId']))                                             
-                            c.close()
-                        else:
-                            #Load the assistant Values
-                            self.assistant=Assistant()
-                            self.assistant.assistantId=result["assistantId"]                         
-                            self.assistant.speechId=result["speechId"]
-                            self.assistant.censorSpeech = result["censorSpeech"]
-                            self.assistant.timeZoneId = result["timeZoneId"]
-                            self.assistant.language = result["language"]
-                            self.assistant.region = result["region"]
-                            #Load the user info
-                            self.assistant.firstName=result["firstName"]
-                            self.assistant.nickName=result["nickName"]
-                            self.send_plist({"class": "AssistantLoaded", "properties": {"version": "20111216-32234-branches/telluride?cnxn=293552c2-8e11-4920-9131-5f5651ce244e", "requestSync":False, "dataAnchor":"removed"}, "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
+                        #Load the assistant Values
+                        self.assistant=Assistant()
+                        self.assistant.assistantId=result["assistantId"]                         
+                        self.assistant.speechId=result["speechId"]
+                        self.assistant.censorSpeech = result["censorSpeech"]
+                        self.assistant.timeZoneId = result["timeZoneId"]
+                        self.assistant.language = result["language"]
+                        self.assistant.region = result["region"]
+                        #Load the user info
+                        self.assistant.firstName=result["firstName"]
+                        self.assistant.nickName=result["nickName"]
+                        self.send_plist({"class": "AssistantLoaded", "properties": {"version": "20111216-32234-branches/telluride?cnxn=293552c2-8e11-4920-9131-5f5651ce244e", "requestSync":False, "dataAnchor":"removed"}, "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
                             
                 elif reqObject['class'] == 'DestroyAssistant':
                     c = self.dbConnection.cursor()
