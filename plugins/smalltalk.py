@@ -5,7 +5,17 @@
 from plugin import *
 
 class smalltalk(Plugin):
+     
       
+    @register("de-DE", "(.*Fick.*)")
+    @register("en-US", "(.*Fuck.*)")
+    def st_fuck(self, speech, language):  
+        if language == 'de-DE':
+            self.say("Das ist nicht gut {0}!".format(self.user_name()))
+        else:            
+            self.say("Mind your language {0}!".format(self.user_name()))
+        self.complete_request()   
+        
         
     @register("de-DE", "(.*Hallo.*)|(.*Hi.*Siri.*)")
     @register("en-US", "(.*Hello.*)|(.*Hi.*Siri.*)")
