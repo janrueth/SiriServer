@@ -18,6 +18,7 @@ yelp_api_key = APIKeyForAPI("yelp")
  
 class food(Plugin):
      @register("en-US", "(find nearest|find nearby|find closest|show closest|show nearby|where is) (.*)")
+     @register("en-GB", "(find nearest|find nearby|find closest|show closest|show nearby|where is) (.*)")
      def yelp_search(self, speech, language, regex):
           self.say('Searching...',' ')
           mapGetLocation = self.getCurrentLocation()
@@ -34,6 +35,7 @@ class food(Plugin):
           if jsonString != None:
                response = json.loads(jsonString)
                if response['message']['text'] == 'OK':
+                    response['businesses'] = sorted(response['businesses'], key=lambda business: float(business['distance']))
                     yelp_results = []
                     for result in response['businesses']:
                          name = result['name']
