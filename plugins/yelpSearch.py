@@ -16,9 +16,9 @@ from siriObjects.mapObjects import SiriMapItemSnippet,SiriLocation, SiriMapItem
 
 yelp_api_key = APIKeyForAPI("yelp")
  
-class food(Plugin):
-     @register("en-US", "(find nearest|find nearby|find closest|show closest|show nearby|where is) (.*)")
-     @register("en-GB", "(find nearest|find nearby|find closest|show closest|show nearby|where is) (.*)")
+class yelpSearch(Plugin):
+     @register("en-US", "(find|show|where).* (nearest|nearby|closest) (.*)")
+     @register("en-GB", "(find|show|where).* (nearest|nearby|closest) (.*)")
      def yelp_search(self, speech, language, regex):
           self.say('Searching...',' ')
           mapGetLocation = self.getCurrentLocation()
@@ -49,7 +49,7 @@ class food(Plugin):
                          view = AddViews(self.refId, dialogPhase="Completion")
                          yelp_results.append(SiriMapItem(name, Location(label=street,latitude=lat,longitude=lng, street=street)))
                     mapsnippet = SiriMapItemSnippet(items=yelp_results)
-                    view.views = [AssistantUtteranceView(speakableText='I found '+str(random_results)+' results for '+str(Query).replace('+',' ')+' near you:', dialogIdentifier="FoodMap"), mapsnippet]
+                    view.views = [AssistantUtteranceView(speakableText='I found '+str(random_results)+' results for '+str(Query).replace('+',' ')+' near you:', dialogIdentifier="yelpSearchMap"), mapsnippet]
                     self.sendRequestWithoutAnswer(view)
                else:
                     self.say("I'm sorry but I did not find any results for "+str(Query).replace('+',' ')+"near you!")
