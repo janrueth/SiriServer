@@ -18,7 +18,7 @@ yelp_api_key = APIKeyForAPI("yelp")
  
 class food(Plugin):
      @register("en-US", "(find nearest|find nearby|find closest|show closest|show nearby|where is) (.*)")
-     def food(self, speech, language, regex):
+     def yelp_search(self, speech, language, regex):
           self.say('Searching...',' ')
           mapGetLocation = self.getCurrentLocation()
           latitude = mapGetLocation.latitude
@@ -26,15 +26,15 @@ class food(Plugin):
           Title = regex.group(regex.lastindex).strip()
           Query = urllib.quote_plus(str(Title.encode("utf-8")))
           random_results = random.randint(2,15)
-          foodurl = "http://api.yelp.com/business_review_search?term={0}&lat={1}&long={2}&radius=10&limit={3}&ywsid={4}".format(str(Query),latitude,longitude,random_results,str(yelp_api_key))
+          yelpurl = "http://api.yelp.com/business_review_search?term={0}&lat={1}&long={2}&radius=10&limit={3}&ywsid={4}".format(str(Query),latitude,longitude,random_results,str(yelp_api_key))
           try:
-               jsonString = urllib2.urlopen(foodurl, timeout=20).read()
+               jsonString = urllib2.urlopen(yelpurl, timeout=20).read()
           except:
                jsonString = None
           if jsonString != None:
                response = json.loads(jsonString)
                if response['message']['text'] == 'OK':
-                    food_results = []
+                    yelp_results = []
                     for result in response['businesses']:
                          name = result['name']
                          street = result['address1']
@@ -45,8 +45,8 @@ class food(Plugin):
                          lng = result['longitude']
                          distance = "{0:.2f}".format(result['distance'])
                          view = AddViews(self.refId, dialogPhase="Completion")
-                         food_results.append(SiriMapItem(name, Location(label=street,latitude=lat,longitude=lng, street=street)))
-                    mapsnippet = SiriMapItemSnippet(items=food_results)
+                         yelp_results.append(SiriMapItem(name, Location(label=street,latitude=lat,longitude=lng, street=street)))
+                    mapsnippet = SiriMapItemSnippet(items=yelp_results)
                     view.views = [AssistantUtteranceView(speakableText='I found '+str(random_results)+' results for '+str(Query).replace('+',' ')+' near you:', dialogIdentifier="FoodMap"), mapsnippet]
                     self.sendRequestWithoutAnswer(view)
                else:
