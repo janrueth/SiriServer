@@ -17,36 +17,40 @@ from siriObjects.mapObjects import SiriMapItemSnippet,SiriLocation, SiriMapItem
 yelp_api_key = APIKeyForAPI("yelp")
  
 class food(Plugin):
-    @register("en-US", "(find nearest|find nearby|find closest|show closeset|show nearby).* ([\w ]+)")
-    def food(self, speech, language, regex):
-        mapGetLocation = self.getCurrentLocation()
-        latitude = mapGetLocation.latitude
-        longitude = mapGetLocation.longitude
-        Title = regex.group(regex.lastindex)
-        Query = urllib.quote_plus(Title.encode("utf-8"))
-	random_results = random.randint(2,15)
-	foodurl = "http://api.yelp.com/business_review_search?term={0}&lat={1}&long={2}&radius=10&limit={3}&ywsid={4}".format(str(Query),latitude,longitude,random_results,str(yelp_api_key))
-	try:
-	     jsonString = urllib2.urlopen(foodurl, timeout=3).read()
-	except:
-	     jsonString = None	
-        if jsonString != None:
-		response = json.loads(jsonString)
-	if response['message']['text'] == 'OK':
-		self.say('I found '+str(random_results)+' for '+str(Query)+' near you:')
-		for result in response['businesses']:
-			name = result['name']
-			street = result['address1']
-			city = result['city']
-			stateCode = result['state']
-			countryCode= result['country_code'];
-			lat = result['latitude']
-			lng = result['longitude']
-			distance = "{0:.2f}".format(result['distance'])
-			view = AddViews(self.refId, dialogPhase="Completion")
-			mapsnippet = SiriMapItemSnippet(items=[SiriMapItem(name, Location(label=street,latitude=lat,longitude=lng, street=street))])
-			view.views = [AssistantUtteranceView(text="Distance : "+str(distance)+" miles", dialogIdentifier="FoodMap"), mapsnippet]
-			self.sendRequestWithoutAnswer(view)
-	else:
-		self.say("Could not get Restaurant Data!");		
-        self.complete_request()
+     @register("en-US", "(find nearest|find nearby|find closest|show closeset|show nearby).* ([\w+ ]+)")
+     def food(self, speech, language, regex):
+          self.say('Searching...',' ')
+          mapGetLocation = self.getCurrentLocation()
+          latitude = mapGetLocation.latitude
+          longitude = mapGetLocation.longitude
+          Title = regex.group(2)
+          Query = urllib.quote_plus(Title.encode("utf-8"))
+          random_results = random.randint(2,15)
+          foodurl = "http://api.yelp.com/business_review_search?term={0}&lat={1}&long={2}&radius=10&limit={3}&ywsid={4}".format(str(Query),latitude,longitude,random_results,str(yelp_api_key))
+          try:
+               jsonString = urllib2.urlopen(foodurl, timeout=20).read()
+          except:
+               jsonString = None
+          if jsonString != None:
+               response = json.loads(jsonString)
+               if response['message']['text'] == 'OK':
+                    food_results = []
+                    for result in response['businesses']:
+                         name = result['name']
+                         street = result['address1']
+                         city = result['city']
+                         stateCode = result['state']
+                         countryCode= result['country_code'];
+                         lat = result['latitude']
+                         lng = result['longitude']
+                         distance = "{0:.2f}".format(result['distance'])
+                         view = AddViews(self.refId, dialogPhase="Completion")
+                         food_results.append(SiriMapItem(name, Location(label=street,latitude=lat,longitude=lng, street=street)))
+                    mapsnippet = SiriMapItemSnippet(items=food_results)
+                    view.views = [AssistantUtteranceView(speakableText='I found '+str(random_results)+' results for '+str(Query)+' near you:', dialogIdentifier="FoodMap"), mapsnippet]
+                    self.sendRequestWithoutAnswer(view)
+               else:
+                    self.say("I'm sorry but I did not find any results for "+str(Query)+"near you!")
+          else:
+               self.say("I'm sorry but I did not find any results for "+str(Query)+"near you!")
+          self.complete_request()
