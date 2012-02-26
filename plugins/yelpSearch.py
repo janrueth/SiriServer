@@ -3,7 +3,7 @@
 #by Alex 'apexad' Martin
 
 import re
-import urllib2, urllib, uuid
+import urllib2, urllib
 import json
 import random
 
@@ -17,14 +17,14 @@ from siriObjects.mapObjects import SiriMapItemSnippet,SiriLocation, SiriMapItem
 yelp_api_key = APIKeyForAPI("yelp")
  
 class food(Plugin):
-     @register("en-US", "(find nearest|find nearby|find closest|show closeset|show nearby).* ([\w+ ]+)")
+     @register("en-US", "(find nearest|find nearby|find closest|show closeset|show nearby|where is) (.*)")
      def food(self, speech, language, regex):
           self.say('Searching...',' ')
           mapGetLocation = self.getCurrentLocation()
           latitude = mapGetLocation.latitude
           longitude = mapGetLocation.longitude
-          Title = regex.group(2)
-          Query = urllib.quote_plus(Title.encode("utf-8"))
+          Title = regex.group(regex.lastindex).strip()
+          Query = urllib.quote_plus(str(Title.encode("utf-8")))
           random_results = random.randint(2,15)
           foodurl = "http://api.yelp.com/business_review_search?term={0}&lat={1}&long={2}&radius=10&limit={3}&ywsid={4}".format(str(Query),latitude,longitude,random_results,str(yelp_api_key))
           try:
@@ -47,10 +47,10 @@ class food(Plugin):
                          view = AddViews(self.refId, dialogPhase="Completion")
                          food_results.append(SiriMapItem(name, Location(label=street,latitude=lat,longitude=lng, street=street)))
                     mapsnippet = SiriMapItemSnippet(items=food_results)
-                    view.views = [AssistantUtteranceView(speakableText='I found '+str(random_results)+' results for '+str(Query)+' near you:', dialogIdentifier="FoodMap"), mapsnippet]
+                    view.views = [AssistantUtteranceView(speakableText='I found '+str(random_results)+' results for '+str(Query).replace('+',' ')+' near you:', dialogIdentifier="FoodMap"), mapsnippet]
                     self.sendRequestWithoutAnswer(view)
                else:
-                    self.say("I'm sorry but I did not find any results for "+str(Query)+"near you!")
+                    self.say("I'm sorry but I did not find any results for "+str(Query).replace('+',' ')+"near you!")
           else:
                self.say("I'm sorry but I did not find any results for "+str(Query)+"near you!")
           self.complete_request()
