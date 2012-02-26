@@ -17,7 +17,7 @@ from siriObjects.mapObjects import SiriMapItemSnippet,SiriLocation, SiriMapItem
 yelp_api_key = APIKeyForAPI("yelp")
  
 class food(Plugin):
-     @register("en-US", "(find nearest|find nearby|find closest|show closeset|show nearby|where is) (.*)")
+     @register("en-US", "(find nearest|find nearby|find closest|show closest|show nearby|where is) (.*)")
      def food(self, speech, language, regex):
           self.say('Searching...',' ')
           mapGetLocation = self.getCurrentLocation()
