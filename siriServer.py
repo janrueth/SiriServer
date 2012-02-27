@@ -529,7 +529,7 @@ PluginManager.load_plugins()
 x.info("Starting Server")
 server = SiriServer('', options.port)
 try:
-    asyncore.loop()
+    asyncore.loop(use_poll = True)
 except (asyncore.ExitNow, KeyboardInterrupt, SystemExit):
     x.info("Caught shutdown, closing server")
     asyncore.dispatcher.close(server)
