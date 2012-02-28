@@ -64,8 +64,7 @@ class HandleConnection(ssl_dispatcher):
         self.gotGoogleAnswer = False
         self.googleData = None
         self.lastRequestId = None
-        self.dictation = None
-        self.dbConnection = db.getConnection()
+        self.dictation = None   
         self.assistant = None
         self.sendLock = threading.Lock()
         self.current_running_plugin = None
@@ -318,7 +317,7 @@ class HandleConnection(ssl_dispatcher):
                     helper.speechId=str.upper(str(uuid.uuid4()))                     
                     noError = True
                     try:
-                        c = self.dbConnection.cursor()
+                        c = dbConnection.cursor()
                         c.execute("INSERT INTO `assistants` (assistantId,speechId,censorSpeech,timeZoneId,language,region,firstName,nickName,date_created) values (%s,%s,%s,%s,%s,%s,%s,%s,NOW())", (helper.assistantId, helper.speechId,"","","","","",""))                        
                     except mdb.Error, e: 
                         noError = False
@@ -355,7 +354,7 @@ class HandleConnection(ssl_dispatcher):
                         except KeyError:
                             self.assistant.nickName=''
                             
-                        c = self.dbConnection.cursor(mdb.cursors.DictCursor)          
+                        c = dbConnection.cursor(mdb.cursors.DictCursor)          
                         c.execute("UPDATE `assistants` set censorSpeech=%s,timeZoneId=%s,language=%s,region=%s,firstName=%s,nickName=%s  where assistantId = %s", (self.assistant.censorSpeech,self.assistant.timeZoneId, self.assistant.language,self.assistant.region,self.assistant.firstName,self.assistant.nickName,self.assistant.assistantId))
                         c.close()
                         
@@ -364,7 +363,7 @@ class HandleConnection(ssl_dispatcher):
                         self.send_plist({"class":"CommandFailed", "properties": {"reason":"Databse error! Assistant not found", "errorCode":2, "callbacks":[]}, "aceId": str(uuid.uuid4()), "refId": reqObject['aceId'], "group":"com.apple.ace.system"})
             
                 elif reqObject['class'] == 'LoadAssistant':
-                    c = self.dbConnection.cursor(mdb.cursors.DictCursor)
+                    c = dbConnection.cursor(mdb.cursors.DictCursor)
                     c.execute("SELECT * FROM `assistants` WHERE assistantId = %s", (reqObject['properties']['assistantId']))                    
                     result = c.fetchone()   
                     c.close()
@@ -374,7 +373,7 @@ class HandleConnection(ssl_dispatcher):
                         if result["censorSpeech"]=='' or result["timeZoneId"]=='' or result["language"]=='' or result["region"]=='' :
                             #destroy the buggy assistant
                             self.send_plist({"class": "AssistantNotFound", "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"}) 
-                            c = self.dbConnection.cursor()
+                            c = dbConnection.cursor()
                             c.execute("DELETE from `assistants` where assistantId = %s", (reqObject['properties']['assistantId']))                                             
                             c.close()
                         else:
@@ -392,7 +391,7 @@ class HandleConnection(ssl_dispatcher):
                             self.send_plist({"class": "AssistantLoaded", "properties": {"version": "20111216-32234-branches/telluride?cnxn=293552c2-8e11-4920-9131-5f5651ce244e", "requestSync":False, "dataAnchor":"removed"}, "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
                             
                 elif reqObject['class'] == 'DestroyAssistant':
-                    c = self.dbConnection.cursor()
+                    c = dbConnection.cursor()
                     c.execute("DELETE from `assistants` where assistantId = %s", (reqObject['properties']['assistantId']))
                     c.close()
                     self.send_plist({"class": "AssistantDestroyed", "properties": {"assistantId": reqObject['properties']['assistantId']}, "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
@@ -461,12 +460,15 @@ class SiriServer(asyncore.dispatcher):
         self.set_reuse_addr()
         self.bind((host, port))
         self.listen(5)
+        global dbConnection
+        dbConnection = db.getConnection()
         logging.getLogger("logger").info("Listening on port {0}".format(port))
         signal.signal(signal.SIGTERM, self.handler)
    
     def handler(self, signum, frame):
         if signum == signal.SIGTERM:
             x.info("Got SIGTERM, closing server")
+            dbConnection.close()
             self.close()
             exit (1)
 
@@ -532,5 +534,6 @@ try:
     asyncore.loop(use_poll = True)
 except (asyncore.ExitNow, KeyboardInterrupt, SystemExit):
     x.info("Caught shutdown, closing server")
+    dbConnection.close()
     asyncore.dispatcher.close(server)
     exit()
