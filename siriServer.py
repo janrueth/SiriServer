@@ -461,6 +461,7 @@ class SiriServer(asyncore.dispatcher):
         self.bind((host, port))
         self.listen(5)
         global dbConnection
+        #one connection to db
         dbConnection = db.getConnection()
         logging.getLogger("logger").info("Listening on port {0}".format(port))
         signal.signal(signal.SIGTERM, self.handler)
