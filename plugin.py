@@ -198,5 +198,5 @@ class Plugin(threading.Thread):
         elif self.assistant.firstName!='':
             self.user_name=self.assistant.firstName.decode("utf-8")
         else:
-            self.user_name='' 
+            self.user_name=u''
         return self.user_name

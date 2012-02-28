@@ -349,13 +349,13 @@ class HandleConnection(ssl_dispatcher):
                         self.assistant.region = objProperties['region']
                         #Record the user firstName and nickName                    
                         try:                        
-                            self.assistant.firstName=objProperties["meCards"][0]["properties"]["firstName"]
+                            self.assistant.firstName=objProperties["meCards"][0]["properties"]["firstName"].encode("utf-8")
                         except KeyError:
-                            self.assistant.firstName=''                        
+                            self.assistant.firstName=u''                        
                         try:                        
-                            self.assistant.nickName=objProperties["meCards"][0]["properties"]["nickName"]       
+                            self.assistant.nickName=objProperties["meCards"][0]["properties"]["nickName"].encode("utf-8")       
                         except KeyError:
-                            self.assistant.nickName=''
+                            self.assistant.nickName=u''
                             
                         c = dbConnection.cursor(mdb.cursors.DictCursor)          
                         c.execute("UPDATE `assistants` set censorSpeech=%s,timeZoneId=%s,language=%s,region=%s,firstName=%s,nickName=%s  where assistantId = %s", (self.assistant.censorSpeech,self.assistant.timeZoneId, self.assistant.language,self.assistant.region,self.assistant.firstName,self.assistant.nickName,self.assistant.assistantId))
