@@ -27,7 +27,7 @@ class yelpSearch(Plugin):
           Title = regex.group(regex.lastindex).strip()
           Query = urllib.quote_plus(str(Title.encode("utf-8")))
           random_results = random.randint(2,15)
-          yelpurl = "http://api.yelp.com/business_review_search?term={0}&lat={1}&long={2}&radius=10&limit={3}&ywsid={4}".format(str(Query),latitude,longitude,random_results,str(yelp_api_key))
+          yelpurl = "http://api.yelp.com/business_review_search?term={0}&lat={1}&long={2}&radius=10&limit=20&ywsid={3}".format(str(Query),latitude,longitude,str(yelp_api_key))
           try:
                jsonString = urllib2.urlopen(yelpurl, timeout=20).read()
           except:
@@ -47,12 +47,14 @@ class yelpSearch(Plugin):
                          lng = result['longitude']
                          distance = "{0:.2f}".format(result['distance'])
                          view = AddViews(self.refId, dialogPhase="Completion")
-                         yelp_results.append(SiriMapItem(name, Location(label=street,latitude=lat,longitude=lng, street=street)))
+                         if (len(yelp_results) <= random_results):
+                              yelp_results.append(SiriMapItem(name, Location(label=street,latitude=lat,longitude=lng, street=street)))
+                    count = min(len(response['businesses']),random_results)
                     mapsnippet = SiriMapItemSnippet(items=yelp_results)
-                    view.views = [AssistantUtteranceView(speakableText='I found '+str(random_results)+' results for '+str(Query).replace('+',' ')+' near you:', dialogIdentifier="yelpSearchMap"), mapsnippet]
+                    view.views = [AssistantUtteranceView(speakableText='I found '+str(count)+' results for '+str(Title)+' near you:', dialogIdentifier="yelpSearchMap"), mapsnippet]
                     self.sendRequestWithoutAnswer(view)
                else:
-                    self.say("I'm sorry but I did not find any results for "+str(Query).replace('+',' ')+"near you!")
+                    self.say("I'm sorry but I did not find any results for "+str(Title)+"near you!")
           else:
-               self.say("I'm sorry but I did not find any results for "+str(Query)+"near you!")
+               self.say("I'm sorry but I did not find any results for "+str(Title)+"near you!")
           self.complete_request()
