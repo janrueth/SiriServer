@@ -13,16 +13,16 @@ class smalltalk(Plugin):
         if language == 'de-DE':
             self.say("Du heißt {0}.".format(self.user_name()).decode("utf-8"))
         else:            
-            self.say("Your name is {0}. At least that's what you told me.".format(self.user_name()))
+            self.say("Your name is {0}. At least that's what you told me.".format(self.user_name()).decode("utf-8"))
         self.complete_request()   
       
     @register("de-DE", "(.*Fick.*)")
     @register("en-US", "(.*Fuck.*)")
     def st_fuck(self, speech, language):  
         if language == 'de-DE':
-            self.say("Das ist nicht gut {0}!".format(self.user_name()))
+            self.say("Das ist nicht gut {0}!".format(self.user_name()).decode("utf-8"))
         else:            
-            self.say("Mind your language {0}!".format(self.user_name()))
+            self.say("Mind your language {0}!".format(self.user_name()).decode("utf-8"))
         self.complete_request()   
         
         
@@ -30,9 +30,9 @@ class smalltalk(Plugin):
     @register("en-US", "(.*Hello.*)|(.*Hi.*Siri.*)")
     def st_hello(self, speech, language):  
         if language == 'de-DE':
-            self.say("Hallo {0}".format(self.user_name()))
+            self.say("Hallo {0}".format(self.user_name()).decode("utf-8"))
         else:            
-            self.say("Hello {0}".format(self.user_name()))
+            self.say("Hello {0}".format(self.user_name()).decode("utf-8"))
         self.complete_request()   
 
     @register("de-DE", "Hi")
@@ -40,11 +40,11 @@ class smalltalk(Plugin):
     @register("fr-FR", "Bonjour")
     def hi(self, speech, language):
         if language == 'de-DE':
-            self.say("Hi {0}".format(self.user_name()))
+            self.say("Hi {0}".format(self.user_name()).decode("utf-8"))
         elif language == 'fr-FR':
-            self.say("Bonjour {0}".format(self.user_name()))
+            self.say("Bonjour {0}".format(self.user_name()).decode("utf-8"))
         else:            
-            self.say("Hi there {0}".format(self.user_name()))
+            self.say("Hi there {0}".format(self.user_name()).decode("utf-8"))
         self.complete_request()
 
     @register("de-DE", ".*Dein Name.*")
