@@ -40,9 +40,8 @@ class yelpSearch(Plugin):
                     yelp_results = []
                     for result in response['businesses']:
                          distance = "{0:.2f}".format(result['distance'])
-                         review_count= result['review_count']
-                         rating = Rating(value=result['avg_rating'], providerId='yelp', count=review_count)
-                         details = Business(totalNumberOfReviews=review_count,name=result['name'],rating=rating)
+                         rating = Rating(value=result['avg_rating'], providerId='YELP', count=result['review_count'])
+                         details = Business(totalNumberOfReviews=result['review_count'],name=result['name'],rating=rating)
                          if (len(yelp_results) < random_results):
                               mapitem = MapItem(label=result['name'], street=result['address1'], stateCode=result['state_code'], postalCode=result['zip'],latitude=result['latitude'], longitude=result['longitude'])
                               mapitem.detail = details
