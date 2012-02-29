@@ -406,7 +406,17 @@ class HandleConnection(ssl_dispatcher):
                             
                         else:
                             self.assistant = result[0]
-                        self.send_plist({"class": "AssistantLoaded", "properties": {"version": "20111216-32234-branches/telluride?cnxn=293552c2-8e11-4920-9131-5f5651ce244e", "requestSync":False, "dataAnchor":"removed"}, "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
+                        if self.assistant.language=='' or self.assistant.language==None:
+                            c = dbConnection.cursor()
+                            if db.db_type == "mysql":
+                                c.execute("DELETE from `assistants` where assistantId = %s", (reqObject['properties']['assistantId']))
+                            else:
+                                c.execute("delete from assistants where assistantId = ?", (reqObject['properties']['assistantId'],))
+                           dbConnection.commit()
+                           c.close() 
+                           self.send_plist({"class": "AssistantNotFound", "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
+                        else:                            
+                            self.send_plist({"class": "AssistantLoaded", "properties": {"version": "20111216-32234-branches/telluride?cnxn=293552c2-8e11-4920-9131-5f5651ce244e", "requestSync":False, "dataAnchor":"removed"}, "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
                             
                 elif reqObject['class'] == 'DestroyAssistant':
                     c = dbConnection.cursor()
