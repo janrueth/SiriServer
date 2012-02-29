@@ -10,16 +10,34 @@ class smalltalk(Plugin):
     @register("en-US", "Good .*night.*")
     def st_night(self, speech, language):
         if language == 'en-US':
-            self.say("Good Night {0}. See you later".format(self.user_name()))
+            self.say("Good Night, {0}. See you later".format(self.user_name()))
         self.complete_request()
-     
+
+    @register("en-US", "Good .*morning.*")
+    def st_morning(self, speech, language):
+        if language == 'en-US':
+            self.say("Good Morning, {0}.".format(self.user_name()))
+        self.complete_request()
+
+    @register("en-US", "Good .*afternoon.*")
+    def st_afternoon(self, speech, language):
+        if language == 'en-US':
+            self.say("Good Afternoon, {0}.".format(self.user_name()))
+        self.complete_request()
+
+    @register("en-US", "Good .*evening.*")
+    def st_evening(self, speech, language):
+        if language == 'en-US':
+            self.say("Good Evening, {0}.".format(self.user_name()))
+        self.complete_request()
+
     @register("en-US", "(testing)|(test)")
     def st_test(self, speech, language):
         if language == 'en-US':
-            self.say("Mission Control, I read you loud and clear {0}".format(self.user_name()))
+            self.say("Mission Control, I read you loud and clear, {0}".format(self.user_name()))
         self.complete_request()
 
-    @register("en-US", "Okay")
+    @register("en-US", "(Okay)|(Ok)|(Okie)")
     def st_yes(self, speech, language):
         if language == 'en-US':
             self.say("Yep, everything's OK")
@@ -34,13 +52,13 @@ class smalltalk(Plugin):
     @register("en-US", "What's up")
     def st_whatups(self, speech, language):
         if language == 'en-US':
-            self.say("Everything is cool {0}".format(self.user_name()))
+            self.say("Everything is cool, {0}".format(self.user_name()))
         self.complete_request()
 
     @register("en-US", "What are you doing")
     def st_doing(self, speech, language):
         if language == 'en-US':
-            self.say("What am I doing? I'm talking with you {0}".format(self.user_name()))
+            self.say("What am I doing? I'm talking with you, {0}".format(self.user_name()))
         self.complete_request()
   
     @register("en-US", "Bye")
@@ -48,6 +66,13 @@ class smalltalk(Plugin):
         if language == 'en-US':
             self.say("OK, see you later..")
         self.complete_request() 
+
+    @register("en-US", "Thank you")
+    def st_thank_you(self, speech, language):
+        if language == 'en-US':
+            self.say("My pleasure. As always.")
+        self.complete_request()
+
     #thanks to LowKey 
      
     @register("de-DE", "(.*Mein name.*)")
