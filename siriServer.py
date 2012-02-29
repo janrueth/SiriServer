@@ -269,7 +269,7 @@ class HandleConnection(ssl_dispatcher):
                     encoder.encode(pcm)
                         
                 elif reqObject['class'] == 'StartCorrectedSpeechRequest':
-                    self.process_recognized_speech({u'hypotheses': [{'confidence': 1.0, 'utterance': str.lower(reqObject['properties']['utterance'])}]}, reqObject['aceId'], False)
+                    self.process_recognized_speech({u'hypotheses': [{'confidence': 1.0, 'utterance': unicode.lower(reqObject['properties']['utterance'])}]}, reqObject['aceId'], False)
             
                 elif ObjectIsCommand(reqObject, FinishSpeech):
                     self.logger.info("End of speech received")
@@ -347,9 +347,9 @@ class HandleConnection(ssl_dispatcher):
                         objProperties = reqObject['properties'] 
                         self.assistant.censorSpeech = objProperties['censorSpeech']
                         self.assistant.timeZoneId = objProperties['timeZoneId']
-                        self.assistant.language = objProperties['language']
-                        
+                        self.assistant.language = objProperties['language']                     
                         #fix if there is no language or a bug in siri, spire
+                        
                         if self.assistant.language=='':
                             self.assistant.language='en-US'
                             
@@ -386,7 +386,7 @@ class HandleConnection(ssl_dispatcher):
                         c = dbConnection.cursor()
                         c.execute("select assistant from assistants where assistantId = ?", (reqObject['properties']['assistantId'],))
                     dbConnection.commit()
-                    result = c.fetchone()   
+                    result = c.fetchone()
                     c.close()
                     if result == None:
                         self.send_plist({"class": "AssistantNotFound", "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
