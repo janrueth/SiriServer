@@ -39,7 +39,6 @@ class yelpSearch(Plugin):
                     response['businesses'] = sorted(response['businesses'], key=lambda business: float(business['distance']))
                     yelp_results = []
                     for result in response['businesses']:
-                         distance = "{0:.2f}".format(result['distance'])
                          rating = Rating(value=result['avg_rating'], providerId='YELP', count=result['review_count'])
                          details = Business(totalNumberOfReviews=result['review_count'],name=result['name'],rating=rating)
                          if (len(yelp_results) < random_results):

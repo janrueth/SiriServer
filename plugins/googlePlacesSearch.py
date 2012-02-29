@@ -39,7 +39,6 @@ class googlePlacesSearch(Plugin):
                if (response['status'] == 'OK') and (len(response['results'])):
                     googleplaces_results = []
                     for result in response['results']:
-                         distance = self.haversine_distance(result['geometry']['location']['lat'],result['geometry']['location']['lng'],latitude,longitude)
                          if "rating" in result:
                               avg_rating = result["rating"]
                          else:
@@ -63,19 +62,3 @@ class googlePlacesSearch(Plugin):
           else:
                self.say("I'm sorry but I did not find any results for "+str(Title)+" near you!")
           self.complete_request()
-
-     def haversine_distance(self, lat1, lon1, lat2, lon2):
-          RAD_PER_DEG = 0.017453293
-          Rkm = 6371
-          dlon = lon2-lon1
-          dlat = lat2-lat1
-          dlon_rad = dlon*RAD_PER_DEG
-          dlat_rad = dlat*RAD_PER_DEG
-          lat1_rad = lat1*RAD_PER_DEG
-          lon1_rad = lon1*RAD_PER_DEG
-          lat2_rad = lat2*RAD_PER_DEG
-          lon2_rad = lon2*RAD_PER_DEG
-        
-          a = (math.sin(dlat_rad/2))**2 + math.cos(lat1_rad) * math.cos(lat2_rad) * (math.sin(dlon_rad/2))**2
-          c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
-          return round(Rkm * c,2)
