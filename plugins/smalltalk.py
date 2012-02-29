@@ -101,9 +101,9 @@ class smalltalk(Plugin):
         if language == 'de-DE':
             self.say(u"Hallo {0}".format(self.user_name()))
         elif language == 'fr-FR':
-            self.say(u"Bonjour {0}".format(self.user_name()));
+            self.say(u"Bonjour {0}!".format(self.user_name()));
         else:
-            self.say(u"Hello {0}".format(self.user_name()))
+            self.say(u"Hello {0}!".format(self.user_name()))
         self.complete_request()
 
     @register("de-DE", ".*Dein Name.*")
