@@ -402,16 +402,17 @@ class HandleConnection(ssl_dispatcher):
                             self.assistant.region = result["region"]
                             #Load the user info
                             self.assistant.firstName=result["firstName"]                           
-                            self.assistant.nickName=result["nickName"]   
-                            
+                            self.assistant.nickName=result["nickName"] 
                         else:
                             self.assistant = result[0]
+                            
                         if self.assistant.language=='' or self.assistant.language==None:
                             c = dbConnection.cursor()
                             if db.db_type == "mysql":
                                 c.execute("DELETE from `assistants` where assistantId = %s", (reqObject['properties']['assistantId']))
                             else:
                                 c.execute("delete from assistants where assistantId = ?", (reqObject['properties']['assistantId'],))
+                                
                            dbConnection.commit()
                            c.close() 
                            self.send_plist({"class": "AssistantNotFound", "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
