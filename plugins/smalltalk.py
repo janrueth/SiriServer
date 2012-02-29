@@ -6,6 +6,49 @@ from plugin import *
 
 class smalltalk(Plugin):
      
+    #only english additions 
+    @register("en-US", "Good .*night.*")
+    def st_night(self, speech, language):
+        if language == 'en-US':
+            self.say("Good Night {0}. See you later".format(self.user_name()))
+        self.complete_request()
+     
+    @register("en-US", "(testing)|(test)")
+    def st_test(self, speech, language):
+        if language == 'en-US':
+            self.say("Mission Control, I read you loud and clear {0}".format(self.user_name()))
+        self.complete_request()
+
+    @register("en-US", "Okay")
+    def st_yes(self, speech, language):
+        if language == 'en-US':
+            self.say("Yep, everything's OK")
+        self.complete_request()
+
+    @register("en-US", "Really")
+    def st_really(self, speech, language):
+        if language == 'en-US':
+            self.say("I suppose so.")
+        self.complete_request()
+
+    @register("en-US", "What's up")
+    def st_whatups(self, speech, language):
+        if language == 'en-US':
+            self.say("Everything is cool {0}".format(self.user_name()))
+        self.complete_request()
+
+    @register("en-US", "What are you doing")
+    def st_doing(self, speech, language):
+        if language == 'en-US':
+            self.say("What am I doing? I'm talking with you {0}".format(self.user_name()))
+        self.complete_request()
+  
+    @register("en-US", "Bye")
+    def st_bye(self, speech, language):
+        if language == 'en-US':
+            self.say("OK, see you later..")
+        self.complete_request() 
+    #thanks to LowKey 
      
     @register("de-DE", "(.*Mein name.*)")
     @register("en-US", "(.*My name.*)")
@@ -17,7 +60,7 @@ class smalltalk(Plugin):
         self.complete_request()   
       
     @register("de-DE", "(.*Fick.*)")
-    @register("en-US", "(.*Fuck.*)")
+    @register("en-US", "(.*Fuck.*)|(.*Dumb.*)")
     def st_fuck(self, speech, language):  
         if language == 'de-DE':
             self.say(u"Das ist nicht gut {0}!".format(self.user_name()))
