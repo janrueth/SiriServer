@@ -7,7 +7,7 @@ import uuid
 #Declate your database sqlite or mysql
 #In Order to use sqlite please uncomment the sqlite line or just change the mysql name to sqlite
 #db_type = "sqlite"
-db_type = "sqlite"
+db_type = "mysql"
 
 __database__ = "database.sqlite3"
 
