@@ -48,20 +48,6 @@ The file SiriProtocol documents everything I (and others) found out about the pr
 Setup, Notes and Instructions
 -----------------------------
 
-**Install python mysql**
-
-* Please install Python-mysql module before proceding
-
-**Create the databse**
-
-* Connect to mysql 
-        mysql -u root -p
-
-* Create the database `googlesiri` 
-        CREATE DATABASE googlesiri;
-
-* Edit `db.py` to the passwords and user dataconfig your need
-
 **Installer**
 
 There is an experimental installer by [johanberglind](https://github.com/johanberglind) which does the steps described below, you may try it instead of the manual method.
@@ -97,6 +83,8 @@ Note: you can also install libspeex via MacPorts, but libflac is not available i
 
 As this project is coded with python you need a python interpreter (this is usually already installed).
 I work with python 2.6.6 and 2.7.2 and both work.
+
+* (Optional) if you want to switch to MySQL please edit the db.py file with your connection info
 
 You also need some python packages to make it work:
 
