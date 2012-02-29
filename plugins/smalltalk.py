@@ -128,7 +128,7 @@ class smalltalk(Plugin):
             rep = ["Je vais bien. Merci !", u"Je vais très bien. Merci !","Parfaitement bien !"]
             self.say(random.choice(rep));
         else:
-            self.say("Fine, thanks for asking!")
+            self.say("I'm fine, thanks for asking!")
         self.complete_request()
         
     @register("de-DE", u"(.*möchtest.*heiraten.*)|(.*willst.*heiraten.*)")
