@@ -68,7 +68,7 @@ class weatherPlugin(Plugin):
                     }
     
     @register("de-DE", "(.*Wetter.*)|(.*Vorhersage.*)")     
-    @register("en-US", "(.*Weather.*)|(.*forecast.*)")
+    @register("en-US", ".*(Weather|forecast|need.*umbrella|rain.*today|cold.*outside|hot.*outside|sunny.*outside.*).*")
     @register("fr-FR", u".*(Météo|prévision|Quel.*temps|(fais|fait|faire).*(chaud|froid)).*|j.*chaud.*|.*température.*")
     def weatherForecastLookUp(self, speech, language):
         speech = speech.replace(u".","")
