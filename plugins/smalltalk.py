@@ -593,10 +593,3 @@ class smalltalk(Plugin):
             self.say(u"Désolé, je devrais payer des royalties si j'en dis plus.")
         self.complete_request()
         
-    @register ("en-US", ".*Chuck.*norris.*joke.*")
-    def cn_joke(self, speech, language):
-	req=urllib.urlopen("http://api.icndb.com/jokes/random")
-	full_json=req.read()
-	full=json.loads(full_json)
-	self.say(full['value']['joke'])
-	self.complete_request()
