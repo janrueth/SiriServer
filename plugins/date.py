@@ -9,7 +9,7 @@ from plugin import *
 class talkToMe(Plugin):   
         
     @register("de-DE", ".*Dein.*Status.*")
-    @register("en-GB", ".*Your.*Status.*")
+    @register("en-US", ".*Your.*Status.*")
     def ttm_uptime_status(self, speech, language):
         uptime = os.popen("uptime").read()
         if language == 'de-DE':
@@ -22,7 +22,7 @@ class talkToMe(Plugin):
     
     
     @register("de-DE", "(Welcher Tag.*)|(Welches Datum.*)")
-    @register("en-GB", "(What Day.*)|(What.*Date.*)")
+    @register("en-US", "(What Day.*)|(What.*Date.*)")
     
     def ttm_say_date(self, speech, language):
         now = date.today()
