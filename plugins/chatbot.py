@@ -40,11 +40,12 @@ def askBOT(input):
         xmlData = xmlData.replace('&gt;', '>')
         xmlData = xmlData.replace('&amp;', '&')
         xmlData = xmlData.replace('<br>', ' ')
+        xmlData = xmlData.replace('Eve', 'Siri')
 	return xmlData
 
 def respond(self, input):
     if input == 'Stop':
-        self.say("Nice to chat with you, see u next time")
+        self.say("Nice to chat with you, see you next time {0}".format(self.user_name()))
         self.complete_request()
     else:
         answer = self.ask(askBOT(input))
