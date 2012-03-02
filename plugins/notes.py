@@ -47,14 +47,16 @@ class Create(ClientBoundCommand):
 
 class note(Plugin):
     localizations = {"noteDefaults": 
-                        {"searching":{"en-US": "Creating your note ..."}, 
-                         "result": {"en-US": "Here is your note:"},
-                         "nothing": {"en-US": "What should I note?"}}, 
+                        {"searching":{"en-US": "Creating your note ...","fr-FR": u"Création de votre note..."}, 
+                         "result": {"en-US": "Here is your note:","fr-FR": "Voici votre note :"},
+                         "nothing": {"en-US": "What should I note?","fr-FR": "Que dois-je noter ?"}}, 
                     "failure": {
-                                "en-US": "I cannot type your note right now."
+                                "en-US": "I cannot type your note right now.",
+                                "fr-FR": "Je ne peux pas écrire votre note maintenant."
                                 }
                     }
     @register("en-US", "(.*note [a-zA-Z0-9]+)|(.*create.*note [a-zA-Z0-9]+)|(.*write.*note [a-zA-Z0-9]+)")
+    @register("fr-FR", u"(.*créer une note [a-zA-Z0-9]+)|(.*note [a-zA-Z0-9]+)")
     def writeNote(self, speech, language):
         content_raw = re.match(".*note ([a-zA-Z0-9, ]+)$", speech, re.IGNORECASE)
         if content_raw == None:
@@ -75,6 +77,11 @@ class note(Plugin):
             if "that" in content_raw:
                 split = content_raw.split(' ')
                 if split[0] == "that":
+                    split.pop(0)
+                    content_raw = ' '.join(map(str, split))
+            if "que" in content_raw:
+                split = content_raw.split(' ')
+                if split[0] == "que":
                     split.pop(0)
                     content_raw = ' '.join(map(str, split))
             if "for" in content_raw:
@@ -98,5 +105,3 @@ class note(Plugin):
             view.views = [view1, view2]
             self.sendRequestWithoutAnswer(view)
         self.complete_request()
-
-    

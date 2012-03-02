@@ -84,6 +84,8 @@ Note: you can also install libspeex via MacPorts, but libflac is not available i
 As this project is coded with python you need a python interpreter (this is usually already installed).
 I work with python 2.6.6 and 2.7.2 and both work.
 
+* (Optional) if you want to switch to MySQL please edit the db.py file with your connection info
+
 You also need some python packages to make it work:
 
 	biplist

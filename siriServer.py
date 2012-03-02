@@ -26,7 +26,8 @@ import speex
 import flac
 import db
 from db import Assistant
-
+if db.db_type == "mysql":
+    import MySQLdb.cursors
 import PluginManager
 
 from siriObjects import speechObjects, baseObjects, uiObjects, systemObjects
@@ -39,9 +40,12 @@ from sslDispatcher import ssl_dispatcher
 
 import signal, os
 
+reload(sys)
+sys.setdefaultencoding( "utf-8" )
+
 class HandleConnection(ssl_dispatcher):
-    __not_recognized = {"de-DE": u"Entschuldigung, ich verstehe \"{0}\" nicht.", "en-US": u"Sorry I don't understand {0}"}
-    __websearch = {"de-DE": u"Websuche", "en-US": u"Websearch"}
+    __not_recognized =  {"de-DE": u"Entschuldigung, ich verstehe \"{0}\" nicht.", "en-US": u"Sorry I don't understand {0}", "fr-FR": u"Désolé je ne comprends pas ce que \"{0}\" veut dire."}
+    __websearch =  {"de-DE": u"Websuche", "en-US": u"Websearch", "fr-FR": u"Rechercher sur le Web"}
     def __init__(self, conn):
         asyncore.dispatcher_with_send.__init__(self, conn)
         
@@ -63,8 +67,7 @@ class HandleConnection(ssl_dispatcher):
         self.gotGoogleAnswer = False
         self.googleData = None
         self.lastRequestId = None
-        self.dictation = None
-        self.dbConnection = db.getConnection()
+        self.dictation = None   
         self.assistant = None
         self.sendLock = threading.Lock()
         self.current_running_plugin = None
@@ -166,7 +169,7 @@ class HandleConnection(ssl_dispatcher):
                 
                 if not dictation:
                     if self.current_running_plugin == None:
-                        plugin = PluginManager.getPluginForImmediateExecution(self.assistant.assistantId, best_match, self.assistant.language, (self.send_object, self.send_plist, self.assistant, self.current_location))
+                        plugin = PluginManager.getPluginForImmediateExecution(self.assistant.assistantId, best_match, self.assistant.language,(self.send_object, self.send_plist, self.assistant, self.current_location))
                         if plugin != None:
                             plugin.refId = requestId
                             plugin.connection = self
@@ -267,7 +270,7 @@ class HandleConnection(ssl_dispatcher):
                     encoder.encode(pcm)
                         
                 elif reqObject['class'] == 'StartCorrectedSpeechRequest':
-                    self.process_recognized_speech({u'hypotheses': [{'confidence': 1.0, 'utterance': str.lower(reqObject['properties']['utterance'])}]}, reqObject['aceId'], False)
+                    self.process_recognized_speech({u'hypotheses': [{'confidence': 1.0, 'utterance': unicode.lower(reqObject['properties']['utterance'])}]}, reqObject['aceId'], False)
             
                 elif ObjectIsCommand(reqObject, FinishSpeech):
                     self.logger.info("End of speech received")
@@ -312,51 +315,119 @@ class HandleConnection(ssl_dispatcher):
                     
                 elif reqObject['class'] == 'CreateAssistant':
                     #create a new assistant
-                    helper = Assistant()
-                    c = self.dbConnection.cursor()
-                    noError = True
+                    helper = Assistant() 
+                    helper.assistantId=str.upper(str(uuid.uuid4())) 
+                    helper.speechId=str.upper(str(uuid.uuid4()))                     
+                    c = dbConnection.cursor()
+                    noError = True 
+                    
                     try:
-                        c.execute("insert into assistants(assistantId, assistant) values (?,?)", (helper.assistantId, helper))
-                        self.dbConnection.commit()
+                        if db.db_type == "mysql":                        
+                            c.execute("INSERT INTO `assistants` (assistantId,speechId,censorSpeech,timeZoneId,language,region,firstName,nickName,date_created) values (%s,%s,%s,%s,%s,%s,%s,%s,NOW())", (helper.assistantId, helper.speechId,"","","","","",""))                        
+                        else:
+                            c.execute("insert into assistants(assistantId, assistant) values (?,?)", (helper.assistantId, helper))                            
+                        dbConnection.commit()                        
+                    except MySQLdb.Error, e: 
+                        noError = False
+                        print e
                     except sqlite3.Error, e: 
                         noError = False
+                        print e
                     c.close()
+                    
                     if noError:
                         self.assistant = helper
-                        self.send_plist({"class": "AssistantCreated", "properties": {"speechId": str(uuid.uuid4()), "assistantId": helper.assistantId}, "group":"com.apple.ace.system", "callbacks":[], "aceId": str(uuid.uuid4()), "refId": reqObject['aceId']})
+                        self.send_plist({"class": "AssistantCreated", "properties": {"speechId": helper.speechId, "assistantId": helper.assistantId}, "group":"com.apple.ace.system", "callbacks":[], "aceId": str(uuid.uuid4()), "refId": reqObject['aceId']})
                     else:
                         self.send_plist({"class":"CommandFailed", "properties": {"reason":"Database error", "errorCode":2, "callbacks":[]}, "aceId": str(uuid.uuid4()), "refId": reqObject['aceId'], "group":"com.apple.ace.system"})
             
                 elif reqObject['class'] == 'SetAssistantData':
                     # fill assistant 
-                    if self.assistant != None:
-                        c = self.dbConnection.cursor()
+                    if self.assistant != None:                    
+                        #Record assistant data
                         objProperties = reqObject['properties'] 
                         self.assistant.censorSpeech = objProperties['censorSpeech']
                         self.assistant.timeZoneId = objProperties['timeZoneId']
-                        self.assistant.language = objProperties['language']
+                        self.assistant.language = objProperties['language']                     
+                        #fix if there is no language or a bug in siri, spire
+                        
+                        if self.assistant.language=='':
+                            self.assistant.language='en-US'
+                            
                         self.assistant.region = objProperties['region']
-                        c.execute("update assistants set assistant = ? where assistantId = ?", (self.assistant, self.assistant.assistantId))
-                        self.dbConnection.commit()
+                        #Record the user firstName and nickName                    
+                        try:                        
+                            self.assistant.firstName=objProperties["meCards"][0]["properties"]["firstName"].encode("utf-8")
+                        except KeyError:
+                            self.assistant.firstName=u''                        
+                        try:                        
+                            self.assistant.nickName=objProperties["meCards"][0]["properties"]["nickName"].encode("utf-8")       
+                        except KeyError:
+                            self.assistant.nickName=u''
+                        
+                        c = dbConnection.cursor()
+                        
+                        if db.db_type == "mysql":
+                            c.execute("UPDATE `assistants` set censorSpeech=%s,timeZoneId=%s,language=%s,region=%s,firstName=%s,nickName=%s  where assistantId = %s", (self.assistant.censorSpeech,self.assistant.timeZoneId, self.assistant.language,self.assistant.region,self.assistant.firstName,self.assistant.nickName,self.assistant.assistantId))
+                        else:
+                            c.execute("update assistants set assistant = ? where assistantId = ?", (self.assistant, self.assistant.assistantId))
+                        
+                        dbConnection.commit()
                         c.close()
-
+                        
+                    else:
+                        #assistant not found lets send the command
+                        self.send_plist({"class":"CommandFailed", "properties": {"reason":"Error! Assistant not found", "errorCode":2, "callbacks":[]}, "aceId": str(uuid.uuid4()), "refId": reqObject['aceId'], "group":"com.apple.ace.system"})
             
                 elif reqObject['class'] == 'LoadAssistant':
-                    c = self.dbConnection.cursor()
-                    c.execute("select assistant from assistants where assistantId = ?", (reqObject['properties']['assistantId'],))
-                    self.dbConnection.commit()
+                    if db.db_type == "mysql":                    
+                        c = dbConnection.cursor(MySQLdb.cursors.DictCursor)
+                        c.execute("SELECT * FROM `assistants` WHERE assistantId = %s", (reqObject['properties']['assistantId']))
+                    else:
+                        c = dbConnection.cursor()
+                        c.execute("select assistant from assistants where assistantId = ?", (reqObject['properties']['assistantId'],))
+                    dbConnection.commit()
                     result = c.fetchone()
+                    c.close()
                     if result == None:
                         self.send_plist({"class": "AssistantNotFound", "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
-                    else:
-                        self.assistant = result[0]
-                        self.send_plist({"class": "AssistantLoaded", "properties": {"version": "20111216-32234-branches/telluride?cnxn=293552c2-8e11-4920-9131-5f5651ce244e", "requestSync":False, "dataAnchor":"removed"}, "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
-                    c.close()
-
+                    else:  
+                        if db.db_type == "mysql":       
+                            #Load the assistant Values
+                            self.assistant=Assistant()
+                            self.assistant.assistantId=result["assistantId"]                         
+                            self.assistant.speechId=result["speechId"]
+                            self.assistant.censorSpeech = result["censorSpeech"]
+                            self.assistant.timeZoneId = result["timeZoneId"]
+                            self.assistant.language = result["language"]
+                            self.assistant.region = result["region"]
+                            #Load the user info
+                            self.assistant.firstName=result["firstName"]                           
+                            self.assistant.nickName=result["nickName"] 
+                        else:
+                            self.assistant = result[0]
+                            
+                        if self.assistant.language=='' or self.assistant.language==None:
+                            c = dbConnection.cursor()
+                            if db.db_type == "mysql":
+                                c.execute("DELETE from `assistants` where assistantId = %s", (reqObject['properties']['assistantId']))
+                            else:
+                                c.execute("delete from assistants where assistantId = ?", (reqObject['properties']['assistantId'],))
+                                
+                            dbConnection.commit()
+                            c.close() 
+                            self.send_plist({"class":"CommandFailed", "properties": {"reason":"Database error Assistant not found or languare settings ", "errorCode":2, "callbacks":[]}, "aceId": str(uuid.uuid4()), "refId": reqObject['aceId'], "group":"com.apple.ace.system"})
+                        else:                            
+                            self.send_plist({"class": "AssistantLoaded", "properties": {"version": "20111216-32234-branches/telluride?cnxn=293552c2-8e11-4920-9131-5f5651ce244e", "requestSync":False, "dataAnchor":"removed"}, "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
+                            
                 elif reqObject['class'] == 'DestroyAssistant':
-                    c = self.dbConnection.cursor()
-                    c.execute("delete from assistants where assistantId = ?", (reqObject['properties']['assistantId'],))
-                    self.dbConnection.commit()
+                    c = dbConnection.cursor()
+                    if db.db_type == "mysql":
+                        c.execute("DELETE from `assistants` where assistantId = %s", (reqObject['properties']['assistantId']))
+                    else:
+                        c.execute("delete from assistants where assistantId = ?", (reqObject['properties']['assistantId'],))
+                        
+                    dbConnection.commit()
                     c.close()
                     self.send_plist({"class": "AssistantDestroyed", "properties": {"assistantId": reqObject['properties']['assistantId']}, "aceId":str(uuid.uuid4()), "refId":reqObject['aceId'], "group":"com.apple.ace.system"})
                 elif reqObject['class'] == 'StartRequest':
@@ -374,9 +445,18 @@ class HandleConnection(ssl_dispatcher):
             #print "expect: ", data+5,  " received: ", len(self.unzipped_input)
             return ((data + 5) < len(self.unzipped_input))
     
-    def read_next_object_from_unzipped(self):
-        cmd, data = struct.unpack('>BI', self.unzipped_input[:5])
-        
+    def read_next_object_from_unzipped(self):        
+        #here comes a critical error! Sometimes the packet is less than :5 lets fix that
+        #Had this problem in the ruby version when a device sent a chopped ping? 
+        #solution was to replace the unziped manually with some other ping, pong value
+        try:
+            cmd, data = struct.unpack('>BI', self.unzipped_input[:5])        
+        except:
+            self.logger.info("Run into critical!!!!")
+            cmd=3
+            data=3
+        self.logger.debug("CMD is {0}".format(cmd))
+        self.logger.debug("DATA is {0}".format(data))
         if cmd == 3: #ping
             self.ping = data
             self.logger.info("Received a Ping ({0})".format(data))
@@ -390,7 +470,7 @@ class HandleConnection(ssl_dispatcher):
         prefix = self.unzipped_input[:5]
         object_data = self.unzipped_input[5:object_size+5]
         self.unzipped_input = self.unzipped_input[object_size+5:]
-        return self.parse_object(object_data)
+        return self.parse_object(object_data)        
     
     def parse_object(self, object_data):
         #this is a binary plist file
@@ -424,14 +504,18 @@ class SiriServer(asyncore.dispatcher):
         self.set_reuse_addr()
         self.bind((host, port))
         self.listen(5)
+        global dbConnection
+        #one connection to db
+        dbConnection = db.getConnection()
         logging.getLogger("logger").info("Listening on port {0}".format(port))
         signal.signal(signal.SIGTERM, self.handler)
    
     def handler(self, signum, frame):
         if signum == signal.SIGTERM:
             x.info("Got SIGTERM, closing server")
+            dbConnection.close()
             self.close()
-    
+            exit (1)
 
     def handle_accept(self):
         pair = self.accept()
@@ -492,8 +576,10 @@ PluginManager.load_plugins()
 x.info("Starting Server")
 server = SiriServer('', options.port)
 try:
-    asyncore.loop()
+    asyncore.loop(use_poll = True)
 except (asyncore.ExitNow, KeyboardInterrupt, SystemExit):
     x.info("Caught shutdown, closing server")
+    dbConnection.close()
+    asyncore.dispatcher.close(server)    
     asyncore.dispatcher.close(server)
-    exit()
+    exit()    
