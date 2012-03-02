@@ -44,7 +44,7 @@ class smalltalk(Plugin):
         self.complete_request()
 
     @register("en-US", "(Okay)|(Ok)|(Okie)")
-    def st_yes(self, speech, language):
+    def st_ok(self, speech, language):
         if language == 'en-US':
             self.say("Yep, everything's OK")
         self.complete_request()
@@ -80,6 +80,26 @@ class smalltalk(Plugin):
         self.complete_request()
 
     #thanks to LowKey 
+
+    @register("en-US", "(Yes)|(Yea)|(Yeah)")
+    @register("fr-FR", "Oui")
+    @register("de-DE", "(Ja)|(jawohl)|(doch)")
+    def st_yes(self, speech, language):
+        if language == 'fr-FR':
+            self.say("J'accepte")
+        elif language == 'de-DE':
+            self.say("Ich stimme")
+        else:
+            self.say("I agree")
+        
+        self.complete_request() 
+    
+    @register("en-US", "(No)|(Nope)|(Not)")
+    @register("fr-FR", "Pas")
+    @register("de-DE", "(Nein)|(Nicht)|(Nichts)")
+    def st_no(self, speech, language):       
+        self.say("Ok.")        
+        self.complete_request()  
      
     @register("de-DE", "(.*Mein name.*)")
     @register("en-US", "(.*My name.*)")
@@ -592,4 +612,4 @@ class smalltalk(Plugin):
             self.say(u"J'aurais voulu être un artiste...")
             self.say(u"Désolé, je devrais payer des royalties si j'en dis plus.")
         self.complete_request()
-        
+     
