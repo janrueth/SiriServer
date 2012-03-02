@@ -444,27 +444,32 @@ class HandleConnection(ssl_dispatcher):
             #print "expect: ", data+5,  " received: ", len(self.unzipped_input)
             return ((data + 5) < len(self.unzipped_input))
     
-    def read_next_object_from_unzipped(self):
+    def read_next_object_from_unzipped(self):        
+        #here comes a critical error! Sometimes the packet is less than :5 lets fix that
+        #Had this problem in the ruby version when a device sent a chopped ping? 
+        #solution was to replace the unziped manually with some other ping, pong value
         try:
-            cmd, data = struct.unpack('>BI', self.unzipped_input[:5])
-        
-            if cmd == 3: #ping
-                self.ping = data
-                self.logger.info("Received a Ping ({0})".format(data))
-                self.logger.info("Returning a Pong ({0})".format(self.pong))
-                self.send_pong(self.pong)
-                self.pong += 1
-                self.unzipped_input = self.unzipped_input[5:]
-                return None
-
-            object_size = data
-            prefix = self.unzipped_input[:5]
-            object_data = self.unzipped_input[5:object_size+5]
-            self.unzipped_input = self.unzipped_input[object_size+5:]
-            return self.parse_object(object_data)
+            cmd, data = struct.unpack('>BI', self.unzipped_input[:5])        
         except:
-            self.logger.info("Error critical!")
+            self.logger.info("Run into critical!!!!")
+            cmd=3
+            data=3
+        self.logger.debug("CMD is {0}".format(cmd))
+        self.logger.debug("DATA is {0}".format(data))
+        if cmd == 3: #ping
+            self.ping = data
+            self.logger.info("Received a Ping ({0})".format(data))
+            self.logger.info("Returning a Pong ({0})".format(self.pong))
+            self.send_pong(self.pong)
+            self.pong += 1
+            self.unzipped_input = self.unzipped_input[5:]
             return None
+
+        object_size = data
+        prefix = self.unzipped_input[:5]
+        object_data = self.unzipped_input[5:object_size+5]
+        self.unzipped_input = self.unzipped_input[object_size+5:]
+        return self.parse_object(object_data)        
     
     def parse_object(self, object_data):
         #this is a binary plist file
