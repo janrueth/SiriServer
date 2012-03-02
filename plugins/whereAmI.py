@@ -19,7 +19,7 @@ geonames_user="test2"
 class whereAmI(Plugin):
     
     @register("de-DE", "(Wo bin ich.*)")    
-    @register("en-US", "(Where am I.*)")
+    @register("en-US", "(Where am I.*)|(What is my location.*)")
     @register("fr-FR", u'(Où suis-je.*)')
     def whereAmI(self, speech, language):
         mapGetLocation = self.getCurrentLocation()
