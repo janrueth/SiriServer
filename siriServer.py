@@ -26,7 +26,8 @@ import speex
 import flac
 import db
 from db import Assistant
-import MySQLdb.cursors
+if db.db_type == "mysql":
+    import MySQLdb.cursors
 import PluginManager
 
 from siriObjects import speechObjects, baseObjects, uiObjects, systemObjects
@@ -581,4 +582,4 @@ except (asyncore.ExitNow, KeyboardInterrupt, SystemExit):
     dbConnection.close()
     asyncore.dispatcher.close(server)    
     asyncore.dispatcher.close(server)
-    exit()
+    exit()    
