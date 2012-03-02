@@ -40,8 +40,8 @@ from sslDispatcher import ssl_dispatcher
 import signal, os
 
 class HandleConnection(ssl_dispatcher):
-    __not_recognized = {"de-DE": u"Entschuldigung, ich verstehe \"{0}\" nicht.", "en-US": u"Sorry I don't understand {0}"}
-    __websearch = {"de-DE": u"Websuche", "en-US": u"Websearch"}
+    __not_recognized = {"de-DE": u"Entschuldigung, ich verstehe \"{0}\" nicht.", "en-US": u"Sorry I don't understand {0}", "fr-FR": u"Désolé mais je ne comprends pas {0}"}
+    __websearch = {"de-DE": u"Websuche", "en-US": u"Websearch", "fr-FR": u"Recherche sur internet"}
     def __init__(self, conn):
         asyncore.dispatcher_with_send.__init__(self, conn)
         
@@ -267,6 +267,7 @@ class HandleConnection(ssl_dispatcher):
                     encoder.encode(pcm)
                         
                 elif reqObject['class'] == 'StartCorrectedSpeechRequest':
+                    
                     self.process_recognized_speech({u'hypotheses': [{'confidence': 1.0, 'utterance': str.lower(reqObject['properties']['utterance'])}]}, reqObject['aceId'], False)
             
                 elif ObjectIsCommand(reqObject, FinishSpeech):
@@ -379,8 +380,8 @@ class HandleConnection(ssl_dispatcher):
         
         if cmd == 3: #ping
             self.ping = data
-            self.logger.info("Received a Ping ({0})".format(data))
-            self.logger.info("Returning a Pong ({0})".format(self.pong))
+            self.logger.debug("Received a Ping ({0})".format(data))
+            self.logger.debug("Returning a Pong ({0})".format(self.pong))
             self.send_pong(self.pong)
             self.pong += 1
             self.unzipped_input = self.unzipped_input[5:]

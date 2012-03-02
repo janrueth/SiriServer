@@ -15,17 +15,10 @@ from siriObjects.uiObjects import AddViews, AssistantUtteranceView, OpenLink, Bu
 from siriObjects.systemObjects import GetRequestOrigin, SetRequestOrigin
 
 __criteria_key__ = "criterias"
-
-
-__error_responses__ = {"de-DE": "Es ist ein Fehler in der Verarbeitung ihrer Anfrage aufgetreten!", "en-US": "There was an error during the processing of your request!", "en-GB": "There was an error during the processing of your request!", "en-AU": "There was an error during the processing of your request!", "fr-FR": "Il y avait une erreur lors du traitement de votre demande!"}
-
-__error_location_help__ = {"de-DE": u"Ich weiß nicht wo du bist… Aber du kannst mir helfen es heraus zu finden…", "en-US": u"I don’t know where you are… But you can help me find out…", "en-GB": u"I don’t know where you are… But you can help me find out…", "en-AU": u"I don’t know where you are… But you can help me find out…", "fr-FR": u"Je ne sais pas où vous êtes ... Mais vous pouvez m'aider à en savoir plus sur ..."}
-
-__error_location_saysettings__ = {"de-DE": u"In den Ortungsdienst Einstellungen, schalte Ortungsdienst und Siri ein.", "en-US": u"In Location Services Settings, turn on both Location Services and Siri.", "en-GB": u"In Location Services Settings, turn on both Location Services and Siri.", "en-AU": u"In Location Services Settings, turn on both Location Services and Siri.", "fr-FR": u"Dans les paramètres de service de localisation, activez les services de localisation et Siri."}
-
-__error_location_settings__ = {"de-DE": u"Ortungsdienst Einstellungen", "en-US": u"Location Services Settings", "en-GB": u"Location Services Settings", "en-AU": u"Location Services Settings", "fr-FR": u"Services de localisation"}
-
-
+__error_responses__ = {"de-DE": "Es ist ein Fehler in der Verarbeitung ihrer Anfrage aufgetreten!", "en-US": "There was an error during the processing of your request!", "en-GB": "There was an error during the processing of your request!", "en-AU": "There was an error during the processing of your request!", "fr-FR": "Il y eu une erreur lors du traitement de votre demande!"}
+__error_location_help__ = {"de-DE": u"Ich weiß nicht wo du bist… Aber du kannst mir helfen es heraus zu finden…", "en-US": u"I don’t know where you are… But you can help me find out…", "en-GB": u"I don’t know where you are… But you can help me find out…", "en-AU": u"I don’t know where you are… But you can help me find out…", "fr-FR": u"Je ne sais pas où vous êtes... Mais vous pouvez m'aider à en savoir plus sur..."}
+__error_location_saysettings__ = {"de-DE": u"In den Ortungsdienst Einstellungen, schalte Ortungsdienst und Siri ein.", "en-US": u"In Location Services Settings, turn on both Location Services and Siri.", "en-GB": u"In Location Services Settings, turn on both Location Services and Siri.", "en-AU": u"In Location Services Settings, turn on both Location Services and Siri.", "fr-FR": u"Dans les réglages de Service de localisation, activez les services de localisation et Siri."}
+__error_location_settings__ = {"de-DE": u"Ortungsdienst Einstellungen", "en-US": u"Location Services Settings", "en-GB": u"Location Services Settings", "en-AU": u"Location Services Settings", "fr-FR": u"Service de localisation"}
 
 def register(lang, regex):
     def addInfosTo(func):

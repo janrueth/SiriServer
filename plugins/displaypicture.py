@@ -9,6 +9,8 @@
 #usage: say "display a picture of william shakespeare" 
 #(or anything else you want a picture of)
 
+# Must be before wwwsearch plugin
+
 import re
 import urllib2, urllib
 import json
@@ -23,16 +25,18 @@ class define(Plugin):
     
     @register("de-DE", "(zeig mir|zeige|zeig).*(bild|zeichnung) (vo. ein..|vo.|aus)* ([\w ]+)")
     @register("en-US", "(display|show me|show).*(picture|image|drawing|illustration) (of|an|a)* ([\w ]+)")
-    def defineword(self, speech, language, regex):
-        Title = regex.group(regex.lastindex)
+    @register("fr-FR", u"(montre|affiche|recherche|cherche|dessine)?.*(photos?|images?|dessins?|illustrations?) (une?|pour|de la|de l'|des|du|de|d'une?|d'|l')* ?([\w ]+)")
+    def displaypicture(self, speech, language, regex):
+        Title = regex.group(regex.lastindex).strip()
         Query = urllib.quote_plus(Title.encode("utf-8"))
         SearchURL = u'https://ajax.googleapis.com/ajax/services/search/images?v=1.0&imgsz=small|medium|large|xlarge&q=' + str(Query)
         try:
+    	    self.say("Je recherche une image pour "+Title+"...")
             jsonResponse = urllib2.urlopen(SearchURL).read()
             jsonDecoded = json.JSONDecoder().decode(jsonResponse)
             ImageURL = jsonDecoded['responseData']['results'][0]['unescapedUrl']
             view = AddViews(self.refId, dialogPhase="Completion")
-            ImageAnswer = AnswerObject(title=str(Title),lines=[AnswerObjectLine(image=ImageURL)])
+            ImageAnswer = AnswerObject(title=Title,lines=[AnswerObjectLine(image=ImageURL)])
             view1 = AnswerSnippet(answers=[ImageAnswer])
             view.views = [view1]
             self.sendRequestWithoutAnswer(view)

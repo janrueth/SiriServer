@@ -7,3 +7,5 @@
 *.cnf
 .DS_Store
 apiKeys.conf
+*~
+*.orig

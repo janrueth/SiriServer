@@ -47,51 +47,71 @@ class timerPlugin(Plugin):
     localizations = {
         'Timer': {
             'durationTooBig': {
-               'en-US': 'Sorry, I can only set timers up to 24 hours.'
+               'en-US': 'Sorry, I can only set timers up to 24 hours.',
+               'fr-FR': u'Désolé, je peux uniquement régler le minuteur pour 24 heures.'
             }, "settingTimer": {
-                "en-US": u"Setting the timer\u2026"
+                "en-US": u"Setting the timer\u2026",
+                "fr-FR": u"Démarrage du minuteur\u2026"
             }, 'showTheTimer': {
-                'en-US': u'Here\u2019s the timer:'
+                'en-US': u'Here\u2019s the timer:',
+                'fr-FR': u'Voici votre minuteur :'
             }, 'timerIsAlreadyPaused': {
-                'en-US': u'It\u2019s already paused.'
+                'en-US': u'It\u2019s already paused.',
+                'fr-FR': u'Il est déjà en pause.'
             }, "timerIsAlreadyRunning": {
-                "en-US": u"Your timer\u2019s already running:"
+                "en-US": u"Your timer\u2019s already running:",
+                "fr-FR": u"Votre minuteur est déjà en marche :"
             }, 'timerIsAlreadyStopped': {
-                'en-US': u'It\u2019s already stopped.'
+                'en-US': u'It\u2019s already stopped.',
+                'fr-FR': u'Votre minuteur est déjà arrêté.'
             }, 'timerWasPaused': {
-                'en-US': u'It\u2019s paused.'
+                'en-US': u'It\u2019s paused.',
+                'fr-FR': u'Il est arrêté.'
             }, 'timerWasReset': {
-                'en-US': u'I\u2019ve canceled the timer.'
+                'en-US': u'I\u2019ve canceled the timer.',
+                'fr-FR': u'J\'ai remis à zéro le minuteur.'
             }, 'timerWasResumed': {
-                'en-US': u'It\u2019s resumed.'
+                'en-US': u'It\u2019s resumed.',
+                'fr-FR': u'C\'est reparti.'
             }, "timerWasSet": {
-                "en-US": "Your timer is set for {0}."
+                "en-US": "Your timer is set for {0}.",
+                "fr-FR": "Votre minuteur est en marche pour {0}."
             }, "wontSetTimer": {
-                "en-US": "OK."
+                "en-US": "OK.",
+                "fr-FR": "OK."
             }
         }
     }
 
     res = {
         'articles': {
-            'en-US': 'a|an|the'
+            'en-US': 'a|an|the',
+            'fr-FR': u'un|une|le',
         }, 'pauseTimer': {
-            'en-US': '.*(pause|freeze|hold).*timer'
+            'en-US': '.*(pause|freeze|hold).*timer',
+            'fr-FR': u'.*(pause|pose|suspend|interromp).*minuteur'
         }, 'resetTimer': {
-            'en-US': '.*(cancel|reset|stop).*timer'
+            'en-US': '.*(cancel|reset|stop).*timer',
+            'fr-FR': u'.*(annule|reset|arret|arrêt|zero|zéro|stop).*minuteur'
         }, 'resumeTimer': {
-            'en-US': '.*(resume|thaw|continue).*timer'
+            'en-US': '.*(resume|thaw|continue).*timer',
+            'fr-FR': u'.*(reprend|continue|relance).*minuteur'
         }, 'setTimer': {
+            #'fr-FR': u'.*minuteur.*\s+([0-9/ ]*|un|une|le|la|pour|sur)\s+(secs?|secondes?|mins?|minutes?|hrs?|heures?)'
             # 'en-US': '.*timer[^0-9]*(((([0-9/ ]*|a|an|the)\s+(seconds?|secs?|minutes?|mins?|hours?|hrs?))\s*(and)?)+)'
-            'en-US': '.*timer[^0-9]*(?P<length>([0-9/ ]|seconds?|secs?|minutes?|mins?|hours?|hrs?|and|the|an|a){2,})'
+            'en-US': '.*timer[^0-9]*(?P<length>([0-9/ ]|seconds?|secs?|minutes?|mins?|hours?|hrs?|and|the|an|a){2,})',
+            'fr-FR': '.*minuteur[^0-9]*(?P<length>([0-9/ ]|secondes?|secs?|minutes?|mins?|heures?|hrs?|et){2,})'
         }, 'showTimer': {
-            'en-US': '.*(show|display|see).*timer'
+            'en-US': '.*(show|display|see).*timer',
+            'fr-FR': u'.*(montre|affiche|voir).*minuteur'
         }, 'timerLength': {
-            'en-US': '([0-9][0-9 /]*|an|a|the)\s+(seconds?|secs?|minutes?|mins?|hours?|hrs?)'
+            'en-US': '([0-9][0-9 /]*|an|a|the)\s+(seconds?|secs?|minutes?|mins?|hours?|hrs?)',
+            'fr-FR': '([0-9][0-9 /]*|un|une|le|la|pour|sur)\s+(secs?|secondes?|mins?|minutes?|hrs?|heures?)',
         }
     }
 
     @register("en-US", res['setTimer']['en-US'])
+    @register("fr-FR", res['setTimer']['fr-FR'])
     def setTimer(self, speech, language):
         m = re.match(timerPlugin.res['setTimer'][language], speech, re.IGNORECASE)
         timer_length = m.group('length')
@@ -156,6 +176,7 @@ class timerPlugin(Plugin):
         self.complete_request()
 
     @register("en-US", res['resetTimer']['en-US'])
+    @register("fr-FR", res['resetTimer']['fr-FR'])
     def resetTimer(self, speech, language):
         response = self.getResponseForRequest(TimerGet(self.refId))
         timer_properties = response['properties']['timer']['properties']
@@ -178,6 +199,7 @@ class timerPlugin(Plugin):
             self.complete_request()
 
     @register("en-US", res['resumeTimer']['en-US'])
+    @register("fr-FR", res['resumeTimer']['fr-FR'])
     def resumeTimer(self, speech, language):
         response = self.getResponseForRequest(TimerGet(self.refId))
         timer_properties = response['properties']['timer']['properties']
@@ -202,6 +224,7 @@ class timerPlugin(Plugin):
             self.complete_request()
 
     @register("en-US", res['pauseTimer']['en-US'])
+    @register("fr-FR", res['pauseTimer']['fr-FR'])
     def pauseTimer(self, speech, language):
         response = self.getResponseForRequest(TimerGet(self.refId))
         timer_properties = response['properties']['timer']['properties']
@@ -232,6 +255,7 @@ class timerPlugin(Plugin):
             self.complete_request()
 
     @register("en-US", res['showTimer']['en-US'])
+    @register("fr-FR", res['showTimer']['fr-FR'])
     def showTimer(self, speech, language):
         response = self.getResponseForRequest(TimerGet(self.refId))
         timer_properties = response['properties']['timer']['properties']
