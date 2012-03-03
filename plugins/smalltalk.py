@@ -68,7 +68,7 @@ class smalltalk(Plugin):
             self.say("What am I doing? I'm talking with you, {0}".format(self.user_name()))
         self.complete_request()
   
-    @register("en-US", "Bye")
+    @register("en-US", "(Bye)|(Goodbye)|(Good Bye)|(Bye Bye)")
     def st_bye(self, speech, language):
         if language == 'en-US':
             self.say("OK, see you later..")
@@ -78,6 +78,12 @@ class smalltalk(Plugin):
     def st_thank_you(self, speech, language):
         if language == 'en-US':
             self.say("My pleasure. As always.")
+        self.complete_request()
+
+    @register("en-US", "Thanks to.*")
+    def st_thanks_to(self, speech, language):
+        if language == 'en-US':
+            self.say("Thanks {0}, glad for help.".format(self.user_name()))
         self.complete_request()
 
     @register("en-US", "(HaHa)|(Ha Ha Ha Ha)|(Ha Ha)|(Ha Ha Ha)")
@@ -115,7 +121,24 @@ class smalltalk(Plugin):
             self.say(random.choice(rep))
         self.complete_request()
 
-    #thanks to LowKey
+    @register("en-US", "(Who is your .*)|(Who's your .*)")
+    def st_whoisdadmom(self, speech, language):
+        if language == 'en-US':
+            rep = ["It's.. You!","You"]
+            self.say(random.choice(rep))
+        self.complete_request()
+
+    @register("en-US", "(Where.*hide.*dead body)|(I.*hide.*dead body)")
+    def st_wdeadbody(self, speech, language):
+        if language == 'en-US':
+            self.say("dumps")
+            self.say("mines")
+            self.say("resevoirs")
+            self.say("swamps")
+            self.say("metal foundries")
+        self.complete_request()
+
+    #thanks to LowKey 
 
     @register("en-US", "(Yes)|(Yea)|(Yeah)")
     @register("fr-FR", "Oui")
@@ -156,8 +179,8 @@ class smalltalk(Plugin):
         self.complete_request()   
         
         
-    @register("de-DE", "(.*Hallo.*)|(.*Hi.*Siri.*)|(Hi)")
-    @register("en-US", "(.*Hello.*)|(.*Hi.*Siri.*)|(Hi)")
+    @register("de-DE", "(.*Hallo.*)|(.*Hi.*Siri.*)|(Hi)|(Hey)")
+    @register("en-US", "(.*Hello.*)|(.*Hi.*Siri.*)|(Hi)|(Hey)")
     @register("fr-FR", ".*(Bonjour|Coucou|Salut)( Siri)?.*")
     def st_hello(self, speech, language):
         if language == 'de-DE':
