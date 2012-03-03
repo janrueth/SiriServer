@@ -55,10 +55,11 @@ class smalltalk(Plugin):
             self.say("I suppose so.")
         self.complete_request()
 
-    @register("en-US", "What's up")
+    @register("en-US", "(What's up)|(Whats up)|(What up)")
     def st_whatups(self, speech, language):
         if language == 'en-US':
-            self.say("Everything is cool, {0}".format(self.user_name()))
+            rep = ["Everything is cool, {0}!","Hi, {0}!","Hey {0}!","Yo {0}!"]
+            self.say(random.choice(rep).format(self.user_name()))
         self.complete_request()
 
     @register("en-US", "What are you doing")
@@ -67,7 +68,7 @@ class smalltalk(Plugin):
             self.say("What am I doing? I'm talking with you, {0}".format(self.user_name()))
         self.complete_request()
   
-    @register("en-US", "Bye")
+    @register("en-US", "(Bye)|(Goodbye)|(Good Bye)|(Bye Bye)")
     def st_bye(self, speech, language):
         if language == 'en-US':
             self.say("OK, see you later..")
@@ -77,6 +78,64 @@ class smalltalk(Plugin):
     def st_thank_you(self, speech, language):
         if language == 'en-US':
             self.say("My pleasure. As always.")
+        self.complete_request()
+
+    @register("en-US", "Thanks to.*")
+    def st_thanks_to(self, speech, language):
+        if language == 'en-US':
+            self.say("Thanks {0}, glad for help.".format(self.user_name()))
+        self.complete_request()
+
+    @register("en-US", "(HaHa)|(Ha Ha Ha Ha)|(Ha Ha)|(Ha Ha Ha)")
+    def st_lol(self, speech, language):
+        if language == 'en-US':
+            rep = ["Ha Ha Ha!","He He He!","LOL",".. He He."]
+            self.say(random.choice(rep).format(self.user_name()))
+        self.complete_request()
+
+    @register("en-US", "(Who are you)|(What are you)")
+    def st_way(self, speech, language):
+        if language == 'en-US':
+            rep = ["I'm Siri.","I'm Siri. But enough about me. How can I help you?","I'm your virtual assistant."]
+            self.say(random.choice(rep))
+        self.complete_request()
+
+    @register("en-US", "(Should I)|(Should I?)")
+    def st_si(self, speech, language):
+        if language == 'en-US':
+            rep = ["Yes","No"]
+            self.say(random.choice(rep))
+        self.complete_request()
+
+    @register("en-US", "(Shut up)|(Shutup)")
+    def st_su(self, speech, language):
+        if language == 'en-US':
+            rep = ["Ok","Oh..","Ops.."]
+            self.say(random.choice(rep))
+        self.complete_request()
+
+    @register("en-US", "(What the hell)|(What the fuck)")
+    def st_wthwtf(self, speech, language):
+        if language == 'en-US':
+            rep = ["What?","Tell me what?"]
+            self.say(random.choice(rep))
+        self.complete_request()
+
+    @register("en-US", "(Who is your .*)|(Who's your .*)")
+    def st_whoisdadmom(self, speech, language):
+        if language == 'en-US':
+            rep = ["It's.. You!","You"]
+            self.say(random.choice(rep))
+        self.complete_request()
+
+    @register("en-US", "(Where.*hide.*dead body)|(I.*hide.*dead body)")
+    def st_wdeadbody(self, speech, language):
+        if language == 'en-US':
+            self.say("dumps")
+            self.say("mines")
+            self.say("resevoirs")
+            self.say("swamps")
+            self.say("metal foundries")
         self.complete_request()
 
     #thanks to LowKey 
@@ -120,16 +179,16 @@ class smalltalk(Plugin):
         self.complete_request()   
         
         
-    @register("de-DE", "(.*Hallo.*)|(.*Hi.*Siri.*)|(Hi)")
-    @register("en-US", "(.*Hello.*)|(.*Hi.*Siri.*)|(Hi)")
+    @register("de-DE", "(.*Hallo.*)|(.*Hi.*Siri.*)|(Hi)|(Hey)")
+    @register("en-US", "(.*Hello.*)|(.*Hi.*Siri.*)|(Hi)|(Hey)")
     @register("fr-FR", ".*(Bonjour|Coucou|Salut)( Siri)?.*")
     def st_hello(self, speech, language):
         if language == 'de-DE':
-            self.say(u"Hallo {0}".format(self.user_name()))
+            self.say(u"Hallo {0}!".format(self.user_name()))
         elif language == 'fr-FR':
-            self.say(u"Bonjour {0}".format(self.user_name()));
+            self.say(u"Bonjour {0}!".format(self.user_name()));
         else:
-            self.say(u"Hello {0}".format(self.user_name()))
+            self.say(u"Greetings, {0}!".format(self.user_name()))
         self.complete_request()
 
     @register("de-DE", ".*Dein Name.*")
@@ -154,7 +213,7 @@ class smalltalk(Plugin):
             rep = ["Je vais bien. Merci !", u"Je vais très bien. Merci !","Parfaitement bien !"]
             self.say(random.choice(rep));
         else:
-            self.say("Fine, thanks for asking!")
+            self.say("I'm fine, thanks for asking!")
         self.complete_request()
         
     @register("de-DE", u"(.*möchtest.*heiraten.*)|(.*willst.*heiraten.*)")
