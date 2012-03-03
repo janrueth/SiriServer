@@ -26,6 +26,7 @@ import speex
 import flac
 import db
 from db import Assistant
+
 if db.db_type == "mysql":
     import MySQLdb.cursors
 import PluginManager
@@ -352,8 +353,7 @@ class HandleConnection(ssl_dispatcher):
                         #fix if there is no language or a bug in siri, spire
                         
                         if self.assistant.language=='':
-                            self.assistant.language='en-US'
-                            
+                            self.assistant.language='en-US'                         
                         self.assistant.region = objProperties['region']
                         #Record the user firstName and nickName                    
                         try:                        
@@ -582,4 +582,6 @@ except (asyncore.ExitNow, KeyboardInterrupt, SystemExit):
     dbConnection.close()
     asyncore.dispatcher.close(server)    
     asyncore.dispatcher.close(server)
+    # A little test
+    asyncore.close_all() 
     exit()    
