@@ -580,8 +580,10 @@ try:
 except (asyncore.ExitNow, KeyboardInterrupt, SystemExit):
     x.info("Caught shutdown, closing server")
     dbConnection.close()
+    x.info("Closed connection to DataBase")
+    asyncore.close_all() 
+    x.info("Closed all active connections")
     asyncore.dispatcher.close(server)    
     asyncore.dispatcher.close(server)
-    # A little test
-    asyncore.close_all() 
+    x.info("All done bye bye...")
     exit()    
