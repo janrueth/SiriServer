@@ -3,6 +3,12 @@
 #by Joh Gerna
 
 from plugin import *
+import random
+import re
+import urllib2, urllib, uuid
+import json
+from urllib2 import urlopen
+from xml.dom import minidom
 
 class smalltalk(Plugin):
      
@@ -38,7 +44,7 @@ class smalltalk(Plugin):
         self.complete_request()
 
     @register("en-US", "(Okay)|(Ok)|(Okie)")
-    def st_yes(self, speech, language):
+    def st_ok(self, speech, language):
         if language == 'en-US':
             self.say("Yep, everything's OK")
         self.complete_request()
@@ -52,7 +58,8 @@ class smalltalk(Plugin):
     @register("en-US", "What's up")
     def st_whatups(self, speech, language):
         if language == 'en-US':
-            self.say("Everything is cool, {0}".format(self.user_name()))
+            rep = ["Everything is cool, {0}!","Hi, {0}!","Hey {0}!","Yo {0}!"]
+            self.say(random.choice(rep).format(self.user_name()))
         self.complete_request()
 
     @register("en-US", "What are you doing")
@@ -74,6 +81,26 @@ class smalltalk(Plugin):
         self.complete_request()
 
     #thanks to LowKey 
+
+    @register("en-US", "(Yes)|(Yea)|(Yeah)")
+    @register("fr-FR", "Oui")
+    @register("de-DE", "(Ja)|(jawohl)|(doch)")
+    def st_yes(self, speech, language):
+        if language == 'fr-FR':
+            self.say("J'accepte")
+        elif language == 'de-DE':
+            self.say("Ich stimme")
+        else:
+            self.say("I agree")
+        
+        self.complete_request() 
+    
+    @register("en-US", "(No)|(Nope)|(Not)")
+    @register("fr-FR", "Pas")
+    @register("de-DE", "(Nein)|(Nicht)|(Nichts)")
+    def st_no(self, speech, language):       
+        self.say("Ok.")        
+        self.complete_request()  
      
     @register("de-DE", "(.*Mein name.*)")
     @register("en-US", "(.*My name.*)")
@@ -99,11 +126,11 @@ class smalltalk(Plugin):
     @register("fr-FR", ".*(Bonjour|Coucou|Salut)( Siri)?.*")
     def st_hello(self, speech, language):
         if language == 'de-DE':
-            self.say(u"Hallo {0}".format(self.user_name()))
+            self.say(u"Hallo {0}!".format(self.user_name()))
         elif language == 'fr-FR':
             self.say(u"Bonjour {0}!".format(self.user_name()));
         else:
-            self.say(u"Hello {0}!".format(self.user_name()))
+            self.say(u"Greetings, {0}!".format(self.user_name()))
         self.complete_request()
 
     @register("de-DE", ".*Dein Name.*")
