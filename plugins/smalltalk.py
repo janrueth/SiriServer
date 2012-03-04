@@ -13,6 +13,13 @@ from xml.dom import minidom
 class smalltalk(Plugin):
      
     #only english additions 
+    @register("en-US", ".*love .*me.*")
+    def st_love_me(self, speech, language):
+        if language == 'en-US':            
+            rep = ["I am not capable of love, {0}".format(self.user_name())]
+            self.say(random.choice(rep))
+        self.complete_request()
+    
     @register("en-US", "Good .*night.*")
     def st_night(self, speech, language):
         if language == 'en-US':
