@@ -5,7 +5,7 @@ import cPickle,base64
 import uuid 
 
 #Declate your database sqlite or mysql
-#In Order to use sqlite please uncomment the sqlite line or just change the mysql name to sqlite
+#In Order to use mysql please uncomment the mysql line and comment the sqlite line or just change the sqlite name to mysql
 #db_type = "mysql"
 db_type = "sqlite"
 
