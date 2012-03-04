@@ -41,7 +41,7 @@ def askBOT(input):
             xmlData = xmlData.replace('&gt;', '>')
             xmlData = xmlData.replace('&amp;', '&')
             xmlData = xmlData.replace('<br>', ' ')
-            xmlData = xmlData.replace('Eve', 'Siri')
+            xmlData = xmlData.replace('Eve.', 'Siri.')
             return xmlData
         except:
             return 'Sorry can you say that again, please ?'
@@ -57,7 +57,7 @@ def respond(self, input):
                               
 class chatBOT(Plugin):
 
-    @register("en-US", "Let's chat")
+    @register("en-US", "(Let's chat)|(Let's talk)")
     def BOT_Message(self, speech, language):
         if language == 'en-US':
             answer = self.ask(u"Ok, Let's chat")
