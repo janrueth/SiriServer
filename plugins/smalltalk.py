@@ -100,7 +100,7 @@ class smalltalk(Plugin):
             self.say(random.choice(rep).format(self.user_name()))
         self.complete_request()
 
-    @register("en-US", "(Who are you)|(What are you)")
+    @register("en-US", "Who are you")
     def st_way(self, speech, language):
         if language == 'en-US':
             rep = ["I'm Siri.","I'm Siri. But enough about me. How can I help you?","I'm your virtual assistant."]
