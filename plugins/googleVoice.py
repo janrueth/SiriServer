@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # siriServer GoogleVoice Plugin_NODB 1.0 
 #Author: SNXRaven (Jonathon Nickols)
+# This requires: http://code.google.com/p/pygooglevoice/ is installed
 
 from plugin import *
 from googlevoice import Voice
