@@ -9,7 +9,7 @@ from googlevoice import Voice
 from googlevoice.util import input
 import re
 
-class raven_test(Plugin):
+class raven_gvsms(Plugin):
 
 
     @register("en-US", "(Send.*text.*message to [a-zA-Z0-9]+)")
