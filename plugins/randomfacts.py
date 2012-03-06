@@ -12,10 +12,14 @@ import os, random
 
 
 class randomfacts(Plugin):
-
+    
+    @register("en-GB","(.*random fact.*)|(.*something *.awesome.*)")
     @register("en-US","(.*random fact.*)|(.*something *.awesome.*)")
     def st_catfact(self, speech, language):
         if language == 'en-US':
+            filename = "./plugins/randomfacts.txt"
+            file = open(filename, 'r')
+        if language == 'en-GB':
             filename = "./plugins/randomfacts.txt"
             file = open(filename, 'r')
 
