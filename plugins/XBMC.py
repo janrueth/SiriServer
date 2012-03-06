@@ -54,7 +54,7 @@ class XBMC(Plugin):
     global xbmc
     xbmc = XBMC_object()
             
-    @register("en-US", "(xbmc)|(xbmc.* [a-z]+)")
+    @register("en-GB", "(xbmc)|(xbmc.* [a-z]+)")
     def test2(self, speech, language):
         global xbmc
         if speech.lower() == 'xbmc':
