@@ -70,6 +70,6 @@ class googlePlacesSearch(Plugin):
           else:
                if language == "fr-FR":
                        self.say("Je suis désolé, je n'ai pas trouvé de résultats pour "+str(Title)+" près de vous!")
-                    else:
+               else:
                         self.say("I'm sorry but I did not find any results for "+str(Title)+" near you!")
           self.complete_request()
