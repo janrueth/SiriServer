@@ -65,31 +65,36 @@ numberTypesLocalized= {
 namesToNumberTypes = {
 'de-DE': {'mobile': "_$!<Mobile>!$_", 'handy': "_$!<Mobile>!$_", 'zuhause': "_$!<Home>!$_", 'privat': "_$!<Home>!$_", 'arbeit': "_$!<Work>!$_"},
 'fr-FR': {'mobile': "_$!<Mobile>!$_", 'gsm': "_$!<Mobile>!$_", 'portable': "_$!<Mobile>!$_", 'domicile': "_$!<Home>!$_", 'maison': "_$!<Home>!$_", 'travail': "_$!<Work>!$_", 'boulot': "_$!<Work>!$_"},
-'en-US': {'work': "_$!<Work>!$_",'home': "_$!<Home>!$_", 'mobile': "_$!<Mobile>!$_"}
+'en-US': {'work': "_$!<Work>!$_",'home': "_$!<Home>!$_", 'mobile': "_$!<Mobile>!$_"},
+'en-GB': {'work': "_$!<Work>!$_",'home': "_$!<Home>!$_", 'mobile': "_$!<Mobile>!$_"}
 }
 
 speakableDemitter={
 'en-US': u", or ",
 'de-DE': u', oder ',
 'fr-FR': u', ou ',
+'en-GB': u", or ",
 }
 
 errorNumberTypes= {
 'de-DE': u"Ich habe dich nicht verstanden, versuch es bitte noch einmal.",
 'en-US': u"Sorry, I did not understand, please try again.",
-'fr-FR': u"Désolé, je n'ai pas compris, veuillez réessayer."
+'fr-FR': u"Désolé, je n'ai pas compris, veuillez réessayer.",
+'en-GB': u"Sorry, I did not understand, please try again."
 }
 
 errorNumberNotPresent= {
 'de-DE': u"Ich habe diese {0} von {1} nicht, aber eine andere.",
 'en-US': u"Sorry, I don't have a {0} number from {1}, but another.",
-'fr-FR': u"Désolé, je n'ai pas un numéro de {0} pour {1}, mais un autre."
+'fr-FR': u"Désolé, je n'ai pas un numéro de {0} pour {1}, mais un autre.",
+'en-GB': u"Sorry, I don't have a {0} number from {1}, but another."
 }
 
 InterruptCall= {
     'en-US': u".*(stop|cancel|none).*",
     'de-DE': u".*(stop|cancel|none).*",
-    'fr-FR': u".*(veu(t|x) plus|veu(x|t) plus|arr(ê|e)te|stop|annule|aucun|abandon).*"
+    'fr-FR': u".*(veu(t|x) plus|veu(x|t) plus|arr(ê|e)te|stop|annule|aucun|abandon).*",
+    'en-GB': u".*(stop|cancel|none).*"
 }
 
 InterruptCallResponse= {
@@ -138,7 +143,21 @@ errorOnCallResponse={'en-US':
                       {'dialogIdentifier': u"PhoneCall#fatalResponse",
                        'text': u"Désolé, je ne peux pas passer cet appel.",
                        'code': -1}
-                       ]
+                       ],
+                      'en-GB':
+                      [ 
+                      {'dialogIdentifier':u"PhoneCall#airplaneMode",
+                       'text': u"Your phone is in airplane mode.",
+                       'code': 1201},
+                      {'dialogIdentifier': u"PhoneCall#networkUnavailable",
+                       'text': u"Uh, I can't seem to find a good connection. Please try your phone call again when you have cellular access.",
+                       'code': 1202},
+                      {'dialogIdentifier': u"PhoneCall#invalidNumber",
+                       'text': u"Sorry, I can't call this number.",
+                       'code': 1203},
+                      {'dialogIdentifier': u"PhoneCall#fatalResponse",
+                       'text': u"Oh oh, I can't make your phone call.",
+                       'code': -1}],    
 }
 
 class phonecallPlugin(Plugin):
@@ -257,6 +276,7 @@ class phonecallPlugin(Plugin):
             lst.items.append(item)
         return root
     
+    @register("en-GB", "(make a )?call (to )?(?P<name>[\w ]+).*(?P<type>work|home|mobile|main|iPhone|pager)?")
     @register("de-DE", "ruf. (?P<name>[\w ]+).*(?P<type>arbeit|zuhause|privat|mobil|handy.*|iPhone.*|pager)? an")
     @register("en-US", "(make a )?call (to )?(?P<name>[\w ]+).*(?P<type>work|home|mobile|main|iPhone|pager)?")
     @register("fr-FR", u"(fai(s|t) un )?(appel|appelle|appeler?) (à )?(?P<name>[\w ]+).*(?P<type>travail|maison|mobile|gsm|iPhone|principal|biper)?")
