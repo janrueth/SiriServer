@@ -4,6 +4,9 @@ Siri Server
 IMPORTANT
 ---------
 
+This repository is discontinued, please visit the (SiriServerCore)[https://github.com/Eichhoernchen/SiriServerCore] repository for an up to date version of the server
+
+
 If you have problems with the server in setup or something else, first read this file to the end and if you have still problems visit: [SiriServer Board](http://hack.silentspark.net/phpbb/index.php)
 Please do NOT post installation problems or other non-code related stuff in the github issues section
 
