@@ -36,7 +36,7 @@ class talkToMe(Plugin):
             result=now.strftime("Heute ist %A, der %d.%m.%Y (Kalenderwoche: %W)")
             self.say(result)
         elif language == 'fr-FR':
-            locale.setlocale(locale.LC_ALL, 'fr_FR')
+            locale.setlocale(locale.LC_ALL, 'fr_FR.utf8')
             result=now.strftime("Il est %A, et nous sommes le %d.%m.%Y (Semaine: %W)")
             self.say(result)
         else:
