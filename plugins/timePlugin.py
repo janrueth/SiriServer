@@ -16,21 +16,22 @@ geonames_user="test2"
 class timePlugin(Plugin):
     
     localizations = {"currentTime": 
-                        {"search":{"de-DE": "Es wird gesucht ...", "en-US": "Looking up ...", "fr-FR": u"Je cherche ..."}, 
-                         "currentTime": {"de-DE": "Es ist @{fn#currentTime}", "en-US": "It is @{fn#currentTime}", "fr-FR": u"Il est @{fn#currentTime}"}}, 
+                        {"search":{"de-DE": "Es wird gesucht ...", "en-US": "Looking up ...", "fr-FR": u"Je cherche ...", "en-GB": "Looking up ..."}, 
+                         "currentTime": {"de-DE": "Es ist @{fn#currentTime}", "en-US": "It is @{fn#currentTime}", "fr-FR": u"Il est @{fn#currentTime}", "en-GB": "It is @{fn#currentTime}"}}, 
                      "currentTimeIn": 
-                        {"search":{"de-DE": "Es wird gesucht ...", "en-US": "Looking up ...", "fr-FR": "Je cherche ..."}, 
+                        {"search":{"de-DE": "Es wird gesucht ...", "en-US": "Looking up ...", "fr-FR": "Je cherche ...", "en-GB": "Looking up ..."}, 
                          "currentTimeIn": 
                                 {
-                                "tts": {"de-DE": u"Die Uhrzeit in {0},{1} ist @{{fn#currentTimeIn#{2}}}:", "en-US": "The time in {0},{1} is @{{fn#currentTimeIn#{2}}}:", "fr-FR": u"Il est  @{{fn#currentTimeIn#{2}}} à {0}, {1}"},
-                                "text": {"de-DE": u"Die Uhrzeit in {0}, {1} ist @{{fn#currentTimeIn#{2}}}:", "en-US": "The time in {0}, {1} is @{{fn#currentTimeIn#{2}}}:", "fr-FR": u"Il est  @{{fn#currentTimeIn#{2}}} à {0}, {1}"}
+                                "tts": {"de-DE": u"Die Uhrzeit in {0},{1} ist @{{fn#currentTimeIn#{2}}}:", "en-US": "The time in {0},{1} is @{{fn#currentTimeIn#{2}}}:", "fr-FR": u"Il est  @{{fn#currentTimeIn#{2}}} à {0}, {1}", "en-GB": "The time in {0},{1} is @{{fn#currentTimeIn#{2}}}:"},
+                                "text": {"de-DE": u"Die Uhrzeit in {0}, {1} ist @{{fn#currentTimeIn#{2}}}:", "en-US": "The time in {0}, {1} is @{{fn#currentTimeIn#{2}}}:", "fr-FR": u"Il est  @{{fn#currentTimeIn#{2}}} à {0}, {1}", "en-GB": "The time in {0}, {1} is @{{fn#currentTimeIn#{2}}}:"}
                                 }
                         },
                     "failure": {
-                                "de-DE": "Ich kann dir die Uhr gerade nicht anzeigen!", "en-US": "I cannot show you the clock right now", "fr-FR": u"Désolé, j'ai perdu ma montre."
+                                "de-DE": "Ich kann dir die Uhr gerade nicht anzeigen!", "en-US": "I cannot show you the clock right now", "fr-FR": u"Désolé, j'ai perdu ma montre.", "en-GB": "I cannot show you the clock right now"
                                 }
                     }
-
+    
+    @register("en-GB", "(What.*time.*)|(.*current time.*)")
     @register("de-DE", "(Wie ?viel Uhr.*)|(.*Uhrzeit.*)")     
     @register("en-US", "(What.*time.*)|(.*current time.*)")
     @register("fr-FR", "(.*Quel.*heure.*)|(.*heure actuelle.*)")
@@ -50,6 +51,7 @@ class timePlugin(Plugin):
         self.sendRequestWithoutAnswer(view)
         self.complete_request()
     
+    @register("en-GB", "(What.*time.*in ([\w ]+))|(.*current time.*in ([\w ]+))")
     @register("de-DE", "(Wieviel Uhr.*in ([\w ]+))|(Uhrzeit.*in ([\w ]+))")
     @register("en-US", "(What.*time.*in ([\w ]+))|(.*current time.*in ([\w ]+))")
     @register("fr-FR", u"(Quel.*heure.*(à|a|au|en) ([\w ]+))|(.*heure actuelle.*(à|a|en) ([\w ]+))")
