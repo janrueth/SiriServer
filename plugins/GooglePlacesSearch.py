@@ -21,8 +21,13 @@ googleplaces_api_key = APIKeyForAPI("google")
 class googlePlacesSearch(Plugin):
      @register("en-US", "(find|show|where).* (nearest|nearby|closest) (.*)")
      @register("en-GB", "(find|show|where).* (nearest|nearby|closest) (.*)")
+     @register("fr-FR", "(trouves|trouve|cherche|où).* (près|proche) (.*)")
      def googleplaces_search(self, speech, language, regex):
-          self.say('Searching...',' ')
+          if language == "fr-FR":
+             self.say('Je recherche...',' ')
+          else:
+              self.say('Searching...',' ')
+          
           mapGetLocation = self.getCurrentLocation()
           latitude= mapGetLocation.latitude
           longitude= mapGetLocation.longitude
@@ -58,7 +63,13 @@ class googlePlacesSearch(Plugin):
                     view.views = [AssistantUtteranceView(speakableText='I found '+str(count_max)+' '+str(Title)+' results... '+str(count_min)+' of them are fairly close to you:', dialogIdentifier="googlePlacesMap"), mapsnippet]
                     self.sendRequestWithoutAnswer(view)
                else:
-                    self.say("I'm sorry but I did not find any results for "+str(Title)+" near you!")
+                    if language == "fr-FR":
+                       self.say("Je suis désolé, je n'ai pas trouvé de résultats pour "+str(Title)+" près de vous!")
+                    else:
+                        self.say("I'm sorry but I did not find any results for "+str(Title)+" near you!")
           else:
-               self.say("I'm sorry but I did not find any results for "+str(Title)+" near you!")
+               if language == "fr-FR":
+                       self.say("Je suis désolé, je n'ai pas trouvé de résultats pour "+str(Title)+" près de vous!")
+               else:
+                        self.say("I'm sorry but I did not find any results for "+str(Title)+" near you!")
           self.complete_request()
