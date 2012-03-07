@@ -6,8 +6,9 @@ from datetime import date
 import locale 
 from plugin import *
 
-class talkToMe(Plugin):   
+class talkToMe(Plugin):  
         
+    @register("en-GB", ".*Your.*Status.*")    
     @register("de-DE", ".*Dein.*Status.*")
     @register("en-US", ".*Your.*Status.*")
     def ttm_uptime_status(self, speech, language):
@@ -21,6 +22,7 @@ class talkToMe(Plugin):
         self.complete_request()     
     
     
+    @register("en-GB", "(What Day.*)|(What.*Date.*)")
     @register("de-DE", "(Welcher Tag.*)|(Welches Datum.*)")
     @register("en-US", "(What Day.*)|(What.*Date.*)")
     
@@ -29,6 +31,10 @@ class talkToMe(Plugin):
         if language == 'de-DE':
             locale.setlocale(locale.LC_ALL, 'de_DE')
             result=now.strftime("Heute ist %A, der %d.%m.%Y (Kalenderwoche: %W)")
+            self.say(result)
+        else:
+            locale.setlocale(locale.LC_ALL, 'en-GB')
+            reult=now.strftime("Today is %A the %d.%m.%Y (Week: %W)")
             self.say(result)
         else:
             locale.setlocale(locale.LC_ALL, 'en_US')
