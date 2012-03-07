@@ -11,8 +11,8 @@ from siriObjects.uiObjects import AddViews, AssistantUtteranceView
 from siriObjects.systemObjects import DomainObject, ResultCallback
 from siriObjects.websearchObjects import WebSearch
 
-webSearchAnswerText = {"de": u"Das Web nach {0} durchsuchen …", "en": u"Searching the web for {0} …", "fr": u"Searching the web for {0} …"}
-webSearchAnswerFailureText = {"de": u"Entschuldigung, Ich, ich kann jetzt nicht das Web durchsuchen.", "en": u"Sorry but I cannot search the web right now.", "fr": u"Sorry but I cannot search the web right now."}
+webSearchAnswerText = {"de": u"Das Web nach {0} durchsuchen …", "en": u"Searching the web for {0} …", "fr": u"Je recherche sur internet {0} …"}
+webSearchAnswerFailureText = {"de": u"Entschuldigung, Ich, ich kann jetzt nicht das Web durchsuchen.", "en": u"Sorry but I cannot search the web right now.", "fr": u"Désolé, je ne peux rechercher sur internet pour le moment.."}
 class startRequestHandler(Plugin):    
 
     #we should provide a shortcut for this....
