@@ -57,7 +57,7 @@ def respond(self, input):
                               
 class chatBOT(Plugin):
 
-    @regester("en-GB", "let's chat")
+    @register("en-GB", "let's chat")
     @register("en-US", "Let's chat")
     def BOT_Message(self, speech, language):
         if language == 'en-US':
