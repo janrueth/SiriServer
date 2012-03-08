@@ -1,6 +1,14 @@
 Siri Server
 ===========
 
+Do you like this?
+-----------------
+If you like this piece of software you can help me by donating, I can afford new devices and so get deeper to the core of all of this. Make it even cooler.
+Or if you just want to give me a little credit for my work. But don't worry the code will remain free, you don't have to donate.
+
+[<img alt="PayPal — The safer, easier way to pay online." src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG_global.gif">](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=2E3TD99JETMA4)
+
+
 IMPORTANT
 ---------
 
