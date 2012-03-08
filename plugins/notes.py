@@ -47,14 +47,16 @@ class Create(ClientBoundCommand):
 
 class note(Plugin):
     localizations = {"noteDefaults": 
-                        {"searching":{"en-US": "Creating your note ...","fr-FR": u"Création de votre note..."}, 
-                         "result": {"en-US": "Here is your note:","fr-FR": "Voici votre note :"},
-                         "nothing": {"en-US": "What should I note?","fr-FR": "Que dois-je noter ?"}}, 
+                        {"searching":{"en-US": "Creating your note ...","fr-FR": u"Création de votre note...","en-GB": "Creating your note..."}, 
+                         "result": {"en-US": "Here is your note:","fr-FR": "Voici votre note :","en-GB": "Here is your note:"},
+                         "nothing": {"en-US": "What should I note?","fr-FR": "Que dois-je noter ?","en-GB": "What should I note?"}}, 
                     "failure": {
                                 "en-US": "I cannot type your note right now.",
-                                "fr-FR": "Je ne peux pas écrire votre note maintenant."
+                                "fr-FR": "Je ne peux pas écrire votre note maintenant.",
+                                "en-GB": "I cannot type your note right now."
                                 }
                     }
+    @register("en-GB", "(.*note [a-zA-Z0-9]+)|(.*create.*note [a-zA-Z0-9]+)|(.*write.*note [a-zA-Z0-9]+)")                
     @register("en-US", "(.*note [a-zA-Z0-9]+)|(.*create.*note [a-zA-Z0-9]+)|(.*write.*note [a-zA-Z0-9]+)")
     @register("fr-FR", u"(.*créer une note [a-zA-Z0-9]+)|(.*note [a-zA-Z0-9]+)")
     def writeNote(self, speech, language):

@@ -23,6 +23,7 @@ from siriObjects.answerObjects import AnswerSnippet, AnswerObject, AnswerObjectL
 
 class define(Plugin):
     
+    @register("en-GB", "(display|show me|show).*(picture|image|drawing|illustration) (of|an|a)* ([\w ]+)")
     @register("de-DE", "(zeig mir|zeige|zeig).*(bild|zeichnung) (vo. ein..|vo.|aus)* ([\w ]+)")
     @register("en-US", "(display|show me|show).*(picture|image|drawing|illustration) (of|an|a)* ([\w ]+)")
     @register("fr-FR", u"(montre|affiche|recherche|cherche|dessine)?.*(photos?|images?|dessins?|illustrations?) (une?|pour|de la|de l'|des|du|de|d'une?|d'|l')* ?([\w ]+)")

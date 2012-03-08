@@ -57,10 +57,16 @@ def respond(self, input):
                               
 class chatBOT(Plugin):
 
+
     @register("en-US", "(Let's chat)|(Let's talk)")
+    @register("en-GB", "let's chat")
+    @register("en-US", "Let's chat")
     def BOT_Message(self, speech, language):
         if language == 'en-US':
             answer = self.ask(u"Ok, Let's chat")
+            respond(self, answer)
+        if language == 'en-GB':
+            answer = self.ask(u"Ok, let's chat")
             respond(self, answer)
             #self.say(askBOT(speech))
 	    self.complete_request() 

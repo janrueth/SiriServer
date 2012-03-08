@@ -14,76 +14,87 @@ responses = {
 'notFound': 
     {'de-DE': u"Entschuldigung, ich konnte niemanden in deinem Telefonbuch finden der so heißt",
      'en-US': u"Sorry, I did not find a match in your phone book",
-     'fr-FR': u"Désolé, je n'ai trouvé aucune correspondance dans votre carnet d'adresse."
+     'fr-FR': u"Désolé, je n'ai trouvé aucune correspondance dans votre carnet d'adresse.",
+     'en-GB': u"Sorry, I did not find a match in your phone book"
     },
 'devel':
     {'de-DE': u"Entschuldigung, aber diese Funktion befindet sich noch in der Entwicklungsphase",
      'en-US': u"Sorry this feature is still under development",
-     'fr-FR': u"Désolé, cette fonctionnalité est encore en cours de développement."
+     'fr-FR': u"Désolé, cette fonctionnalité est encore en cours de développement.",
+     'en-GB': u"Sorry this feature is still under development"
     },
  'select':
     {'de-DE': u"Wen genau?", 
      'en-US': u"Which one?",
-     'fr-FR': u"Lequel ?"
+     'fr-FR': u"Lequel ?", 
+     'en-GB': u"Which one?"
     },
 'selectNumber':
     {'de-DE': u"Welche Telefonnummer für {0}",
      'en-US': u"Which phone one for {0}",
-     'fr-FR': u"Quel numéro pour {0}"
+     'fr-FR': u"Quel numéro pour {0}",
+     'en-GB': u"Which phone one for {0}"
     },
 'callPersonSpeak':
     {'de-DE': u"Rufe {0}, {1} an.",
      'en-US': u"Calling {0}, {1}.",
-     'fr-FR': u"Appel de {0}, {1}."
+     'fr-FR': u"Appel de {0}, {1}.",
+     'en-GB': u"Calling {0}, {1}."
     },
 'callPerson': 
     {'de-DE': u"Rufe {0}, {1} an: {2}",
      'en-US': u"Calling {0}, {1}: {2}",
-     'fr-FR': u"Appel de {0}, {1}: {2}"
+     'fr-FR': u"Appel de {0}, {1}: {2}",
+     'en-GB': u"Calling {0}, {1}: {2}"
     }
 }
 
 numberTypesLocalized= {
-'_$!<Mobile>!$_': {'en-US': u"mobile", 'de-DE': u"Handynummer", 'fr-FR': u"mobile"},
-'iPhone': {'en-US': u"iPhone", 'de-DE': u"iPhone-Nummer", 'fr-FR': u"iPhone"},
-'_$!<Home>!$_': {'en-US': u"home", 'de-DE': u"Privatnummer", 'fr-FR': u"domicile"},
-'_$!<Work>!$_': {'en-US': u"work", 'de-DE': u"Geschäftsnummer", 'fr-FR': u"bureau"},
-'_$!<Main>!$_': {'en-US': u"main", 'de-DE': u"Hauptnummer",'fr-FR': u"principal"},
-'_$!<HomeFAX>!$_': {'en-US': u"home fax", 'de-DE': u'private Faxnummer', 'fr-FR': u'fax domicile'},
-'_$!<WorkFAX>!$_': {'en-US': u"work fax", 'de-DE': u"geschäftliche Faxnummer", 'fr-FR': u"fax bureau"},
-'_$!<OtherFAX>!$_': {'en-US': u"_$!<OtherFAX>!$_", 'de-DE': u"_$!<OtherFAX>!$_", 'fr-FR': u"_$!<OtherFAX>!$_"},
-'_$!<Pager>!$_': {'en-US': u"pager", 'de-DE': u"Pagernummer", 'fr-FR': u"biper"},
-'_$!<Other>!$_':{'en-US': u"other phone", 'de-DE': u"anderes Telefon", 'fr-FR': u"autre"}
+'_$!<Mobile>!$_': {'en-US': u"mobile", 'de-DE': u"Handynummer", 'fr-FR': u"mobile", 'en-GB': u"mobile"},
+'iPhone': {'en-US': u"iPhone", 'de-DE': u"iPhone-Nummer", 'fr-FR': u"iPhone", 'en-GB': u"iPhone"},
+'_$!<Home>!$_': {'en-US': u"home", 'de-DE': u"Privatnummer", 'fr-FR': u"domicile", 'en-GB': u"home"},
+'_$!<Work>!$_': {'en-US': u"work", 'de-DE': u"Geschäftsnummer", 'fr-FR': u"bureau", 'en-GB': u"work"},
+'_$!<Main>!$_': {'en-US': u"main", 'de-DE': u"Hauptnummer",'fr-FR': u"principal", 'en-GB': u"main"},
+'_$!<HomeFAX>!$_': {'en-US': u"home fax", 'de-DE': u'private Faxnummer', 'fr-FR': u'fax domicile', 'en-GB': u"home fax"},
+'_$!<WorkFAX>!$_': {'en-US': u"work fax", 'de-DE': u"geschäftliche Faxnummer", 'fr-FR': u"fax bureau", 'en-GB': u"work fax"},
+'_$!<OtherFAX>!$_': {'en-US': u"_$!<OtherFAX>!$_", 'de-DE': u"_$!<OtherFAX>!$_", 'fr-FR': u"_$!<OtherFAX>!$_", 'en-GB': u"_$!<OtherFAX>!$_"},
+'_$!<Pager>!$_': {'en-US': u"pager", 'de-DE': u"Pagernummer", 'fr-FR': u"biper", 'en-GB': u"pager"},
+'_$!<Other>!$_':{'en-US': u"other phone", 'de-DE': u"anderes Telefon", 'fr-FR': u"autre", 'en-GB': u"other phone"}
 }
 
 namesToNumberTypes = {
 'de-DE': {'mobile': "_$!<Mobile>!$_", 'handy': "_$!<Mobile>!$_", 'zuhause': "_$!<Home>!$_", 'privat': "_$!<Home>!$_", 'arbeit': "_$!<Work>!$_"},
 'fr-FR': {'mobile': "_$!<Mobile>!$_", 'gsm': "_$!<Mobile>!$_", 'portable': "_$!<Mobile>!$_", 'domicile': "_$!<Home>!$_", 'maison': "_$!<Home>!$_", 'travail': "_$!<Work>!$_", 'boulot': "_$!<Work>!$_"},
-'en-US': {'work': "_$!<Work>!$_",'home': "_$!<Home>!$_", 'mobile': "_$!<Mobile>!$_"}
+'en-US': {'work': "_$!<Work>!$_",'home': "_$!<Home>!$_", 'mobile': "_$!<Mobile>!$_"},
+'en-GB': {'work': "_$!<Work>!$_",'home': "_$!<Home>!$_", 'mobile': "_$!<Mobile>!$_"}
 }
 
 speakableDemitter={
 'en-US': u", or ",
 'de-DE': u', oder ',
 'fr-FR': u', ou ',
+'en-GB': u", or ",
 }
 
 errorNumberTypes= {
 'de-DE': u"Ich habe dich nicht verstanden, versuch es bitte noch einmal.",
 'en-US': u"Sorry, I did not understand, please try again.",
-'fr-FR': u"Désolé, je n'ai pas compris, veuillez réessayer."
+'fr-FR': u"Désolé, je n'ai pas compris, veuillez réessayer.",
+'en-GB': u"Sorry, I did not understand, please try again."
 }
 
 errorNumberNotPresent= {
 'de-DE': u"Ich habe diese {0} von {1} nicht, aber eine andere.",
 'en-US': u"Sorry, I don't have a {0} number from {1}, but another.",
-'fr-FR': u"Désolé, je n'ai pas un numéro de {0} pour {1}, mais un autre."
+'fr-FR': u"Désolé, je n'ai pas un numéro de {0} pour {1}, mais un autre.",
+'en-GB': u"Sorry, I don't have a {0} number from {1}, but another."
 }
 
 InterruptCall= {
     'en-US': u".*(stop|cancel|none).*",
     'de-DE': u".*(stop|cancel|none).*",
-    'fr-FR': u".*(veu(t|x) plus|veu(x|t) plus|arr(ê|e)te|stop|annule|aucun|abandon).*"
+    'fr-FR': u".*(veu(t|x) plus|veu(x|t) plus|arr(ê|e)te|stop|annule|aucun|abandon).*",
+    'en-GB': u".*(stop|cancel|none).*"
 }
 
 InterruptCallResponse= {
@@ -132,7 +143,21 @@ errorOnCallResponse={'en-US':
                       {'dialogIdentifier': u"PhoneCall#fatalResponse",
                        'text': u"Désolé, je ne peux pas passer cet appel.",
                        'code': -1}
-                       ]
+                       ],
+                      'en-GB':
+                      [ 
+                      {'dialogIdentifier':u"PhoneCall#airplaneMode",
+                       'text': u"Your phone is in airplane mode.",
+                       'code': 1201},
+                      {'dialogIdentifier': u"PhoneCall#networkUnavailable",
+                       'text': u"Uh, I can't seem to find a good connection. Please try your phone call again when you have cellular access.",
+                       'code': 1202},
+                      {'dialogIdentifier': u"PhoneCall#invalidNumber",
+                       'text': u"Sorry, I can't call this number.",
+                       'code': 1203},
+                      {'dialogIdentifier': u"PhoneCall#fatalResponse",
+                       'text': u"Oh oh, I can't make your phone call.",
+                       'code': -1}],    
 }
 
 class phonecallPlugin(Plugin):
@@ -251,6 +276,7 @@ class phonecallPlugin(Plugin):
             lst.items.append(item)
         return root
     
+    @register("en-GB", "(make a )?call (to )?(?P<name>[\w ]+).*(?P<type>work|home|mobile|main|iPhone|pager)?")
     @register("de-DE", "ruf. (?P<name>[\w ]+).*(?P<type>arbeit|zuhause|privat|mobil|handy.*|iPhone.*|pager)? an")
     @register("en-US", "(make a )?call (to )?(?P<name>[\w ]+).*(?P<type>work|home|mobile|main|iPhone|pager)?")
     @register("fr-FR", u"(fai(s|t) un )?(appel|appelle|appeler?) (à )?(?P<name>[\w ]+).*(?P<type>travail|maison|mobile|gsm|iPhone|principal|biper)?")

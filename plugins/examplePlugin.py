@@ -6,6 +6,7 @@ from plugin import *
 
 class examplePlugin(Plugin):
     
+    @register("en-GB", ".*Meaning.*Life.*")
     @register("de-DE", ".*Sinn.*Leben.*")
     @register("en-US", ".*Meaning.*Life.*")
     def meaningOfLife(self, speech, language):
@@ -15,7 +16,8 @@ class examplePlugin(Plugin):
         else:
             self.say("I shouldn't tell you!")
         self.complete_request()
-
+        
+    @register("en-GB", ".*location.*test.*")
     @register("de-DE", ".*standort.*test.*")
     @register("en-US", ".*location.*test.*")
     def locationTest(self, speech, language):

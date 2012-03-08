@@ -22,6 +22,7 @@ class define(Plugin):
     # - Display movie info -
     # -------------------------------------------
     #@register("en-US",  "(movie [a-zA-Z0-9]+)")
+    @register("en-GB", "(movie)* ([\w ]+)")
     @register("en-US", "(movie)* ([\w ]+)")
     def imdb_info(self,  speech,  language,  regex):
         ShowTitle = regex.group(regex.lastindex)
@@ -52,6 +53,7 @@ class define(Plugin):
     # - Display poster info -
     # -------------------------------------------
     #@register("en-US",  "(poster [a-zA-Z0-9]+)")
+    @register("en-GB", "(poster)* ([\w ]+)")
     @register("en-US", "(poster)* ([\w ]+)")
     def imdb_poster(self,  speech,  language,  regex):
         ShowTitle = regex.group(regex.lastindex)

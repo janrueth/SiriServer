@@ -11,7 +11,8 @@ from urllib2 import urlopen
 from xml.dom import minidom
 
 class horoscope(Plugin):
-
+	
+        @register ("en-GB", "(Tell me the horoscope for [a-zA-Z]+)|(Horoscope for [a-zA-Z]+)|(Horoscope for [a-zA-Z]+)|(The horoscope for [a-zA-Z]+)")
 	@register ("en-US", "(Tell me the horoscope for [a-zA-Z]+)|(Horoscope for [a-zA-Z]+)|(Horoscope for [a-zA-Z]+)|(The horoscope for [a-zA-Z]+)")
 	def horoscope_zodiac(self, speech, language):
 	    zodiac = speech.replace('Tell me ','').replace('the ','').replace('The ', '').replace('horoscope','').replace('for ', '').replace('Horoscope ','').replace(' ','')
