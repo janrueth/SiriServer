@@ -13,6 +13,31 @@ from xml.dom import minidom
 class smalltalk(Plugin):
      
     #only english additions 
+    
+    @register("en-US", "what can you do")
+    def st_can_you_do(self, speech, language):
+        if language == 'en-US':            
+            self.say("I can do many things {0}.".format(self.user_name()))
+        self.complete_request()
+    
+    @register("en-US", ".*(sex)|(horny)|(sexy).*")
+    def st_sexual(self, speech, language):
+        if language == 'en-US':            
+            self.say("{0}, you have such a dirty mind.".format(self.user_name()))
+        self.complete_request()
+        
+    @register("en-US", "(help)|(please)")
+    def st_help(self, speech, language):
+        if language == 'en-US':            
+            self.say("How can I help you {0} ?".format(self.user_name()))
+        self.complete_request()   
+        
+    @register("en-US", "(How old are you)|(what is your age)")
+    def st_siri_age(self, speech, language):
+        if language == 'en-US':            
+            self.say("My first development version was released to public in February 2012. Do the math and you will find my age.")
+        self.complete_request()       
+    
     @register("en-US", ".*love .*me.*")
     def st_love_me(self, speech, language):
         if language == 'en-US':            
