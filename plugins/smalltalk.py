@@ -689,7 +689,7 @@ class smalltalk(Plugin):
         self.complete_request()
    
     @register("en-US",".*you.*blow.*me.*")
-    def st_blow_me(self, speech, langauge):
+    def st_blow_me(self, speech, language):
         if language == 'en-US':
             self.say("I'll pretend I didn't hear that.")
         self.complete_request()
