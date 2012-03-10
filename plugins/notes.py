@@ -57,7 +57,7 @@ class note(Plugin):
                                 }
                     }
     @register("en-US", "(.*not that [a-zA-Z0-9]+)(.*note that [a-zA-Z0-9]+)|(.*note [a-zA-Z0-9]+)|(.*create.*note [a-zA-Z0-9]+)|(.*write.*note [a-zA-Z0-9]+)")
-    @register("en-US", "(.*note that [a-zA-Z0-9]+)|(.*note [a-zA-Z0-9]+)|(.*create.*note [a-zA-Z0-9]+)|(.*write.*note [a-zA-Z0-9]+)")
+    @register("en-GB", "(.*note that [a-zA-Z0-9]+)|(.*note [a-zA-Z0-9]+)|(.*create.*note [a-zA-Z0-9]+)|(.*write.*note [a-zA-Z0-9]+)")
     @register("fr-FR", u"(.*créer une note [a-zA-Z0-9]+)|(.*note [a-zA-Z0-9]+)")
     def writeNote(self, speech, language):
         content_raw = re.match(".*note ([a-zA-Z0-9, ]+)$", speech, re.IGNORECASE)
