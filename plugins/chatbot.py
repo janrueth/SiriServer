@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-#by Daniel "P4r4doX" Zaťovič
+#by Daniel "P4r4doX" Zaťovič and a little by Jimmy Kane
 #Edited by boeaja
 
 from plugin import *
@@ -8,16 +8,16 @@ import urllib2
 from xml.dom.minidom import parseString
 
 #You can choose your own BOT here : http://pandorabots.com/botmaster/en/~1ce90ef1ac87f6dc9dce531~/mostactive
-# EVE
-botID = "a9481f8c7e347656"
+# EVE English
+botID_en = "a9481f8c7e347656"
 
-# A.L.I.C.E
-#botID = "f5d922d97e345aa1"
+# A.L.I.C.E German
+botID_de = "d227fbf14e34d947"
 
 
-
-def askBOT(input):	
+def askBOT(botID,input,language):	
 	#convert symbols to HEX
+        print  botID
         try:        
             input = input.replace(' ', '%20')
             input = input.replace('?', '%3F')
@@ -44,16 +44,24 @@ def askBOT(input):
             xmlData = xmlData.replace('Eve.', 'Siri.')
             return xmlData
         except:
-            return 'Sorry can you say that again, please ?'
-
-def respond(self, input):
+            if language == 'de-DE':           
+                return 'Entschuldigung?'
+            else:
+                return 'Sorry can you say that again, please ?'
+            
+def respond(self,botID, input,language):
     if input == 'Stop':
-        self.say("Nice to chat with you, see you next time {0}".format(self.user_name()))
-        self.complete_request()
+        
+        if language == 'de-DE':           
+            self.say(u"Gut, danke {0}".format(self.user_name()))                    
+        else:
+            self.say(u"Nice to chat with you, see you next time {0}".format(self.user_name()))        
+            
     else:
-        answer = self.ask(askBOT(input))
-        respond(self, answer)
-    self.complete_request()
+        answer = self.ask(askBOT(botID,input,language))
+        respond(self,botID,answer,language)
+        
+    self.complete_request()   
                               
 class chatBOT(Plugin):
 
@@ -61,12 +69,16 @@ class chatBOT(Plugin):
     @register("en-US", "(Let's chat)|(Let's talk)")
     @register("en-GB", "let's chat")
     @register("en-US", "Let's chat")
+    @register("de-DE", "(Ich will mit dir chatten)|(Ich will mit dir sprechen)")
     def BOT_Message(self, speech, language):
-        if language == 'en-US':
-            answer = self.ask(u"Ok, Let's chat")
-            respond(self, answer)
-        if language == 'en-GB':
+        if language == 'en-US':           
             answer = self.ask(u"Ok, let's chat")
-            respond(self, answer)
-            #self.say(askBOT(speech))
-	    self.complete_request() 
+            respond(self, botID_en ,answer,language)
+        if language == 'en-GB':            
+            answer = self.ask(u"Ok, let's chat")
+            respond(self,botID_en, answer,language)
+            #self.say(askBOT(speech))	    
+        if language == 'de-DE':            
+            answer = self.ask(u"Ok.")
+            respond(self,botID_de, answer,language)
+        self.complete_request() 
