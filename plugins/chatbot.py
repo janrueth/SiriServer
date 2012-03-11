@@ -2,17 +2,14 @@
 # -*- coding: utf-8 -*-
 #by Daniel "P4r4doX" Zaťovič and a little by Jimmy Kane
 #Edited by boeaja
-import re
+
 from plugin import *
 import urllib2 
 from xml.dom.minidom import parseString
 
 #You can choose your own BOT here : http://pandorabots.com/botmaster/en/~1ce90ef1ac87f6dc9dce531~/mostactive
 # EVE English
-#botID_en = "a9481f8c7e347656"
-
-#SIRI 
-botID_en="ae8206713e34cb2e"
+botID_en = "a9481f8c7e347656"
 
 # A.L.I.C.E German
 botID_de = "d227fbf14e34d947"
@@ -61,24 +58,26 @@ def respond(self,botID, input,language):
             self.say(u"Nice to chat with you, see you next time {0}".format(self.user_name()))        
             
     else:
-        answer = self.say(askBOT(botID,input,language))      
+        answer = self.ask(askBOT(botID,input,language))
+        respond(self,botID,answer,language)
         
     self.complete_request()   
                               
 class chatBOT(Plugin):
 
 
-    @register("en-US", "(.*)")
-    @register("en-GB", "(.*)")    
-    @register("de-DE", "(.*)")
-    def BOT_Message(self, speech, language,regex):
-        if language == 'en-US':
-            answer = regex.group(regex.lastindex).strip()
+    @register("en-US", "(Let's chat)|(Let's talk)")
+    @register("en-GB", "(Let's chat)|(Let's talk)")
+    @register("de-DE", "(Ich will mit dir chatten)|(Ich will mit dir sprechen)")
+    def BOT_Message(self, speech, language):
+        if language == 'en-US':           
+            answer = self.ask(u"Ok, let's chat")
             respond(self, botID_en ,answer,language)
         if language == 'en-GB':            
-            answer = regex.group(regex.lastindex).strip()
-            respond(self,botID_en, answer,language)            
+            answer = self.ask(u"Ok, let's chat")
+            respond(self,botID_en, answer,language)
+            #self.say(askBOT(speech))	    
         if language == 'de-DE':            
-            answer = regex.group(regex.lastindex).strip()
+            answer = self.ask(u"Ok.")
             respond(self,botID_de, answer,language)
-        self.complete_request() 
+        self.complete_request()
