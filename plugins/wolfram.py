@@ -27,7 +27,7 @@ APPID = APIKeyForAPI("wolframalpha")
 
 class wolfram(Plugin):
     
-    @register("de-DE", "(Was ist [a-zA-Z0-9]+)|(Wer ist [a-zA-Z0-9]+)|(Wie viel [a-zA-Z0-9]+)|(Was war [a-zA-Z0-9]+)|(Wer ist [a-zA-Z0-9]+)|(Wie lang [a-zA-Z0-9]+)|(Was ist [a-zA-Z0-9]+)|(Wie weit [a-zA-Z0-9]+)|(Wann ist [a-zA-Z0-9]+)|(Zeig mir [a-zA-Z0-9]+)|(Wie hoch [a-zA-Z0-9]+)|(Wie tief [a-zA-Z0-9]+)")     
+    @register("de-DE", u"(Was ist [a-zA-Z0-9]+)|(Wer ist [a-zA-Z0-9]+)|(Wie viel [a-zA-Z0-9]+)|(Was war [a-zA-Z0-9]+)|(Wer ist [a-zA-Z0-9]+)|(Wie lang [a-zA-Z0-9]+)|(Was ist [a-zA-Z0-9]+)|(Wie weit [a-zA-Z0-9]+)|(Wann ist [a-zA-Z0-9]+)|(Zeig mir [a-zA-Z0-9]+)|(Wie hoch [a-zA-Z0-9]+)|(Wie tief [a-zA-Z0-9]+)")     
     @register("en-US", "(What is [a-zA-Z0-9]+)|(Who is [a-zA-Z0-9]+)|(How many [a-zA-Z0-9]+)|(What was [a-zA-Z0-9]+)|(Who's [a-zA-Z0-9]+)|(How long [a-zA-Z0-9]+)|(What's [a-zA-Z0-9]+)|(How far [a-zA-Z0-9]+)|(When is [a-zA-Z0-9]+)|(Show me [a-zA-Z0-9]+)|(How high [a-zA-Z0-9]+)|(How deep [a-zA-Z0-9]+)")
     def wolfram(self, speech, language):
         if language == "en-US":
@@ -140,7 +140,7 @@ class wolfram(Plugin):
                   wolfram_pod8 = pod.getAttribute('title')
                count_wolfram += 1
         if language == 'de-DE':
-            self.say("Dies könnte Ihre Frage zu beantworten:")
+            self.say(u"Dies könnte Ihre Frage zu beantworten:")
         else:
             self.say("This might answer your question:")
         view = AddViews(self.refId, dialogPhase="Completion")
@@ -189,7 +189,7 @@ class wolfram(Plugin):
                 self.say("Sorry I can't process your request. Your APPID is not set! Please register free dev account at http://wolframalpha.com and edit line 21 with you APPID.")
             else:
                 if language == 'de-DE':
-                    self.say("Es tut mir leid. Ich konnte keine Antwort auf Ihre Frage finden.")
+                    self.say(u"Es tut mir leid. Ich konnte keine Antwort auf Ihre Frage finden.")
                 else:
                     self.say("Nothing has found for your query!")
             self.complete_request()
