@@ -282,10 +282,10 @@ class phonecallPlugin(Plugin):
     @register("fr-FR", u"(fai(s|t) un )?(appel|appelle|appeler?) (à )?(?P<name>[\w ]+).*(?P<type>travail|maison|mobile|gsm|iPhone|principal|biper)?")
     def makeCall(self, speech, language, regex):
         personToCall = regex.group('name')
-        print "PersonToCall : "+personToCall
+        #print "PersonToCall : "+personToCall
         numberType = str.lower(regex.group('type')) if type in regex.groupdict() else None
         numberType = self.getNumberTypeForName(numberType, language)
-        print u"numberType : " +str(numberType)
+        #print u"numberType : " +str(numberType)
         persons = self.searchUserByName(personToCall)
         print "Persons : "
         for person in persons:
