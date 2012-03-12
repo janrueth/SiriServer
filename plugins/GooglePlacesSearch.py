@@ -19,7 +19,7 @@ from siriObjects.localsearchObjects import Business, MapItem, MapItemSnippet, Ra
 googleplaces_api_key = APIKeyForAPI("google")
  
 class googlePlacesSearch(Plugin):
-     @register("en-US", "(find|show|where).* (nearest|nearby|closest) (.*)")
+     @register("en-US", "(find|show|where).* (find|nearest|nearby|closest) (.*)")
      @register("en-GB", "(find|show|where).* (nearest|nearby|closest) (.*)")
      @register("fr-FR", "(trouves|trouve|cherche|où).* (près|proche) (.*)")
      def googleplaces_search(self, speech, language, regex):
