@@ -425,7 +425,7 @@ class smalltalk(Plugin):
             self.say("Hummus. Compost. Pumice. Mud. Gravel.")
         self.complete_request()
    
-    @register("en-US", ".*bury.*dead.*body.*")
+    @register("en-US", ".*(bury|dump).*dead.*body.*")
     def st_deadbody(self, speech, language):
         if language == 'en-US':
             self.say("dumps")
