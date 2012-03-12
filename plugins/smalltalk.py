@@ -257,7 +257,7 @@ class smalltalk(Plugin):
         elif language == 'fr-FR':
             self.say("Non merci, je suis amoureux de l'iPhone blanc de ton ami.");
         else:
-            self.say("No thank you, I'm in love with the black iPhone from you friend.")
+            self.say("No thank you, I'm in love with the black iPhone from your friend.")
         self.complete_request()
 
     @register("de-DE", u".*erzähl.*Witz.*")
