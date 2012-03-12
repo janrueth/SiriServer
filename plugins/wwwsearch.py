@@ -9,7 +9,7 @@ class wwwSearch(Plugin):
     @register("de-DE", "(websuche.*)|(web suche.*)|(internetsuche.*)|(internet suche.*)|(web.*)|(internet.*)")
     @register("en-US", "(web search.*)|(web.*)|(internet.*)|(internet search.*)")
     @register("fr-FR", u".*(recherche web de|rechercher? sur internet|chercher? sur internet|recherche de|rechercher?|chercher?|google|trouver?)(.*)(?!wiki(pedia)?)$")    
-    def webSearch(self, speech, language):
+    def webSearch(self, speech, language,regex):
         if (language == "en-GB"):
             if (speech.find('web search') == 0):
                 speech = speech.replace('web search', ' ',1)
