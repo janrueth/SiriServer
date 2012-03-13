@@ -1,7 +1,7 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
-# by Alex 'apexad' Martin
-# help from: muhkuh0815 & gaVRos
+# -*- coding: utf-8 -*- 
+#by Alex 'apexad' Martin
+#help from: muhkuh0815 & gaVRos
 
 import re
 import urllib2, urllib
@@ -15,7 +15,7 @@ from siriObjects.baseObjects import AceObject, ClientBoundCommand
 from siriObjects.systemObjects import GetRequestOrigin,Location
 from siriObjects.uiObjects import AddViews, AssistantUtteranceView
 from siriObjects.localsearchObjects import Business, MapItem, MapItemSnippet, Rating
-
+ 
 googleplaces_api_key = APIKeyForAPI("google")
  
 class googlePlacesSearch(Plugin):
@@ -38,6 +38,8 @@ class googlePlacesSearch(Plugin):
                response = json.loads(jsonString)
                if (response['status'] == 'OK') and (len(response['results'])):
                     googleplaces_results = []
+                    response['results'] = sorted(response['results'], key=lambda result: self.haversine_distance(result['geometry']['location']['lat'],result['geometry']['location']['lng'],latitude,longitude))
+
                     for result in response['results']:
                          if "rating" in result:
                               avg_rating = result["rating"]
@@ -62,3 +64,18 @@ class googlePlacesSearch(Plugin):
           else:
                self.say("I'm sorry but I did not find any results for "+str(Title)+" near you!")
           self.complete_request()
+     def haversine_distance(self, lat1, lon1, lat2, lon2):
+          RAD_PER_DEG = 0.017453293
+          Rkm = 6371
+          dlon = lon2-lon1
+          dlat = lat2-lat1
+          dlon_rad = dlon*RAD_PER_DEG
+          dlat_rad = dlat*RAD_PER_DEG
+          lat1_rad = lat1*RAD_PER_DEG
+          lon1_rad = lon1*RAD_PER_DEG
+          lat2_rad = lat2*RAD_PER_DEG
+          lon2_rad = lon2*RAD_PER_DEG
+        
+          a = (math.sin(dlat_rad/2))**2 + math.cos(lat1_rad) * math.cos(lat2_rad) * (math.sin(dlon_rad/2))**2
+          c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+          return round(Rkm * c,2)
