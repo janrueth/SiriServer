@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #need help? ask john-dev
+#updated version to work with SiriServerCore by cytec
  
 import re
 import urllib2, urllib
@@ -9,23 +10,20 @@ import json
  
 from plugin import *
  
-from siriObjects.baseObjects import AceObject, ClientBoundCommand
-from siriObjects.systemObjects import GetRequestOrigin
+from siriObjects.systemObjects import GetRequestOrigin, Location
 from siriObjects.uiObjects import AddViews, AssistantUtteranceView
-from siriObjects.mapObjects import SiriLocation, SiriMapItem, SiriMapItemSnippet
+from siriObjects.localsearchObjects import MapItem, MapItemSnippet
 
 geonames_user="test2"
  
 class whereAmI(Plugin):
     
-    @register("de-DE", "(Wo bin ich.*)")    
+    @register("de-DE", "(Wo bin ich.*)")
+    @register("fr-FR", u'(Où suis-je.*)')    
     @register("en-US", "(Where am I.*)|(What is my location.*)")
-    @register("fr-FR", u'(Où suis-je.*)')
     def whereAmI(self, speech, language):
-        mapGetLocation = self.getCurrentLocation()
-        latitude = mapGetLocation.latitude
-        longitude = mapGetLocation.longitude
-        url = u"http://maps.googleapis.com/maps/api/geocode/json?latlng={0},{1}&sensor=false&language={2}".format(str(latitude),str(longitude), language)
+        location = self.getCurrentLocation(force_reload=True,accuracy=GetRequestOrigin.desiredAccuracyBest)
+        url = "http://maps.googleapis.com/maps/api/geocode/json?latlng={0},{1}&sensor=false&language={2}".format(str(location.latitude),str(location.longitude), language)
         try:
             jsonString = urllib2.urlopen(url, timeout=3).read()
         except:
@@ -53,22 +51,8 @@ class whereAmI(Plugin):
                 else:
                     self.say("This is your location {0}".format(self.user_name()))
                     the_header="Your location"
-                Location=SiriLocation(the_header, street, city, stateLong, countryCode, postalCode, latitude, longitude)
-                mapsnippet = SiriMapItemSnippet(items=[SiriMapItem(the_header, Location)])
-                view.views = [AssistantUtteranceView(text=the_header, dialogIdentifier="Map"), mapsnippet]
-                self.sendRequestWithoutAnswer(view)
-            else:
-                if language=="de-DE":
-                    self.say('Die Googlemaps informationen waren ungenügend!','Fehler')
-                elif language == 'fr-FR':
-                    self.say(u"La réponse de Googlemaps ne contient pas l'information nécessaire",'Erreur')
-                else:
-                    self.say('The Googlemaps response did not hold the information i need!','Error')
-        else:
-            if language=="de-DE":
-                self.say('Ich konnte keine Verbindung zu Googlemaps aufbauen','Fehler')
-            if language=="fr-FR":
-                self.say(u"Je ne peux pas établir de connexion à Googlemaps",'Erreur')
-            else:
-                self.say('Could not establish a conenction to Googlemaps','Error');
+        view = AddViews(self.refId, dialogPhase="Completion")
+        mapsnippet = MapItemSnippet(items=[MapItem(label=postalCode+" "+city, street=street, city=city, postalCode=postalCode, latitude=location.latitude, longitude=location.longitude, detailType="CURRENT_LOCATION")])
+        view.views = [AssistantUtteranceView(speakableText=the_header, dialogIdentifier="Map#whereAmI"), mapsnippet]
+        self.sendRequestWithoutAnswer(view)
         self.complete_request()
