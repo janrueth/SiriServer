@@ -22,13 +22,11 @@ from siriObjects.answerObjects import AnswerSnippet, AnswerObject, AnswerObjectL
 
 APPID = APIKeyForAPI("wolframalpha")
 
-
-
-
 class wolfram(Plugin):
     
-    @register("de-DE", "(Was ist [a-zA-Z0-9]+)|(Wer ist [a-zA-Z0-9]+)|(Wie viel [a-zA-Z0-9]+)|(Was war [a-zA-Z0-9]+)|(Wer ist [a-zA-Z0-9]+)|(Wie lang [a-zA-Z0-9]+)|(Was ist [a-zA-Z0-9]+)|(Wie weit [a-zA-Z0-9]+)|(Wann ist [a-zA-Z0-9]+)|(Zeig mir [a-zA-Z0-9]+)|(Wie hoch [a-zA-Z0-9]+)|(Wie tief [a-zA-Z0-9]+)")     
-    @register("en-US", "(What is [a-zA-Z0-9]+)|(Who is [a-zA-Z0-9]+)|(How many [a-zA-Z0-9]+)|(What was [a-zA-Z0-9]+)|(Who's [a-zA-Z0-9]+)|(How long [a-zA-Z0-9]+)|(What's [a-zA-Z0-9]+)|(How far [a-zA-Z0-9]+)|(When is [a-zA-Z0-9]+)|(Show me [a-zA-Z0-9]+)|(How high [a-zA-Z0-9]+)|(How deep [a-zA-Z0-9]+)")
+    @register("de-DE", ".*")     
+    @register("en-US", ".*")
+    
     def wolfram(self, speech, language):
         if language == "en-US":
             wolframQuestion = speech.replace('who is ','').replace('what is ','').replace('what was ','').replace('Who is ','').replace('What is ','').replace('What was ','').replace(' ', '%20')
@@ -78,72 +76,71 @@ class wolfram(Plugin):
         query_type = query_list.getAttribute('error')
         for node in dom.getElementsByTagName('queryresult'):
             for pod in node.getElementsByTagName('pod'):
-               xmlTag = dom.getElementsByTagName('plaintext')[count_wolfram].toxml()
-               xmlTag2 = dom.getElementsByTagName('subpod')[count_wolfram]
-               xmlData=xmlTag.replace('<plaintext>','').replace('</plaintext>','')
-               if count_wolfram == 0:
-                  if xmlData == "<plaintext/>":
-                      image_list = dom.getElementsByTagName('img')[count_wolfram]
-                      image_type = image_list.getAttribute('src')
-                      wolfram0 = image_type
-                      wolfram0_img = 1
-                  else:
-                      wolfram0 = xmlData
-                  wolfram_pod0 = pod.getAttribute('title')
-               elif count_wolfram == 1:
-                  if xmlData == "<plaintext/>":
-                      image_list = dom.getElementsByTagName('img')[count_wolfram]
-                      image_type = image_list.getAttribute('src')
-                      wolfram1 = image_type
-                      wolfram1_img = 1
-                  else:
-                      wolfram1 = xmlData
-                  wolfram_pod1 = pod.getAttribute('title')
-               elif count_wolfram == 2:
-                  if xmlData == "<plaintext/>":
-                     image_list = dom.getElementsByTagName('img')[count_wolfram]
-                     image_type = image_list.getAttribute('src')
-                     wolfram2 = image_type
-                     wolfram2_img = 1
-                  else:
-                     wolfram2 = xmlData
-                  wolfram_pod2 = pod.getAttribute('title')
-               elif count_wolfram == 3:
-                  if xmlData == "<plaintext/>":
-                     image_list = dom.getElementsByTagName('img')[count_wolfram]
-                     image_type = image_list.getAttribute('src')
-                     wolfram3 = image_type
-                     wolfram3_img = 1
-                  else:
-                     wolfram3 = xmlData
-                  wolfram_pod3 = pod.getAttribute('title')
-               elif count_wolfram == 4:
-                  if xmlData == "<plaintext/>":
-                     image_list = dom.getElementsByTagName('img')[count_wolfram]
-                     image_type = image_list.getAttribute('src')
-                     wolfram4 = image_type
-                     wolfram4_img = 1
-                  else:
-                     wolfram4 = xmlData
-                  wolfram_pod4 = pod.getAttribute('title')
-               elif count_wolfram == 5:
-                  wolfram5 = xmlData
-                  wolfram_pod5 = pod.getAttribute('title')
-               elif count_wolfram == 6:
-                  wolfram6 = xmlData
-                  wolfram_pod6 = pod.getAttribute('title')
-               elif count_wolfram == 7:
-                  wolfram7 = xmlData
-                  wolfram_pod7 = pod.getAttribute('title')
-               elif count_wolfram == 8:
-                  wolfram8 = xmlData
-                  wolfram_pod8 = pod.getAttribute('title')
-               count_wolfram += 1
+                xmlTag = dom.getElementsByTagName('plaintext')[count_wolfram].toxml()
+                xmlTag2 = dom.getElementsByTagName('subpod')[count_wolfram]
+                xmlData=xmlTag.replace('<plaintext>','').replace('</plaintext>','')
+                if count_wolfram == 0:
+                    if xmlData == "<plaintext/>":
+                        image_list = dom.getElementsByTagName('img')[count_wolfram]
+                        image_type = image_list.getAttribute('src')
+                        wolfram0 = image_type
+                        wolfram0_img = 1
+                    else:
+                        wolfram0 = xmlData
+                    wolfram_pod0 = pod.getAttribute('title')
+                elif count_wolfram == 1:
+                    if xmlData == "<plaintext/>":
+                        image_list = dom.getElementsByTagName('img')[count_wolfram]
+                        image_type = image_list.getAttribute('src')
+                        wolfram1 = image_type
+                        wolfram1_img = 1
+                    else:
+                        wolfram1 = xmlData
+                    wolfram_pod1 = pod.getAttribute('title')
+                elif count_wolfram == 2:
+                    if xmlData == "<plaintext/>":
+                        image_list = dom.getElementsByTagName('img')[count_wolfram]
+                        image_type = image_list.getAttribute('src')
+                        wolfram2 = image_type
+                        wolfram2_img = 1
+                    else:
+                        wolfram2 = xmlData
+                    wolfram_pod2 = pod.getAttribute('title')
+                elif count_wolfram == 3:
+                    if xmlData == "<plaintext/>":
+                        image_list = dom.getElementsByTagName('img')[count_wolfram]
+                        image_type = image_list.getAttribute('src')
+                        wolfram3 = image_type
+                        wolfram3_img = 1
+                    else:
+                        wolfram3 = xmlData
+                    wolfram_pod3 = pod.getAttribute('title')
+                elif count_wolfram == 4:
+                    if xmlData == "<plaintext/>":
+                        image_list = dom.getElementsByTagName('img')[count_wolfram]
+                        image_type = image_list.getAttribute('src')
+                        wolfram4 = image_type
+                        wolfram4_img = 1
+                    else:
+                        wolfram4 = xmlData
+                    wolfram_pod4 = pod.getAttribute('title')
+                elif count_wolfram == 5:
+                    wolfram5 = xmlData
+                    wolfram_pod5 = pod.getAttribute('title')
+                elif count_wolfram == 6:
+                    wolfram6 = xmlData
+                    wolfram_pod6 = pod.getAttribute('title')
+                elif count_wolfram == 7:
+                    wolfram7 = xmlData
+                    wolfram_pod7 = pod.getAttribute('title')
+                elif count_wolfram == 8:
+                    wolfram8 = xmlData
+                    wolfram_pod8 = pod.getAttribute('title')
+                count_wolfram += 1
         if language == 'de-DE':
             self.say("Dies könnte Ihre Frage zu beantworten:")
         else:
-            self.say("This might answer your question:")
-        view = AddViews(self.refId, dialogPhase="Completion")
+            view = AddViews(self.refId, dialogPhase="Completion")
         if wolfram_pod0 != 12:
             if wolfram0_img == 1:
                 wolframAnswer = AnswerObject(title=wolfram_pod0,lines=[AnswerObjectLine(image=wolfram0)])
@@ -191,7 +188,8 @@ class wolfram(Plugin):
                 if language == 'de-DE':
                     self.say("Es tut mir leid. Ich konnte keine Antwort auf Ihre Frage finden.")
                 else:
-                    self.say("Nothing has found for your query!")
+                    self.say("Sorry, I did not understand your question!")
+            
             self.complete_request()
             view1 = 0
         elif wolfram_pod1 == 12:
