@@ -115,7 +115,7 @@ class XBMC(Plugin):
                     xbmc.play(json,{'file':trailer})
                 else:
                     self.say("It seems that there is no trailer available for this movie.")
-            elif 'play' in command or 'plate' in command or 'place' in command or 'played' in command or 'start' in command:
+            elif 'play' in command or 'plate' in command or 'place' in command or 'played' in command:
                 command, title=command.split(' ',1)
                 if 'first occurrence' in title:
                     first_match = True
