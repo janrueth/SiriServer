@@ -104,7 +104,7 @@ You can install both via `easy_install`,
 easy_install is available at [http://pypi.python.org/pypi/setuptools](http://pypi.python.org/pypi/setuptools),
 on Linux you can also get it via your packet manager:
 
-	sudo apt-get install python-setuptools
+	sudo apt-get install python-setuptools libevent-dev python-dev swig
 
 After you installed it, run:
 
