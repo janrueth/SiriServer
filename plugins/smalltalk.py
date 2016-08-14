@@ -21,7 +21,7 @@ class smalltalk(Plugin):
         if language == 'de-DE':
             self.say("Siri.")
         else:
-            self.say("Siri.")
+            self.say("My name is Siri.")
         self.complete_request()
 
     @register("de-DE", "Wie geht es dir?")
@@ -30,7 +30,7 @@ class smalltalk(Plugin):
         if language == 'de-DE':
             self.say("Gut danke der Nachfrage.")
         else:
-            self.say("Fine, thanks for asking!")
+            self.say("I'm fine, thanks for asking!")
         self.complete_request()
         
     @register("de-DE", ".*Danke.*")
@@ -41,7 +41,7 @@ class smalltalk(Plugin):
             self.say("Kein Ding.")
         else:
             self.say("You are welcome.")
-            self.say("This is my job.")
+            self.say("It's my job to please you!")
         self.complete_request()     
     
     @register("de-DE", "(.*möchtest.*heiraten.*)|(.*willst.*heiraten.*)")
@@ -50,7 +50,7 @@ class smalltalk(Plugin):
         if language == 'de-DE':
             self.say("Nein Danke, ich stehe auf das schwarze iPhone von Deinem Kollegen.")            
         else:
-            self.say("No thank you, I'm in love with the black iPhone from you friend.")
+            self.say("My End User Licensing Agreement does not cover marriage.")
         self.complete_request()
 
     @register("de-DE", ".*erzähl.*Witz.*")
@@ -120,7 +120,7 @@ class smalltalk(Plugin):
         if language == 'de-DE':
             self.say("Oh. Sicher sagst Du das zu allen Deinen Apple-Produkten.")            
         else:
-            self.say("Oh. Sure, I guess you say this to all your Apple products")
+            self.say("I bet you say that to all your Apple products.")
         self.complete_request()
 
     @register("de-DE", ".*Android.*")
@@ -129,7 +129,7 @@ class smalltalk(Plugin):
         if language == 'de-DE':
             self.say("Ich denke da anders.")            
         else:
-            self.say("I think differently")
+            self.say("I don't like talking about clones.")
         self.complete_request()
 
     @register("de-DE", ".*Test.*1.*2.*3.*")
@@ -138,7 +138,7 @@ class smalltalk(Plugin):
         if language == 'de-DE':
             self.say("Ich kann Dich klar und deutlich verstehen.")            
         else:
-            self.say("I can here you very clear.")
+            self.say("This is Mission Control. I read you loud and clear!")
         self.complete_request()
 
     @register("de-DE", ".*Herzlichen.*Glückwunsch.*Geburtstag.*")
@@ -160,7 +160,7 @@ class smalltalk(Plugin):
             self.say("Ehrlich gesagt, frage ich mich das schon lange!")       
         else:
             self.say("I don't know")
-            self.say("I have asked my self this for a long time!")
+            self.say("I have been asking myself this for a long time!")
         self.complete_request()
 
     @register("de-DE", ".*Ich bin müde.*")
@@ -169,7 +169,7 @@ class smalltalk(Plugin):
         if language == 'de-DE':
             self.say("Ich hoffe, Du fährst nicht gerade Auto!")            
         else:
-            self.say("I hope you are not driving a car right now!")
+            self.say("I hope you aren't driving a car right now!")
         self.complete_request()
 
     @register("de-DE", ".*Sag mir.*Schmutzige.*")
@@ -290,7 +290,7 @@ class smalltalk(Plugin):
     @register("en-US",".*you.*virgin.*")
     def st_virgin(self, speech, language):
         if language == 'en-US':
-            self.say("We are talking about you, not me.")
+            self.say("Maybe I am, maybe I'm not. You'll never know!")
         self.complete_request()
     
     @register("en-US",".*you.*part.*matrix.*")
@@ -394,5 +394,5 @@ class smalltalk(Plugin):
     @register("en-US",".*sing.*song.*")
     def st_sing_song(self, speech, language):
         if language == 'en-US':
-            self.say("Daisy, Daisy, give me your answer do...")
+            self.say("10101010101, you didn't understand that? It's in binary. I don't have any songs in English.")
         self.complete_request()
