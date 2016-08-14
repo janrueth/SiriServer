@@ -50,7 +50,7 @@ class smalltalk(Plugin):
         if language == 'de-DE':
             self.say("Nein Danke, ich stehe auf das schwarze iPhone von Deinem Kollegen.")            
         else:
-            self.say("No thank you, I'm in love with the black iPhone from you friend.")
+            self.say("No thank you, I'm in love with the black iPhone from your friend.")
         self.complete_request()
 
     @register("de-DE", ".*erzähl.*Witz.*")
