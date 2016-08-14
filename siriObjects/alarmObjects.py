@@ -4,31 +4,33 @@ from siriObjects.uiObjects import Snippet
 
 
 class AlarmObject(DomainObject):
-    def __init__(self, label = None, minute = None, hour = None, frequency = None, enabled = None):
-        super(AlarmObject, self).__init__("com.apple.ace.alarm")
+    def __init__(self, identifier="", hour=None, minute=None, enabled=None, frequency=None):
+        super(AlarmObject, self).__init__("com.apple.ace.alarm", identifier)
         self.relativeOffsetMinutes = None
-        self.label = label
-        self.minute = minute
+        self.label = None
         self.hour = hour
+        self.minute = minute
         self.frequency = frequency
-        self.enabled = 1
+        self.enabled = enabled
     
     def to_plist(self):
         self.add_property('relativeOffsetMinutes')
-        self.add_property('minute')
         self.add_property('label')
         self.add_property('hour')
+        self.add_property('minute')
         self.add_property('frequency')
         self.add_property('enabled')
         return super(AlarmObject, self).to_plist()
 
 class AlarmCreate(ClientBoundCommand):
-    def __init__(self, refId, alarm = None):
+    def __init__(self, refId, alarmToCreate=None):
         super(AlarmCreate, self).__init__("Create", "com.apple.ace.alarm", None, refId)      
-        self.alarmToCreate = alarm
+        self.alarmToCreate = alarmToCreate
+        self.targetAppId = None
     
     def to_plist(self):
         self.add_property('alarmToCreate')
+        self.add_property('targetAppId')
         return super(AlarmCreate, self).to_plist()
 
 class AlarmCreateCompleted(ServerBoundCommand):
@@ -58,12 +60,12 @@ class AlarmDeleteCompleted(ServerBoundCommand):
 
 
 class AlarmSearch(ClientBoundCommand):
-    def __init__(self, refId):
+    def __init__(self, refId, hour = None, minute = None):
         super(AlarmSearch, self).__init__("Search", "com.apple.ace.alarm", None, refId)
-        self.minute = None # number
+        self.minute = minute # number
         self.label = None # string
         self.identifier = None #url
-        self.hour = None #number
+        self.hour = hour #number
         self.frequency = None #array
         self.enabled = None # number
         self.targetAppId = None # url
@@ -88,23 +90,23 @@ class AlarmSearchCompleted(ServerBoundCommand):
 
 
 class AlarmSnippet(Snippet):                
-    def __init__(self, alarms = None):
+    def __init__(self, alarms=None):
         super(AlarmSnippet, self).__init__("com.apple.ace.alarm")
-        self.alarms = alarms if alarms != None else []
+        self.alarms = alarms # array
     
     def to_plist(self):
         self.add_property('alarms')
         return super(AlarmSnippet, self).to_plist()
-        
+
 class AlarmUpdate(ClientBoundCommand):
-    def __init__(self, refId):
+    def __init__(self, refId, alarmId=None, hour=None, minute=None):
         super(AlarmUpdate, self).__init__("Update", "com.apple.ace.alarm", None, refId)
         self.removedFrequency = None # array
-        self.minute = None # number
+        self.minute = minute # number
         self.label = None #string
-        self.hour = None # number
+        self.hour = hour # number
         self.enabled = None # number
-        self.alarmId = None # url
+        self.alarmId = alarmId # url
         self.addedFrequency = None # array
         self.targetAppId = None # url
 
